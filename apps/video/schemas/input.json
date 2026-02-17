@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "url"],
+  "properties": {
+    "type": { "const": "video" },
+    "version": { "const": "1.0" },
+    "url": { "type": "string" },
+    "title": { "type": "string" },
+    "autoplay": { "type": "boolean", "default": false },
+    "muted": { "type": "boolean", "default": false },
+    "loop": { "type": "boolean", "default": false },
+    "poster": { "type": "string" },
+    "startTime": { "type": "number", "minimum": 0 }
+  }
+}

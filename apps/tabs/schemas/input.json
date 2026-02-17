@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "tabs"],
+  "properties": {
+    "type": { "const": "tabs" },
+    "version": { "const": "1.0" },
+    "activeTab": { "type": "string" },
+    "tabs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "viewUrl", "structuredContent"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "icon": { "type": "string" },
+          "viewUrl": { "type": "string" },
+          "structuredContent": {}
+        }
+      }
+    }
+  }
+}

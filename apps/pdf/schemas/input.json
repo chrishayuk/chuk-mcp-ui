@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "url"],
+  "properties": {
+    "type": { "const": "pdf" },
+    "version": { "const": "1.0" },
+    "url": { "type": "string" },
+    "initialPage": { "type": "integer", "minimum": 1, "default": 1 },
+    "title": { "type": "string" }
+  }
+}

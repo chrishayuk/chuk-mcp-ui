@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "layers"],
+  "properties": {
+    "type": { "const": "map" },
+    "version": { "const": "1.0" },
+    "center": {
+      "type": "object",
+      "properties": {
+        "lat": { "type": "number" },
+        "lon": { "type": "number" }
+      },
+      "required": ["lat", "lon"]
+    },
+    "zoom": { "type": "integer", "minimum": 1, "maximum": 22 },
+    "bounds": {
+      "type": "object",
+      "properties": {
+        "south": { "type": "number" },
+        "west": { "type": "number" },
+        "north": { "type": "number" },
+        "east": { "type": "number" }
+      },
+      "required": ["south", "west", "north", "east"]
+    },
+    "basemap": { "enum": ["osm", "satellite", "terrain", "dark"] },
+    "layers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "features"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "visible": { "type": "boolean", "default": true },
+          "opacity": { "type": "number", "minimum": 0, "maximum": 1 },
+          "features": { "type": "object" },
+          "style": {
+            "type": "object",
+            "properties": {
+              "color": { "type": "string" },
+              "weight": { "type": "number" },
+              "fillColor": { "type": "string" },
+              "fillOpacity": { "type": "number" },
+              "icon": { "type": "string" },
+              "radius": { "type": "number" }
+            }
+          },
+          "cluster": {
+            "type": "object",
+            "properties": {
+              "enabled": { "type": "boolean" },
+              "radius": { "type": "integer", "default": 50 }
+            }
+          },
+          "popup": {
+            "type": "object",
+            "required": ["title"],
+            "properties": {
+              "title": { "type": "string" },
+              "body": { "type": "string" },
+              "fields": { "type": "array", "items": { "type": "string" } },
+              "actions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["label", "tool", "arguments"],
+                  "properties": {
+                    "label": { "type": "string" },
+                    "tool": { "type": "string" },
+                    "arguments": {
+                      "type": "object",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    "confirm": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "controls": {
+      "type": "object",
+      "properties": {
+        "zoom": { "type": "boolean", "default": true },
+        "layers": { "type": "boolean", "default": true },
+        "scale": { "type": "boolean", "default": true },
+        "fullscreen": { "type": "boolean", "default": false }
+      }
+    }
+  }
+}

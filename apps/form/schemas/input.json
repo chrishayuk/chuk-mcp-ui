@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "schema", "submitTool"],
+  "properties": {
+    "type": { "const": "form" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "schema": { "type": "object" },
+    "uiSchema": { "type": "object" },
+    "initialValues": { "type": "object" },
+    "submitTool": { "type": "string" },
+    "submitLabel": { "type": "string" },
+    "cancelable": { "type": "boolean" },
+    "layout": { "enum": ["vertical", "horizontal"] }
+  }
+}

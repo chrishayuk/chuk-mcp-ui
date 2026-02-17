@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "left", "right"],
+  "properties": {
+    "type": { "const": "split" },
+    "version": { "const": "1.0" },
+    "direction": { "enum": ["horizontal", "vertical"], "default": "horizontal" },
+    "ratio": { "type": "string", "default": "50:50" },
+    "left": { "$ref": "#/definitions/SplitPanel" },
+    "right": { "$ref": "#/definitions/SplitPanel" }
+  },
+  "definitions": {
+    "SplitPanel": {
+      "type": "object",
+      "required": ["viewUrl", "structuredContent"],
+      "properties": {
+        "label": { "type": "string" },
+        "viewUrl": { "type": "string" },
+        "structuredContent": {}
+      }
+    }
+  }
+}

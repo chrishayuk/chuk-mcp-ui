@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "chartType", "data"],
+  "properties": {
+    "type": { "const": "chart" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "subtitle": { "type": "string" },
+    "chartType": {
+      "enum": ["bar", "line", "scatter", "pie", "doughnut", "area", "radar", "bubble"]
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "values"],
+        "properties": {
+          "label": { "type": "string" },
+          "values": { "type": "array" },
+          "color": { "type": "string" },
+          "backgroundColor": { "type": "string" },
+          "fill": { "type": "boolean" },
+          "type": { "type": "string" },
+          "borderWidth": { "type": "number" },
+          "tension": { "type": "number" }
+        }
+      }
+    },
+    "xAxis": {
+      "type": "object",
+      "properties": {
+        "label": { "type": "string" },
+        "type": { "enum": ["linear", "logarithmic", "category", "time"] },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "stacked": { "type": "boolean" }
+      }
+    },
+    "yAxis": {
+      "type": "object",
+      "properties": {
+        "label": { "type": "string" },
+        "type": { "enum": ["linear", "logarithmic", "category", "time"] },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "stacked": { "type": "boolean" }
+      }
+    },
+    "legend": {
+      "type": "object",
+      "properties": {
+        "position": { "enum": ["top", "bottom", "left", "right", "none"] }
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "enum": ["line", "label"] },
+          "axis": { "enum": ["x", "y"] },
+          "value": {},
+          "label": { "type": "string" },
+          "color": { "type": "string" }
+        }
+      }
+    },
+    "interactive": { "type": "boolean", "default": true }
+  }
+}
