@@ -67,7 +67,7 @@ interface Panel {
 Depends on child Views' CSP requirements.
 
 ## Size Budget
-Target: < 150KB. Actual: 538KB / 142KB gzip
+Target: < 150KB. Actual: 692 KB / 191 KB gzip (includes Tailwind CSS + shadcn/ui + Framer Motion)
 
 ## Test Cases
 
@@ -103,3 +103,11 @@ Target: < 150KB. Actual: 538KB / 142KB gzip
 - MUST support being embedded as a child in another composition View
 - MUST handle dynamic panel count (1 panel, many panels)
 - MUST isolate child Views within their own iframe contexts
+
+## Storybook Stories
+
+Story file: `apps/dashboard/src/Dashboard.stories.tsx`
+
+| Story | Description |
+|-------|-------------|
+| FourPanelGrid | Grid layout with 4 labeled panels (about:blank iframes) |

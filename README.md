@@ -153,11 +153,22 @@ Cross-View communication is built in — click a map marker, the table highlight
 
 ```bash
 pnpm install
-pnpm build        # Build all 10 Views (Turbo parallel)
-pnpm test         # Run all tests
-pnpm type-check   # TypeScript strict checking
-pnpm dev          # Dev servers with hot reload
+pnpm build            # Build all 10 Views (Turbo parallel)
+pnpm test             # Run all tests (183 tests)
+pnpm type-check       # TypeScript strict checking
+pnpm dev              # Dev servers with hot reload
+pnpm storybook        # Storybook dev server on port 6006
+pnpm build-storybook  # Static Storybook build
 ```
+
+### Storybook
+
+72 stories across 25 groups cover every component and View:
+
+- **15 component stories** — Button, Card, Badge, Input, Select, Checkbox, RadioGroup, Slider, Textarea, Label, Table, Tabs, ScrollArea, Separator, Tooltip
+- **10 View stories** — DataTable, DynamicForm, ChartRenderer, Markdown, Video, PDF, MapView, Dashboard, Split, Tabs
+
+Theme toggle (light/dark) in the toolbar via `applyTheme()`. Run `pnpm storybook` to browse.
 
 ### Monorepo Structure
 
@@ -176,6 +187,8 @@ chuk-mcp-ui/
     tabs/           @chuk/view-tabs
   packages/
     shared/         Shared utilities (lifecycle, theme, actions, fallback)
+    ui/             Design system (Tailwind v4 + shadcn/ui + Framer Motion)
+  .storybook/       Storybook config (main, preview, theme decorator)
   examples/
     demo-server/    Python MCP server (all 10 Views, hosted on Fly.io)
     python-heritage/ Python heritage exploration example

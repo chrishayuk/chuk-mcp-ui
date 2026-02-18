@@ -1,11 +1,23 @@
 import { useState, useCallback } from "react";
-import { useView, Fallback, CSS_VARS } from "@chuk/view-shared";
-import type {
-  FormContent,
-  FieldSchema,
-  FieldUI,
-  FieldGroup,
-} from "./schema";
+import { useView, Fallback } from "@chuk/view-shared";
+import { motion } from "framer-motion";
+import { fadeIn } from "@chuk/view-ui/animations";
+import {
+  Button,
+  Input,
+  Label,
+  Textarea,
+  Checkbox,
+  RadioGroup,
+  RadioGroupItem,
+  Slider,
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@chuk/view-ui";
+import type { FormContent, FieldSchema, FieldUI, FieldGroup } from "./schema";
 
 export function FormView() {
   const { data, content, callTool, isConnected } =
@@ -17,12 +29,12 @@ export function FormView() {
   return <DynamicForm data={data} onCallTool={callTool} />;
 }
 
-interface DynamicFormProps {
+export interface DynamicFormProps {
   data: FormContent;
   onCallTool: (name: string, args: Record<string, unknown>) => Promise<void>;
 }
 
-function DynamicForm({ data, onCallTool }: DynamicFormProps) {
+export function DynamicForm({ data, onCallTool }: DynamicFormProps) {
   const { schema, uiSchema, initialValues, submitTool, submitLabel, title, description } = data;
   const [values, setValues] = useState<Record<string, unknown>>(
     () => initialValues ?? buildDefaults(schema)
@@ -61,10 +73,16 @@ function DynamicForm({ data, onCallTool }: DynamicFormProps) {
   const groups = uiSchema?.groups;
 
   return (
-    <div style={styles.container}>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        {title && <h2 style={styles.title}>{title}</h2>}
-        {description && <p style={styles.description}>{description}</p>}
+    <div className="h-full overflow-auto font-sans text-foreground bg-background">
+      <motion.form
+        onSubmit={handleSubmit}
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+        className="max-w-[600px] mx-auto p-6"
+      >
+        {title && <h2 className="mb-1 text-lg font-semibold">{title}</h2>}
+        {description && <p className="mb-5 text-sm text-muted-foreground">{description}</p>}
 
         {groups ? (
           groups.map((group) => (
@@ -93,12 +111,12 @@ function DynamicForm({ data, onCallTool }: DynamicFormProps) {
           ))
         )}
 
-        <div style={styles.actions}>
-          <button type="submit" disabled={submitting} style={styles.submitBtn}>
+        <div className="mt-6 flex gap-2">
+          <Button type="submit" disabled={submitting}>
             {submitting ? "Submitting..." : submitLabel ?? "Submit"}
-          </button>
+          </Button>
         </div>
-      </form>
+      </motion.form>
     </div>
   );
 }
@@ -121,9 +139,9 @@ function FieldGroupSection({
   const [collapsed, setCollapsed] = useState(group.collapsed ?? false);
 
   return (
-    <fieldset style={styles.fieldset}>
+    <fieldset className="border rounded-lg p-4 mb-4">
       <legend
-        style={styles.legend}
+        className="text-sm font-semibold cursor-pointer select-none px-1"
         onClick={() => group.collapsible && setCollapsed((c) => !c)}
       >
         {group.collapsible && (collapsed ? "\u25b6 " : "\u25bc ")}
@@ -169,84 +187,97 @@ function FieldRenderer({
   const widget = ui?.widget ?? inferWidget(fieldSchema);
 
   return (
-    <div style={styles.field}>
+    <div className="mb-4">
       {widget !== "checkbox" && (
-        <label htmlFor={fieldKey} style={styles.label}>
+        <Label htmlFor={fieldKey}>
           {label}
-          {required && <span style={styles.required}> *</span>}
-        </label>
+          {required && <span className="text-destructive"> *</span>}
+        </Label>
       )}
 
       {widget === "textarea" ? (
-        <textarea
+        <Textarea
           id={fieldKey}
           value={String(value ?? "")}
           onChange={(e) => onChange(e.target.value)}
           placeholder={ui?.placeholder}
           disabled={ui?.disabled}
           readOnly={ui?.readonly}
-          style={{ ...styles.input, minHeight: "80px", resize: "vertical" as const }}
+          className="min-h-[80px] resize-y"
         />
       ) : widget === "select" ? (
-        <select
-          id={fieldKey}
+        <Select
           value={String(value ?? "")}
-          onChange={(e) => onChange(coerceValue(fieldSchema, e.target.value))}
+          onValueChange={(v) => onChange(coerceValue(fieldSchema, v))}
           disabled={ui?.disabled}
-          style={styles.input}
         >
-          <option value="">{ui?.placeholder ?? "Select..."}</option>
-          {fieldSchema.enum?.map((opt, i) => (
-            <option key={String(opt)} value={String(opt)}>
-              {fieldSchema.enumLabels?.[i] ?? String(opt)}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger id={fieldKey}>
+            <SelectValue placeholder={ui?.placeholder ?? "Select..."} />
+          </SelectTrigger>
+          <SelectContent>
+            {fieldSchema.enum?.map((opt, i) => (
+              <SelectItem key={String(opt)} value={String(opt)}>
+                {fieldSchema.enumLabels?.[i] ?? String(opt)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       ) : widget === "radio" ? (
-        <div style={styles.radioGroup}>
+        <RadioGroup
+          value={String(value ?? "")}
+          onValueChange={(v) => onChange(v)}
+          disabled={ui?.disabled}
+        >
           {fieldSchema.enum?.map((opt, i) => (
-            <label key={String(opt)} style={styles.radioLabel}>
-              <input
-                type="radio"
-                name={fieldKey}
-                value={String(opt)}
-                checked={value === opt}
-                onChange={() => onChange(opt)}
-                disabled={ui?.disabled}
-              />
-              {fieldSchema.enumLabels?.[i] ?? String(opt)}
-            </label>
+            <div key={String(opt)} className="flex items-center gap-2">
+              <RadioGroupItem value={String(opt)} id={`${fieldKey}-${opt}`} />
+              <Label htmlFor={`${fieldKey}-${opt}`} className="font-normal">
+                {fieldSchema.enumLabels?.[i] ?? String(opt)}
+              </Label>
+            </div>
           ))}
-        </div>
+        </RadioGroup>
       ) : widget === "checkbox" ? (
-        <label style={styles.checkboxLabel}>
-          <input
-            type="checkbox"
+        <div className="flex items-center gap-2">
+          <Checkbox
             id={fieldKey}
             checked={Boolean(value)}
-            onChange={(e) => onChange(e.target.checked)}
+            onCheckedChange={(checked) => onChange(checked)}
             disabled={ui?.disabled}
           />
-          {label}
-          {required && <span style={styles.required}> *</span>}
-        </label>
+          <Label htmlFor={fieldKey} className="font-normal">
+            {label}
+            {required && <span className="text-destructive"> *</span>}
+          </Label>
+        </div>
       ) : widget === "slider" ? (
-        <div style={styles.sliderWrap}>
-          <input
-            type="range"
+        <div className="flex items-center gap-3">
+          <Slider
             id={fieldKey}
             min={fieldSchema.minimum ?? 0}
             max={fieldSchema.maximum ?? 100}
-            value={Number(value ?? fieldSchema.minimum ?? 0)}
-            onChange={(e) => onChange(Number(e.target.value))}
+            value={[Number(value ?? fieldSchema.minimum ?? 0)]}
+            onValueChange={([v]) => onChange(v)}
             disabled={ui?.disabled}
-            style={{ flex: 1 }}
+            className="flex-1"
           />
-          <span style={styles.sliderValue}>{String(value ?? 0)}</span>
+          <span className="text-sm min-w-[40px] text-right">{String(value ?? 0)}</span>
         </div>
       ) : (
-        <input
-          type={widget === "number" ? "number" : widget === "password" ? "password" : widget === "date" ? "date" : widget === "datetime" ? "datetime-local" : widget === "color" ? "color" : "text"}
+        <Input
+          type={
+            widget === "number"
+              ? "number"
+              : widget === "password"
+                ? "password"
+                : widget === "date"
+                  ? "date"
+                  : widget === "datetime"
+                    ? "datetime-local"
+                    : widget === "color"
+                      ? "color"
+                      : "text"
+          }
           id={fieldKey}
           value={String(value ?? "")}
           onChange={(e) =>
@@ -261,12 +292,11 @@ function FieldRenderer({
           readOnly={ui?.readonly}
           min={fieldSchema.minimum}
           max={fieldSchema.maximum}
-          style={styles.input}
         />
       )}
 
-      {ui?.help && <p style={styles.help}>{ui.help}</p>}
-      {error && <p style={styles.error}>{error}</p>}
+      {ui?.help && <p className="mt-1 text-xs text-muted-foreground">{ui.help}</p>}
+      {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
     </div>
   );
 }
@@ -327,80 +357,3 @@ function validate(
   }
   return errors;
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    height: "100%",
-    overflow: "auto",
-    fontFamily: `var(${CSS_VARS.fontFamily})`,
-    color: `var(${CSS_VARS.colorText})`,
-    backgroundColor: `var(${CSS_VARS.colorBackground})`,
-  },
-  form: {
-    maxWidth: "600px",
-    margin: "0 auto",
-    padding: "24px",
-  },
-  title: { margin: "0 0 4px", fontSize: "18px", fontWeight: 600 },
-  description: {
-    margin: "0 0 20px",
-    fontSize: "14px",
-    color: `var(${CSS_VARS.colorTextSecondary})`,
-  },
-  field: { marginBottom: "16px" },
-  label: {
-    display: "block",
-    marginBottom: "4px",
-    fontSize: "14px",
-    fontWeight: 500,
-  },
-  required: { color: "#e63946" },
-  input: {
-    width: "100%",
-    padding: "8px 12px",
-    border: `1px solid var(${CSS_VARS.colorBorder})`,
-    borderRadius: `var(${CSS_VARS.borderRadius})`,
-    backgroundColor: `var(${CSS_VARS.colorSurface})`,
-    color: `var(${CSS_VARS.colorText})`,
-    fontSize: "14px",
-    boxSizing: "border-box" as const,
-  },
-  radioGroup: { display: "flex", flexDirection: "column" as const, gap: "6px" },
-  radioLabel: { display: "flex", alignItems: "center", gap: "6px", fontSize: "14px" },
-  checkboxLabel: { display: "flex", alignItems: "center", gap: "8px", fontSize: "14px" },
-  sliderWrap: { display: "flex", alignItems: "center", gap: "12px" },
-  sliderValue: { fontSize: "14px", minWidth: "40px", textAlign: "right" as const },
-  help: {
-    margin: "4px 0 0",
-    fontSize: "12px",
-    color: `var(${CSS_VARS.colorTextSecondary})`,
-  },
-  error: { margin: "4px 0 0", fontSize: "12px", color: "#e63946" },
-  fieldset: {
-    border: `1px solid var(${CSS_VARS.colorBorder})`,
-    borderRadius: `var(${CSS_VARS.borderRadius})`,
-    padding: "16px",
-    marginBottom: "16px",
-  },
-  legend: {
-    fontSize: "14px",
-    fontWeight: 600,
-    cursor: "pointer",
-    userSelect: "none" as const,
-  },
-  actions: {
-    marginTop: "24px",
-    display: "flex",
-    gap: "8px",
-  },
-  submitBtn: {
-    padding: "10px 24px",
-    border: "none",
-    borderRadius: `var(${CSS_VARS.borderRadius})`,
-    backgroundColor: `var(${CSS_VARS.colorPrimary})`,
-    color: "#fff",
-    fontSize: "14px",
-    fontWeight: 500,
-    cursor: "pointer",
-  },
-};

@@ -55,7 +55,7 @@ interface SplitPanel {
 Depends on child Views.
 
 ## Size Budget
-Target: < 150KB. Actual: 537KB / 142KB gzip
+Target: < 150KB. Actual: 691 KB / 191 KB gzip (includes Tailwind CSS + shadcn/ui)
 
 ## Test Cases
 
@@ -87,3 +87,12 @@ Target: < 150KB. Actual: 537KB / 142KB gzip
 - MUST render right panel as an iframe with its `viewUrl` as src
 - MUST support being embedded as a child in dashboard or tabs Views
 - MUST isolate child Views within their own iframe contexts
+
+## Storybook Stories
+
+Story file: `apps/split/src/Split.stories.tsx`
+
+| Story | Description |
+|-------|-------------|
+| Horizontal | 60:40 horizontal split |
+| Vertical | 50:50 vertical split |

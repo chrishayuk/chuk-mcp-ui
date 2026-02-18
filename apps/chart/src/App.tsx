@@ -22,7 +22,7 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import { useView, Fallback, CSS_VARS } from "@chuk/view-shared";
+import { useView, Fallback } from "@chuk/view-shared";
 import type { ChartContent, ChartDataset, DataPoint } from "./schema";
 
 ChartJS.register(
@@ -63,7 +63,7 @@ export function ChartView() {
   return <ChartRenderer data={data} />;
 }
 
-function ChartRenderer({ data }: { data: ChartContent }) {
+export function ChartRenderer({ data }: { data: ChartContent }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<ChartJS | null>(null);
 
@@ -171,19 +171,7 @@ function ChartRenderer({ data }: { data: ChartContent }) {
   }, [data]);
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        padding: "16px",
-        boxSizing: "border-box",
-        fontFamily: `var(${CSS_VARS.fontFamily})`,
-        backgroundColor: `var(${CSS_VARS.colorBackground})`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
+    <div className="w-full h-full p-4 font-sans bg-background flex items-center justify-center">
       <canvas ref={canvasRef} />
     </div>
   );

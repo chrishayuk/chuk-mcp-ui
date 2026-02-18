@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/*
+ * Theme bridge: maps --chuk-* runtime CSS variables (set by packages/shared/theme.ts)
+ * to Tailwind v4 design tokens. This lets shadcn/ui components and Tailwind utility
+ * classes like bg-background, text-foreground, etc. resolve to the host's theme.
+ *
+ * Dark mode works automatically — applyTheme("dark") changes the --chuk-* values,
+ * and these tokens cascade without needing Tailwind's dark: variant.
+ */
+
+@theme {
+  --color-background: var(--chuk-color-background, #ffffff);
+  --color-foreground: var(--chuk-color-text, #1a1a1a);
+
+  --color-primary: var(--chuk-color-primary, #3388ff);
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: var(--chuk-color-surface, #f5f5f5);
+  --color-secondary-foreground: var(--chuk-color-text, #1a1a1a);
+
+  --color-muted: var(--chuk-color-surface, #f5f5f5);
+  --color-muted-foreground: var(--chuk-color-text-secondary, #666666);
+
+  --color-accent: var(--chuk-color-surface, #f5f5f5);
+  --color-accent-foreground: var(--chuk-color-text, #1a1a1a);
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: var(--chuk-color-border, #e0e0e0);
+  --color-input: var(--chuk-color-border, #e0e0e0);
+  --color-ring: var(--chuk-color-primary, #3388ff);
+
+  --color-card: var(--chuk-color-background, #ffffff);
+  --color-card-foreground: var(--chuk-color-text, #1a1a1a);
+
+  --color-popover: var(--chuk-color-background, #ffffff);
+  --color-popover-foreground: var(--chuk-color-text, #1a1a1a);
+
+  --color-surface: var(--chuk-color-surface, #f5f5f5);
+
+  --font-family-sans: var(
+    --chuk-font-family,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif
+  );
+
+  --radius-sm: calc(var(--chuk-border-radius, 6px) * 0.5);
+  --radius-md: var(--chuk-border-radius, 6px);
+  --radius-lg: calc(var(--chuk-border-radius, 6px) * 1.5);
+  --radius-xl: calc(var(--chuk-border-radius, 6px) * 2);
+}

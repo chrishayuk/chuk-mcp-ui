@@ -146,15 +146,15 @@ async def list_heritage_sites() -> dict:
             "filterable": True,
             "exportable": True,
             "columns": [
-                {"key": "name", "label": "Name", "sortable": True},
+                {"key": "name", "label": "Name", "sortable": True, "width": "30%"},
                 {
                     "key": "designation",
                     "label": "Designation",
                     "type": "badge",
                     "badgeColors": DESIGNATION_COLORS,
                 },
-                {"key": "grade", "label": "Grade", "sortable": True},
-                {"key": "nhle_id", "label": "NHLE ID"},
+                {"key": "grade", "label": "Grade", "sortable": True, "align": "center"},
+                {"key": "nhle_id", "label": "NHLE ID", "align": "right"},
             ],
             "rows": [
                 {

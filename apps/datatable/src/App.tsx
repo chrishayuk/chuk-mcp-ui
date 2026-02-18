@@ -1,5 +1,20 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { useView, Fallback, resolveTemplates, CSS_VARS } from "@chuk/view-shared";
+import { useView, Fallback, resolveTemplates } from "@chuk/view-shared";
+import {
+  Button,
+  Input,
+  Badge,
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+  ScrollArea,
+  cn,
+} from "@chuk/view-ui";
+import { motion } from "framer-motion";
+import { fadeIn } from "@chuk/view-ui/animations";
 import type { DataTableContent, Column, RowAction } from "./schema";
 
 export function DataTableView() {
@@ -17,12 +32,12 @@ export function DataTableView() {
   return <DataTable data={data} onCallTool={callTool} />;
 }
 
-interface DataTableProps {
+export interface DataTableProps {
   data: DataTableContent;
   onCallTool: (name: string, args: Record<string, unknown>) => Promise<void>;
 }
 
-function DataTable({ data, onCallTool }: DataTableProps) {
+export function DataTable({ data, onCallTool }: DataTableProps) {
   const {
     title,
     columns,
@@ -135,140 +150,143 @@ function DataTable({ data, onCallTool }: DataTableProps) {
   );
 
   return (
-    <div style={styles.container}>
+    <div className="flex flex-col h-full font-sans text-foreground bg-background">
       {(title || filterable || exportable) && (
-        <div style={styles.toolbar}>
-          {title && <h2 style={styles.title}>{title}</h2>}
-          <div style={styles.toolbarRight}>
+        <div className="flex items-center justify-between px-4 py-3 border-b flex-wrap gap-2">
+          {title && <h2 className="m-0 text-base font-semibold">{title}</h2>}
+          <div className="flex items-center gap-2">
             {filterable && (
-              <input
+              <Input
                 type="text"
                 placeholder="Filter..."
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                style={styles.filterInput}
+                className="w-48"
                 aria-label="Filter table"
               />
             )}
             {exportable && (
-              <button onClick={handleExport} style={styles.exportBtn}>
+              <Button variant="outline" size="sm" onClick={handleExport}>
                 Export CSV
-              </button>
+              </Button>
             )}
           </div>
         </div>
       )}
-      <div style={styles.tableWrap}>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              {columns.map((col) => (
-                <th
-                  key={col.key}
-                  style={{
-                    ...styles.th,
-                    width: col.width,
-                    textAlign: col.align ?? "left",
-                    cursor: sortable && col.sortable !== false ? "pointer" : "default",
-                  }}
-                  onClick={() =>
-                    sortable && col.sortable !== false && handleSort(col.key)
-                  }
-                  aria-sort={
-                    sortKey === col.key
-                      ? sortDir === "asc"
-                        ? "ascending"
-                        : "descending"
-                      : undefined
-                  }
-                >
-                  {col.label}
-                  {sortKey === col.key && (
-                    <span style={styles.sortIndicator}>
-                      {sortDir === "asc" ? " \u25b2" : " \u25bc"}
-                    </span>
-                  )}
-                </th>
-              ))}
-              {actions && actions.length > 0 && (
-                <th style={styles.th}>Actions</th>
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {sortedRows.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={columns.length + (actions ? 1 : 0)}
-                  style={styles.emptyCell}
-                >
-                  {filter ? "No matching rows." : "No data."}
-                </td>
-              </tr>
-            ) : (
-              sortedRows.map((row, i) => {
-                const rowId = String(row.nhle_id ?? row.id ?? "");
-                const isHighlighted = rowId && rowId === highlightedId;
-                return (
-                <tr
-                  key={i}
-                  ref={isHighlighted ? highlightRef : undefined}
-                  style={{
-                    ...styles.tr,
-                    backgroundColor: isHighlighted
-                      ? `color-mix(in srgb, var(${CSS_VARS.colorPrimary}) 15%, transparent)`
-                      : undefined,
-                    cursor: rowId ? "pointer" : undefined,
-                  }}
-                  onClick={() => {
-                    if (rowId && panelId) {
-                      setHighlightedId(rowId);
-                      window.parent.postMessage(
-                        {
-                          __chuk_panel_id: panelId,
-                          __chuk_event: "row-click",
-                          nhle_id: rowId,
-                          properties: row,
-                        },
-                        "*"
-                      );
+      <ScrollArea className="flex-1">
+        <motion.div variants={fadeIn} initial="hidden" animate="visible">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {columns.map((col) => (
+                  <TableHead
+                    key={col.key}
+                    style={{ width: col.width, textAlign: col.align ?? "left" }}
+                    className={cn(
+                      "sticky top-0 bg-muted font-semibold text-xs uppercase tracking-wider select-none whitespace-nowrap",
+                      sortable && col.sortable !== false && "cursor-pointer"
+                    )}
+                    onClick={() =>
+                      sortable && col.sortable !== false && handleSort(col.key)
                     }
-                  }}
-                >
-                  {columns.map((col) => (
-                    <td
-                      key={col.key}
-                      style={{
-                        ...styles.td,
-                        textAlign: col.align ?? "left",
+                    aria-sort={
+                      sortKey === col.key
+                        ? sortDir === "asc"
+                          ? "ascending"
+                          : "descending"
+                        : undefined
+                    }
+                  >
+                    {col.label}
+                    {sortKey === col.key && (
+                      <span className="text-[10px] ml-0.5">
+                        {sortDir === "asc" ? " \u25b2" : " \u25bc"}
+                      </span>
+                    )}
+                  </TableHead>
+                ))}
+                {actions && actions.length > 0 && (
+                  <TableHead className="sticky top-0 bg-muted font-semibold text-xs uppercase tracking-wider select-none whitespace-nowrap">
+                    Actions
+                  </TableHead>
+                )}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {sortedRows.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length + (actions ? 1 : 0)}
+                    className="py-8 text-center text-muted-foreground"
+                  >
+                    {filter ? "No matching rows." : "No data."}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                sortedRows.map((row, i) => {
+                  const rowId = String(row.nhle_id ?? row.id ?? "");
+                  const isHighlighted = rowId && rowId === highlightedId;
+                  return (
+                    <TableRow
+                      key={i}
+                      ref={isHighlighted ? highlightRef : undefined}
+                      className={cn(
+                        "border-b transition-colors",
+                        isHighlighted && "bg-primary/15",
+                        rowId && "cursor-pointer"
+                      )}
+                      onClick={() => {
+                        if (rowId && panelId) {
+                          setHighlightedId(rowId);
+                          window.parent.postMessage(
+                            {
+                              __chuk_panel_id: panelId,
+                              __chuk_event: "row-click",
+                              nhle_id: rowId,
+                              properties: row,
+                            },
+                            "*"
+                          );
+                        }
                       }}
                     >
-                      <CellValue column={col} value={row[col.key]} />
-                    </td>
-                  ))}
-                  {actions && actions.length > 0 && (
-                    <td style={styles.td}>
-                      <div style={styles.actionGroup}>
-                        {actions.map((action, ai) => (
-                          <button
-                            key={ai}
-                            onClick={() => handleAction(action, row)}
-                            style={styles.actionBtn}
-                          >
-                            {action.label}
-                          </button>
-                        ))}
-                      </div>
-                    </td>
-                  )}
-                </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-      <div style={styles.footer}>
+                      {columns.map((col) => (
+                        <TableCell
+                          key={col.key}
+                          className={cn(
+                            col.align === "right" && "text-right",
+                            col.align === "center" && "text-center"
+                          )}
+                        >
+                          <CellValue column={col} value={row[col.key]} />
+                        </TableCell>
+                      ))}
+                      {actions && actions.length > 0 && (
+                        <TableCell>
+                          <div className="flex gap-1">
+                            {actions.map((action, ai) => (
+                              <Button
+                                key={ai}
+                                variant="ghost"
+                                size="sm"
+                                className="text-xs"
+                                onClick={() => handleAction(action, row)}
+                              >
+                                {action.label}
+                              </Button>
+                            ))}
+                          </div>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </motion.div>
+      </ScrollArea>
+      <div className="px-4 py-2 text-xs text-muted-foreground border-t">
         {sortedRows.length} of {rows.length} rows
         {filter && ` (filtered)`}
       </div>
@@ -278,14 +296,18 @@ function DataTable({ data, onCallTool }: DataTableProps) {
 
 function CellValue({ column, value }: { column: Column; value: unknown }) {
   if (value === null || value === undefined) {
-    return <span style={styles.nullValue}>—</span>;
+    return <span className="text-muted-foreground">&mdash;</span>;
   }
 
   switch (column.type) {
     case "badge": {
       const str = String(value);
-      const color = column.badgeColors?.[str] ?? `var(${CSS_VARS.colorPrimary})`;
-      return <span style={{ ...styles.badge, backgroundColor: color }}>{str}</span>;
+      const color = column.badgeColors?.[str] ?? undefined;
+      return (
+        <Badge className="text-white" style={{ backgroundColor: color }}>
+          {str}
+        </Badge>
+      );
     }
     case "boolean":
       return <span>{value ? "\u2713" : "\u2717"}</span>;
@@ -295,7 +317,7 @@ function CellValue({ column, value }: { column: Column; value: unknown }) {
           href={String(value)}
           target="_blank"
           rel="noopener noreferrer"
-          style={styles.link}
+          className="text-primary hover:underline no-underline"
         >
           {String(value)}
         </a>
@@ -314,121 +336,3 @@ function CellValue({ column, value }: { column: Column; value: unknown }) {
       return <span>{String(value)}</span>;
   }
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    height: "100%",
-    fontFamily: `var(${CSS_VARS.fontFamily})`,
-    color: `var(${CSS_VARS.colorText})`,
-    backgroundColor: `var(${CSS_VARS.colorBackground})`,
-  },
-  toolbar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "12px 16px",
-    borderBottom: `1px solid var(${CSS_VARS.colorBorder})`,
-    flexWrap: "wrap",
-    gap: "8px",
-  },
-  toolbarRight: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-  },
-  title: {
-    margin: 0,
-    fontSize: "16px",
-    fontWeight: 600,
-  },
-  filterInput: {
-    padding: "6px 12px",
-    border: `1px solid var(${CSS_VARS.colorBorder})`,
-    borderRadius: `var(${CSS_VARS.borderRadius})`,
-    backgroundColor: `var(${CSS_VARS.colorSurface})`,
-    color: `var(${CSS_VARS.colorText})`,
-    fontSize: "14px",
-    outline: "none",
-  },
-  exportBtn: {
-    padding: "6px 12px",
-    border: `1px solid var(${CSS_VARS.colorBorder})`,
-    borderRadius: `var(${CSS_VARS.borderRadius})`,
-    backgroundColor: `var(${CSS_VARS.colorSurface})`,
-    color: `var(${CSS_VARS.colorText})`,
-    fontSize: "13px",
-    cursor: "pointer",
-  },
-  tableWrap: {
-    flex: 1,
-    overflow: "auto",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    fontSize: "14px",
-  },
-  th: {
-    position: "sticky" as const,
-    top: 0,
-    padding: "10px 12px",
-    borderBottom: `2px solid var(${CSS_VARS.colorBorder})`,
-    backgroundColor: `var(${CSS_VARS.colorSurface})`,
-    fontWeight: 600,
-    fontSize: "13px",
-    textTransform: "uppercase" as const,
-    letterSpacing: "0.5px",
-    userSelect: "none",
-    whiteSpace: "nowrap",
-  },
-  tr: {
-    borderBottom: `1px solid var(${CSS_VARS.colorBorder})`,
-  },
-  td: {
-    padding: "8px 12px",
-  },
-  emptyCell: {
-    padding: "32px",
-    textAlign: "center",
-    color: `var(${CSS_VARS.colorTextSecondary})`,
-  },
-  footer: {
-    padding: "8px 16px",
-    fontSize: "12px",
-    color: `var(${CSS_VARS.colorTextSecondary})`,
-    borderTop: `1px solid var(${CSS_VARS.colorBorder})`,
-  },
-  badge: {
-    display: "inline-block",
-    padding: "2px 8px",
-    borderRadius: "12px",
-    fontSize: "12px",
-    fontWeight: 500,
-    color: "#fff",
-  },
-  nullValue: {
-    color: `var(${CSS_VARS.colorTextSecondary})`,
-  },
-  link: {
-    color: `var(${CSS_VARS.colorPrimary})`,
-    textDecoration: "none",
-  },
-  actionGroup: {
-    display: "flex",
-    gap: "4px",
-  },
-  actionBtn: {
-    padding: "4px 8px",
-    border: `1px solid var(${CSS_VARS.colorBorder})`,
-    borderRadius: `var(${CSS_VARS.borderRadius})`,
-    backgroundColor: "transparent",
-    color: `var(${CSS_VARS.colorPrimary})`,
-    fontSize: "12px",
-    cursor: "pointer",
-  },
-  sortIndicator: {
-    fontSize: "10px",
-  },
-};

@@ -59,7 +59,7 @@ Uses: `--chuk-font-family`, `--chuk-color-background`, `--chuk-color-surface`, `
 Depends on child Views.
 
 ## Size Budget
-Target: < 150KB. Actual: 537KB / 142KB gzip
+Target: < 150KB. Actual: 691 KB / 191 KB gzip (includes Tailwind CSS + shadcn/ui + Framer Motion)
 
 ## Test Cases
 
@@ -103,3 +103,11 @@ Target: < 150KB. Actual: 537KB / 142KB gzip
 - MUST support being embedded as a child in dashboard or split Views
 - MUST isolate child Views within their own iframe contexts
 - MUST handle dynamic tab count (single tab, many tabs)
+
+## Storybook Stories
+
+Story file: `apps/tabs/src/TabsView.stories.tsx`
+
+| Story | Description |
+|-------|-------------|
+| ThreeTabs | Three tabs (Overview, Details, Settings) with tab switching |

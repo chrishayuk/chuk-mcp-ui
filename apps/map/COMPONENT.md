@@ -242,7 +242,7 @@ Use `view-dashboard` to compose map with other Views.
 
 **Target:** < 200KB (Leaflet ~140KB + markercluster ~30KB + app code ~30KB)
 
-**Actual:** 748KB / 206KB gzip
+**Actual:** 754 KB / 208 KB gzip (includes Tailwind CSS + shadcn/ui)
 
 ## Test Cases
 
@@ -567,3 +567,12 @@ undefined). No rendering error.
 
 **Expected:** Map renders within 2 seconds. Panning and zooming remain
 smooth. Clusters form and split correctly.
+
+## Storybook Stories
+
+Story file: `apps/map/src/MapView.stories.tsx`
+
+| Story | Description |
+|-------|-------------|
+| SingleLayer | Three London landmarks on OSM basemap with popups |
+| Clustered | Same data with marker clustering enabled |

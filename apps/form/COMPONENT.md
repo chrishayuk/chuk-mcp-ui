@@ -258,8 +258,8 @@ None. The component is built as a single-file HTML artifact (`vite-plugin-single
 
 | Metric   | Target   | Actual              |
 |----------|----------|---------------------|
-| Raw      | < 150 KB | 542 KB              |
-| Gzip     | --       | 144 KB              |
+| Raw      | < 150 KB | 809 KB              |
+| Gzip     | --       | 230 KB              |
 
 ---
 
@@ -1146,3 +1146,13 @@ apps/form/
 - Submitting with `title = "Bug"` (too short) shows `"Minimum length is 5."`
 - Submitting with `title = "Login fails"` and `priority = "high"` succeeds
 - `callTool("create_issue", { title: "Login fails", description: "", priority: "high", assignee: "", notify: true, ref_id: "proj-42" })` is invoked
+
+## Storybook Stories
+
+Story file: `apps/form/src/DynamicForm.stories.tsx`
+
+| Story | Description |
+|-------|-------------|
+| Minimal | 3 fields: name, email, message |
+| WithGroups | 2 field groups with collapsible section |
+| AllWidgets | 12 widget types demonstrating every input variant |

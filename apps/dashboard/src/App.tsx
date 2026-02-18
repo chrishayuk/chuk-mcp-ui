@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback } from "react";
-import { useView, Fallback, CSS_VARS } from "@chuk/view-shared";
+import { useView, Fallback } from "@chuk/view-shared";
+import { cn } from "@chuk/view-ui";
 import type { DashboardContent, Panel } from "./schema";
 
 /**
@@ -19,7 +20,7 @@ export function DashboardView() {
   return <Dashboard data={data} />;
 }
 
-function Dashboard({ data }: { data: DashboardContent }) {
+export function Dashboard({ data }: { data: DashboardContent }) {
   const { title, layout, panels, gap = "8px" } = data;
   const iframeRefs = useRef<Map<string, HTMLIFrameElement>>(new Map());
 
@@ -57,38 +58,21 @@ function Dashboard({ data }: { data: DashboardContent }) {
     []
   );
 
-  const containerStyle: React.CSSProperties = {
-    display: "flex",
-    flexDirection: layout === "split-vertical" ? "column" : "row",
-    flexWrap: layout === "grid" ? "wrap" : "nowrap",
-    width: "100%",
-    height: "100%",
-    gap,
-    padding: gap,
-    boxSizing: "border-box",
-    fontFamily: `var(${CSS_VARS.fontFamily})`,
-    backgroundColor: `var(${CSS_VARS.colorBackground})`,
-    overflow: "hidden",
-  };
-
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+    <div className="h-full flex flex-col">
       {title && (
-        <div
-          style={{
-            padding: "8px 12px",
-            fontSize: "15px",
-            fontWeight: 600,
-            color: `var(${CSS_VARS.colorText})`,
-            borderBottom: `1px solid var(${CSS_VARS.colorBorder})`,
-            fontFamily: `var(${CSS_VARS.fontFamily})`,
-            backgroundColor: `var(${CSS_VARS.colorBackground})`,
-          }}
-        >
+        <div className="px-3 py-2 text-[15px] font-semibold text-foreground border-b font-sans bg-background">
           {title}
         </div>
       )}
-      <div style={containerStyle}>
+      <div
+        className={cn(
+          "w-full h-full font-sans bg-background overflow-hidden",
+          layout === "split-vertical" ? "flex flex-col" : "flex flex-row",
+          layout === "grid" && "flex-wrap"
+        )}
+        style={{ gap, padding: gap }}
+      >
         {panels.map((panel) => (
           <PanelFrame
             key={panel.id}
@@ -135,34 +119,18 @@ function PanelFrame({
     return () => onRef(null);
   }, [onRef]);
 
-  const panelStyle: React.CSSProperties = {
-    flex: panel.width ? `0 0 ${panel.width}` : 1,
-    height: panel.height ?? (layout === "split-vertical" ? undefined : "100%"),
-    minWidth: panel.minWidth ?? 0,
-    minHeight: panel.minHeight ?? 0,
-    border: `1px solid var(${CSS_VARS.colorBorder})`,
-    borderRadius: `var(${CSS_VARS.borderRadius})`,
-    overflow: "hidden",
-    position: "relative",
-    display: "flex",
-    flexDirection: "column",
-  };
-
   return (
-    <div style={panelStyle}>
+    <div
+      className="border rounded-md overflow-hidden relative flex flex-col"
+      style={{
+        flex: panel.width ? `0 0 ${panel.width}` : 1,
+        height: panel.height ?? (layout === "split-vertical" ? undefined : "100%"),
+        minWidth: panel.minWidth ?? 0,
+        minHeight: panel.minHeight ?? 0,
+      }}
+    >
       {panel.label && (
-        <div
-          style={{
-            padding: "4px 8px",
-            fontSize: "12px",
-            fontWeight: 600,
-            color: `var(${CSS_VARS.colorTextSecondary})`,
-            backgroundColor: `var(${CSS_VARS.colorSurface})`,
-            borderBottom: `1px solid var(${CSS_VARS.colorBorder})`,
-            textTransform: "uppercase",
-            letterSpacing: "0.5px",
-          }}
-        >
+        <div className="px-2 py-1 text-xs font-semibold text-muted-foreground bg-muted border-b uppercase tracking-wider">
           {panel.label}
         </div>
       )}
@@ -171,11 +139,7 @@ function PanelFrame({
         src={panel.viewUrl}
         onLoad={handleLoad}
         sandbox="allow-scripts allow-same-origin"
-        style={{
-          flex: 1,
-          width: "100%",
-          border: "none",
-        }}
+        className="flex-1 w-full border-none"
         title={panel.label ?? panel.id}
       />
     </div>

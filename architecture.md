@@ -208,13 +208,36 @@ chuk-mcp-ui/
 │   ├── split/                  # @chuk/view-split — two-panel layout
 │   └── tabs/                   # @chuk/view-tabs — tabbed panels
 │
+├── .storybook/                # Storybook config
+│   ├── main.ts                # Story discovery, Vite + Tailwind plugin
+│   ├── preview.ts             # Global decorators, theme toolbar
+│   ├── theme-decorator.tsx    # applyTheme() light/dark switcher
+│   └── mock-call-tool.ts      # fn() mock for Actions panel
+│
 ├── packages/
-│   └── shared/                 # @chuk/view-shared
+│   ├── shared/                 # @chuk/view-shared
+│   │   ├── src/
+│   │   │   ├── use-view.ts     # useView hook (App protocol, theme, errors)
+│   │   │   ├── theme.ts        # CSS custom property mapping
+│   │   │   ├── actions.ts      # template resolver for callServerTool
+│   │   │   └── fallback.tsx    # graceful degradation component
+│   │   └── package.json
+│   └── ui/                      # @chuk/view-ui
 │       ├── src/
-│       │   ├── use-view.ts     # useView hook (App protocol, theme, errors)
-│       │   ├── theme.ts        # CSS custom property mapping
-│       │   ├── actions.ts      # template resolver for callServerTool
-│       │   └── fallback.tsx    # graceful degradation component
+│       │   ├── index.ts         # barrel export (15 components + cn)
+│       │   ├── lib/utils.ts     # cn() — clsx + tailwind-merge
+│       │   ├── styles/
+│       │   │   ├── theme.css    # @theme bridge: --chuk-* → Tailwind tokens
+│       │   │   └── globals.css  # base reset, imports theme.css
+│       │   ├── components/      # 15 shadcn/ui components (Radix primitives)
+│       │   │   ├── button.tsx, card.tsx, badge.tsx, input.tsx
+│       │   │   ├── label.tsx, textarea.tsx, checkbox.tsx
+│       │   │   ├── radio-group.tsx, slider.tsx, select.tsx
+│       │   │   ├── table.tsx, tabs.tsx, scroll-area.tsx
+│       │   │   ├── separator.tsx, tooltip.tsx
+│       │   └── animations/      # Framer Motion shared variants
+│       │       ├── variants.ts  # fadeIn, slideUp, listContainer, pressable
+│       │       └── transitions.ts # springSnappy, easeOut, easeInOut
 │       └── package.json
 │
 ├── chuk-view-schemas/          # Python Pydantic v2 models (PyPI)
@@ -223,8 +246,7 @@ chuk-mcp-ui/
 │   │   ├── chart.py
 │   │   ├── datatable.py
 │   │   └── ...                 # All 10 View schemas
-│   ├── pyproject.toml
-│   └── README.md
+│   └── pyproject.toml
 │
 ├── examples/
 │   ├── demo-server/            # Live MCP server (Fly.io, streamable HTTP)
@@ -280,20 +302,22 @@ Node servers `readFileSync` this. The CDN serves this same file.
 ```typescript
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import { viteSingleFile } from "vite-plugin-singlefile";
 
 export default defineConfig({
-  plugins: [react(), viteSingleFile()],
+  plugins: [react(), tailwindcss(), viteSingleFile()],
   build: {
     outDir: "dist",
-    rollupOptions: {
-      output: { entryFileNames: "mcp-app.html" }
-    }
+    emptyOutDir: true,
+    rollupOptions: { input: "mcp-app.html" }
   }
 });
 ```
 
-Matches the Anthropic build pattern: everything inlined into one file.
+Tailwind CSS v4 runs as a Vite plugin (`@tailwindcss/vite`) — no PostCSS
+config, no `tailwind.config.js`. Everything inlined into one file via
+`vite-plugin-singlefile`, matching the Anthropic build pattern.
 
 ---
 
@@ -518,19 +542,138 @@ const viewHtml = readFileSync(require.resolve("@chuk/view-map"), "utf-8");
 
 ## Theming
 
-Views receive host theme during init and map to CSS custom properties:
+Views receive host theme context during init. The theming pipeline has
+four stages:
 
-```typescript
-app.oncontext = (ctx) => {
-  const r = document.documentElement.style;
-  r.setProperty("--color-primary", ctx.theme.colors.primary);
-  r.setProperty("--color-bg", ctx.theme.colors.background);
-  r.setProperty("--color-text", ctx.theme.colors.text);
-  document.documentElement.classList.toggle("dark", ctx.theme.mode === "dark");
-};
+1. **Host sends theme context** to the View via the App protocol.
+2. **`applyTheme()`** in `packages/shared/theme.ts` sets `--chuk-*` CSS
+   custom properties on `document.documentElement`.
+3. **`packages/ui/src/styles/theme.css`** bridges `--chuk-*` vars to
+   Tailwind v4 `@theme` tokens (e.g., `--color-background`, `--color-primary`).
+4. **Tailwind utility classes** like `bg-background`, `text-foreground`,
+   `text-primary` resolve at runtime through the bridge.
+
+```
+Host → applyTheme() → --chuk-* vars → @theme bridge → Tailwind tokens → utility classes
 ```
 
-Shared `packages/shared/theme.ts` handles this for all Views.
+```typescript
+// packages/shared/theme.ts — called by useView on context change
+export function applyTheme(mode: "light" | "dark" = "light"): void {
+  const root = document.documentElement;
+  const defaults = mode === "dark" ? DARK_DEFAULTS : LIGHT_DEFAULTS;
+
+  for (const [prop, value] of Object.entries(defaults)) {
+    root.style.setProperty(prop, value);
+  }
+
+  root.classList.toggle("dark", mode === "dark");
+}
+```
+
+```css
+/* packages/ui/src/styles/theme.css — @theme bridge */
+@theme {
+  --color-background: var(--chuk-color-background, #ffffff);
+  --color-foreground: var(--chuk-color-text, #1a1a1a);
+  --color-primary: var(--chuk-color-primary, #3388ff);
+  --color-primary-foreground: #ffffff;
+  --color-muted: var(--chuk-color-surface, #f5f5f5);
+  --color-border: var(--chuk-color-border, #e0e0e0);
+}
+```
+
+Dark mode works automatically. When the host sends a dark theme,
+`applyTheme("dark")` updates the `--chuk-*` variable values. The
+Tailwind `@theme` tokens cascade instantly — no class swapping, no
+rebuild, no JavaScript re-render.
+
+---
+
+## Design System
+
+All Views share a design system built on three technologies:
+
+| Layer | Technology | Role |
+|-------|-----------|------|
+| Utility CSS | Tailwind CSS v4 | Styling via `@tailwindcss/vite` plugin, CSS-first config |
+| Components | shadcn/ui + Radix UI | 15 accessible component primitives (source-owned) |
+| Animation | Framer Motion | Declarative enter/exit animations (opt-in per View) |
+
+### packages/ui
+
+The `@chuk/view-ui` package lives at `packages/ui/` and provides:
+
+- **15 shadcn/ui components**: Button, Card, Badge, Input, Label, Textarea, Checkbox, RadioGroup, Slider, Select, Table, Tabs, ScrollArea, Separator, Tooltip
+- **Theme bridge** (`theme.css`): Maps runtime `--chuk-*` CSS variables to Tailwind v4 `@theme` tokens
+- **Animation variants**: Shared Framer Motion variants (fadeIn, slideUp, listContainer, tabPanel, pressable)
+- **Utility function**: `cn()` -- clsx + tailwind-merge for conditional class merging
+
+### How Views Use It
+
+Each View's entry point imports the global styles:
+
+```typescript
+import "@chuk/view-ui/styles";  // Tailwind + theme bridge
+```
+
+Views import components and utilities:
+
+```typescript
+import { Button, Input, Badge, Table, cn } from "@chuk/view-ui";
+import { motion } from "framer-motion";
+import { fadeIn } from "@chuk/view-ui/animations";
+```
+
+### Bundle Impact
+
+The design system adds ~50-100 KB to each View (Tailwind CSS + Radix
+primitives). Views that don't use Framer Motion pay zero animation cost.
+Total bundle sizes range from 542 KB (video) to 810 KB (datatable).
+
+---
+
+## Storybook
+
+72 stories cover every component and View, organised in two tiers:
+
+### Component Stories (48 stories)
+
+Colocated in `packages/ui/src/components/*.stories.tsx`. Each shadcn/ui
+component has stories exercising its variants, sizes, and states.
+
+### View Stories (24 stories)
+
+Colocated in `apps/*/src/*.stories.tsx`. Each View's inner component is
+exported and rendered directly with mock data, bypassing the `useView` hook.
+Views that use `callServerTool` pass a `mockCallTool` (Storybook `fn()`)
+for the Actions panel.
+
+### Theme Toggle
+
+A toolbar decorator applies `applyTheme("light" | "dark")` from
+`@chuk/view-shared`, so every story can be previewed in both themes.
+
+### Configuration
+
+```
+.storybook/
+  main.ts           # Stories from packages/ui + apps/*, Tailwind v4 plugin
+  preview.ts        # Theme toolbar, centered layout, CSS import
+  theme-decorator   # Applies --chuk-* vars via applyTheme()
+  mock-call-tool    # fn() mock for callServerTool actions
+```
+
+Storybook uses `@storybook/react-vite` with Tailwind CSS v4 injected via
+`viteFinal`. Workspace package aliases resolve `@chuk/view-ui` and
+`@chuk/view-shared` for both dev and production builds.
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm storybook` | Dev server on port 6006 |
+| `pnpm build-storybook` | Static build to `storybook-static/` |
 
 ---
 
@@ -642,3 +785,4 @@ doesn't even choose the visualisations.
 
 This is the "Next.js of MCP" — React gave components, Next.js gave SSR
 composition. View packages are the components, the runtime is Next.js.
+

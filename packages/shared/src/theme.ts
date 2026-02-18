@@ -14,7 +14,7 @@ export const CSS_VARS = {
 } as const;
 
 /** Default light theme values */
-const LIGHT_DEFAULTS: Record<string, string> = {
+export const LIGHT_DEFAULTS: Record<string, string> = {
   [CSS_VARS.colorPrimary]: "#3388ff",
   [CSS_VARS.colorBackground]: "#ffffff",
   [CSS_VARS.colorSurface]: "#f5f5f5",
@@ -26,7 +26,7 @@ const LIGHT_DEFAULTS: Record<string, string> = {
 };
 
 /** Default dark theme values */
-const DARK_DEFAULTS: Record<string, string> = {
+export const DARK_DEFAULTS: Record<string, string> = {
   [CSS_VARS.colorPrimary]: "#5ba3ff",
   [CSS_VARS.colorBackground]: "#1a1a2e",
   [CSS_VARS.colorSurface]: "#16213e",

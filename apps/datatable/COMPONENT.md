@@ -183,7 +183,7 @@ None -- no external resources loaded. All assets are inlined by
 
 **Target:** < 150KB (React ~130KB + app code ~20KB)
 
-**Actual:** 541KB / 143KB gzip
+**Actual:** 810 KB / 230 KB gzip (includes Tailwind CSS + shadcn/ui + Framer Motion)
 
 ## Test Cases
 
@@ -268,3 +268,13 @@ None -- no external resources loaded. All assets are inlined by
 - Filter input has `aria-label="Filter table"`.
 - Sortable columns have pointer cursor.
 - Non-sortable columns have default cursor.
+
+## Storybook Stories
+
+Story file: `apps/datatable/src/DataTable.stories.tsx`
+
+| Story | Description |
+|-------|-------------|
+| Default | 5 rows with badge column, row actions (Edit, Delete with confirm) |
+| Empty | Empty rows array showing empty state |
+| ManyRows | 20 programmatically generated rows |

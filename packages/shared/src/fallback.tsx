@@ -1,5 +1,3 @@
-import { CSS_VARS } from "./theme";
-
 interface FallbackProps {
   message?: string;
   content?: Array<{ type: string; text?: string }>;
@@ -19,20 +17,7 @@ export function Fallback({ message, content }: FallbackProps) {
     "No data to display.";
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100%",
-        padding: "2rem",
-        fontFamily: `var(${CSS_VARS.fontFamily})`,
-        color: `var(${CSS_VARS.colorTextSecondary})`,
-        backgroundColor: `var(${CSS_VARS.colorBackground})`,
-        textAlign: "center",
-        whiteSpace: "pre-wrap",
-      }}
-    >
+    <div className="flex items-center justify-center h-full p-8 font-sans text-muted-foreground bg-background text-center whitespace-pre-wrap">
       {text}
     </div>
   );

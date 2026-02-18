@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-import { useView, Fallback, resolveTemplates, CSS_VARS } from "@chuk/view-shared";
+import { useView, Fallback, resolveTemplates } from "@chuk/view-shared";
 import type { MapContent, MapLayer, PopupAction } from "./schema";
 
 // Fix Leaflet default icon paths (broken when bundled)
@@ -38,13 +38,13 @@ export function MapView() {
   return <LeafletMap data={data} app={app} onCallTool={callTool} />;
 }
 
-interface LeafletMapProps {
+export interface LeafletMapProps {
   data: MapContent;
   app: unknown;
   onCallTool: (name: string, args: Record<string, unknown>) => Promise<void>;
 }
 
-function LeafletMap({ data, onCallTool }: LeafletMapProps) {
+export function LeafletMap({ data, onCallTool }: LeafletMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const layerGroupsRef = useRef<Map<string, L.LayerGroup>>(new Map());
@@ -184,11 +184,7 @@ function LeafletMap({ data, onCallTool }: LeafletMapProps) {
   return (
     <div
       ref={containerRef}
-      style={{
-        width: "100%",
-        height: "100%",
-        fontFamily: `var(${CSS_VARS.fontFamily})`,
-      }}
+      className="w-full h-full font-sans"
     />
   );
 }

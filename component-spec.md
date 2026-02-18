@@ -94,11 +94,17 @@ so that an AI coding agent can build the View from the spec alone.
 
 ## Size Budget
 
-{Target bundle size for dist/view.html}
+{Target bundle size for dist/mcp-app.html}
 
 ## Test Cases
 
 {Key scenarios to validate}
+
+## Storybook Stories
+
+{List of stories with their names and what they demonstrate}
+
+Story file location: `apps/{name}/src/{Component}.stories.tsx`
 ```
 
 ---
@@ -400,6 +406,15 @@ Use `view-dashboard` to compose map with other Views.
 - Missing `structuredContent` renders plain text from `content`.
 - Wrong `type` field renders fallback.
 - Incompatible `version` renders warning with best-effort.
+
+## Storybook Stories
+
+Story file: `apps/map/src/MapView.stories.tsx`
+
+| Story | Description |
+|-------|-------------|
+| SingleLayer | Three London landmarks on OSM basemap with popups |
+| Clustered | Same data with marker clustering enabled |
 ```
 
 ---

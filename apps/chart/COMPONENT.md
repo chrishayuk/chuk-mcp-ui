@@ -193,8 +193,8 @@ None. The component is bundled as a single HTML file via `vite-plugin-singlefile
 
 | Metric       | Target      | Actual              |
 |--------------|-------------|---------------------|
-| Raw          | < 250 KB    | 739 KB              |
-| Gzip         | --          | 212 KB              |
+| Raw          | < 250 KB    | 745 KB              |
+| Gzip         | --          | 214 KB              |
 
 The overshoot is due to the full Chart.js library being bundled. Chart.js tree-shaking is limited because all eight chart controllers and their associated elements/scales are registered.
 
@@ -897,3 +897,16 @@ Output: a single self-contained `dist/mcp-app.html` file (via `vite-plugin-singl
 ```
 
 **Expected:** The second dataset's `type: "area"` is mapped to `"line"` in the Chart.js config. However, the auto-fill and tension defaults for area only apply when `chartType === "area"` at the root level. The dataset-level `type: "area"` override maps to `"line"` but does not automatically set fill or tension unless `fill: true` is explicitly set on the dataset.
+
+## Storybook Stories
+
+Story file: `apps/chart/src/ChartRenderer.stories.tsx`
+
+| Story | Description |
+|-------|-------------|
+| Bar | Multi-dataset bar chart with axis labels |
+| Line | Two sensor datasets over time |
+| Pie | 5-slice market share |
+| Scatter | 12 height vs weight points |
+| Area | Monthly revenue trend with fill |
+| Radar | 6-category skill assessment |

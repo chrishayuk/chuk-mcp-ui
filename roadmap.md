@@ -59,6 +59,9 @@ of every CHUK MCP server.
 ### Deliverables
 
 - [x] `view-markdown` — rich markdown with code blocks, tables, links
+- [x] Design system — Tailwind CSS v4, shadcn/ui (15 components), Framer Motion animations
+- [x] `packages/ui` — shared component library with theme bridge
+- [x] Storybook — 72 stories (15 component + 10 View), theme toggle, static build
 - [ ] `view-timeline` — events on lanes with zoom/pan
 - [ ] `view-tree` — hierarchical explorer with lazy loading
 - [ ] `view-code` — syntax highlighting, optional editing
@@ -235,6 +238,8 @@ without installing anything locally.
 | Cross-View interaction | 2 | ✓ Done — click marker -> highlight row |
 | GitHub Actions CI | — | ✓ Done — build, test, type-check |
 | Zod schemas + tests | — | ✓ Done — 10 schemas, 183 total tests |
+| Design system (Tailwind + shadcn + Framer Motion) | 3 | ✓ Done — packages/ui, all 10 Views migrated |
+| Storybook (72 stories, theme toggle) | 3 | ✓ Done — component + View stories, static build |
 | First View on npm | 1 | Pending |
 | PyPI publish | 1 | Pending |
 | Full CHUK coverage | 3-4 | In progress |
@@ -284,11 +289,13 @@ without installing anything locally.
 | Monorepo tool | Turborepo + pnpm | Fast, proven, good for parallel builds |
 | UI framework | React | ext-apps SDK has React bindings, largest ecosystem |
 | Bundler | Vite + vite-plugin-singlefile | Matches Anthropic's ext-apps build pattern exactly |
-| Build output | Single `dist/view.html` per View | npm publishes it, CDN serves it — same file |
+| Build output | Single `dist/mcp-app.html` per View | npm publishes it, CDN serves it — same file |
 | Map library | Leaflet | Lighter than CesiumJS, covers 90% of spatial needs |
 | Chart library | Chart.js | Lightweight, covers all common chart types |
 | CDN hosting | Fly.io | Docker-based, auto-stop/start, Node.js static server |
 | npm scope | `@chuk/view-*` | Clean namespace, discoverable |
 | CDN domain | `chuk-mcp-ui-views.fly.dev` | Fly.io, versioned URL paths |
 | Schema validation | Ajv + Zod (JS) / Pydantic (Py) | Triple schema: JSON Schema, Zod, Pydantic |
-| Styling | CSS custom properties | Themeable, no CSS-in-JS overhead |
+| Styling | Tailwind CSS v4 + shadcn/ui | Utility-first CSS, accessible Radix primitives, theme bridge to --chuk-* vars |
+| Animation | Framer Motion (opt-in) | Declarative enter/exit, zero cost for Views that skip it |
+| Component development | Storybook 8 | 72 stories, theme toggle, colocated with source |

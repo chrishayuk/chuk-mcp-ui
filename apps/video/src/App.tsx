@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import { useView, Fallback, CSS_VARS } from "@chuk/view-shared";
+import { useView, Fallback } from "@chuk/view-shared";
 import type { VideoContent } from "./schema";
 
 export function VideoView() {
@@ -12,7 +12,7 @@ export function VideoView() {
   return <VideoPlayer data={data} />;
 }
 
-function VideoPlayer({ data }: { data: VideoContent }) {
+export function VideoPlayer({ data }: { data: VideoContent }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -28,39 +28,13 @@ function VideoPlayer({ data }: { data: VideoContent }) {
   }, [data.startTime]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        fontFamily: `var(${CSS_VARS.fontFamily})`,
-        backgroundColor: `var(${CSS_VARS.colorBackground})`,
-        color: `var(${CSS_VARS.colorText})`,
-      }}
-    >
+    <div className="flex flex-col h-full font-sans bg-background text-foreground">
       {data.title && (
-        <div
-          style={{
-            padding: "8px 12px",
-            fontSize: "15px",
-            fontWeight: 600,
-            borderBottom: `1px solid var(${CSS_VARS.colorBorder})`,
-          }}
-        >
+        <div className="px-3 py-2 text-[15px] font-semibold border-b">
           {data.title}
         </div>
       )}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "8px",
-          boxSizing: "border-box",
-          overflow: "hidden",
-        }}
-      >
+      <div className="flex-1 flex items-center justify-center p-2 overflow-hidden">
         <video
           ref={videoRef}
           src={data.url}
@@ -69,11 +43,7 @@ function VideoPlayer({ data }: { data: VideoContent }) {
           muted={data.muted}
           loop={data.loop}
           poster={data.poster}
-          style={{
-            maxWidth: "100%",
-            maxHeight: "100%",
-            borderRadius: `var(${CSS_VARS.borderRadius})`,
-          }}
+          className="max-w-full max-h-full rounded-md"
         />
       </div>
     </div>

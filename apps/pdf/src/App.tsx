@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useView, Fallback, CSS_VARS } from "@chuk/view-shared";
+import { useView, Fallback } from "@chuk/view-shared";
+import { Button } from "@chuk/view-ui";
 import type { PdfContent } from "./schema";
 
 const PDFJS_CDN = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67";
@@ -48,7 +49,7 @@ export function PdfView() {
   return <PdfViewer data={data} />;
 }
 
-function PdfViewer({ data }: { data: PdfContent }) {
+export function PdfViewer({ data }: { data: PdfContent }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [pdfDoc, setPdfDoc] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(data.initialPage ?? 1);
@@ -124,80 +125,35 @@ function PdfViewer({ data }: { data: PdfContent }) {
   if (loading) return <Fallback message="Loading PDF..." />;
   if (error) return <Fallback message={error} />;
 
-  const btnStyle: React.CSSProperties = {
-    padding: "4px 10px",
-    border: `1px solid var(${CSS_VARS.colorBorder})`,
-    borderRadius: `var(${CSS_VARS.borderRadius})`,
-    background: `var(${CSS_VARS.colorSurface})`,
-    color: `var(${CSS_VARS.colorText})`,
-    cursor: "pointer",
-    fontSize: "13px",
-  };
-
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-        fontFamily: `var(${CSS_VARS.fontFamily})`,
-        backgroundColor: `var(${CSS_VARS.colorBackground})`,
-        color: `var(${CSS_VARS.colorText})`,
-      }}
-    >
+    <div className="flex flex-col h-full font-sans bg-background text-foreground">
       {data.title && (
-        <div
-          style={{
-            padding: "8px 12px",
-            fontSize: "15px",
-            fontWeight: 600,
-            borderBottom: `1px solid var(${CSS_VARS.colorBorder})`,
-          }}
-        >
+        <div className="px-3 py-2 text-[15px] font-semibold border-b">
           {data.title}
         </div>
       )}
       {/* Toolbar */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          padding: "6px 12px",
-          borderBottom: `1px solid var(${CSS_VARS.colorBorder})`,
-          backgroundColor: `var(${CSS_VARS.colorSurface})`,
-          fontSize: "13px",
-          flexWrap: "wrap",
-        }}
-      >
-        <button style={btnStyle} onClick={prevPage} disabled={currentPage <= 1}>
+      <div className="flex items-center gap-2 px-3 py-1.5 border-b bg-muted text-[13px] flex-wrap">
+        <Button variant="outline" size="sm" onClick={prevPage} disabled={currentPage <= 1}>
           Prev
-        </button>
+        </Button>
         <span>
           Page {currentPage} of {numPages}
         </span>
-        <button style={btnStyle} onClick={nextPage} disabled={currentPage >= numPages}>
+        <Button variant="outline" size="sm" onClick={nextPage} disabled={currentPage >= numPages}>
           Next
-        </button>
-        <span style={{ margin: "0 8px", color: `var(${CSS_VARS.colorBorder})` }}>|</span>
-        <button style={btnStyle} onClick={zoomOut} disabled={scale <= 0.5}>
+        </Button>
+        <span className="mx-2 text-border">|</span>
+        <Button variant="outline" size="sm" onClick={zoomOut} disabled={scale <= 0.5}>
           -
-        </button>
+        </Button>
         <span>{Math.round(scale * 100)}%</span>
-        <button style={btnStyle} onClick={zoomIn} disabled={scale >= 3}>
+        <Button variant="outline" size="sm" onClick={zoomIn} disabled={scale >= 3}>
           +
-        </button>
+        </Button>
       </div>
       {/* Canvas */}
-      <div
-        style={{
-          flex: 1,
-          overflow: "auto",
-          display: "flex",
-          justifyContent: "center",
-          padding: "16px",
-        }}
-      >
+      <div className="flex-1 overflow-auto flex justify-center p-4">
         <canvas ref={canvasRef} />
       </div>
     </div>
