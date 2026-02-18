@@ -206,7 +206,14 @@ chuk-mcp-ui/
 │   ├── pdf/                    # @chuk/view-pdf — PDF.js viewer
 │   ├── dashboard/              # @chuk/view-dashboard — multi-panel composition
 │   ├── split/                  # @chuk/view-split — two-panel layout
-│   └── tabs/                   # @chuk/view-tabs — tabbed panels
+│   ├── tabs/                   # @chuk/view-tabs — tabbed panels
+│   ├── detail/                 # @chuk/view-detail — detail panel display
+│   ├── counter/                # @chuk/view-counter — numeric counter display
+│   ├── code/                   # @chuk/view-code — syntax-highlighted code (Shiki)
+│   ├── progress/               # @chuk/view-progress — progress indicator display
+│   ├── confirm/                # @chuk/view-confirm — confirmation dialog
+│   ├── json/                   # @chuk/view-json — collapsible JSON tree
+│   └── status/                 # @chuk/view-status — status indicator display
 │
 ├── .storybook/                # Storybook config
 │   ├── main.ts                # Story discovery, Vite + Tailwind plugin
@@ -245,12 +252,12 @@ chuk-mcp-ui/
 │   │   ├── map.py
 │   │   ├── chart.py
 │   │   ├── datatable.py
-│   │   └── ...                 # All 10 View schemas
+│   │   └── ...                 # All 17 View schemas
 │   └── pyproject.toml
 │
 ├── examples/
 │   ├── demo-server/            # Live MCP server (Fly.io, streamable HTTP)
-│   │   ├── server.py           # FastMCP with 11 tools, all 10 Views
+│   │   ├── server.py           # FastMCP with 11 tools, all 17 Views
 │   │   ├── Dockerfile
 │   │   ├── fly.toml            # mcp-view-demo.fly.dev
 │   │   └── requirements.txt
@@ -510,7 +517,7 @@ Main export is `dist/mcp-app.html`. Schema, types, and Zod are secondary exports
 ### Fly.io Hosting
 
 Static hosting via Fly.io with a Node.js server (`server.mjs`). Docker
-image copies all 10 `dist/mcp-app.html` files and serves them with CORS
+image copies all 17 `dist/mcp-app.html` files and serves them with CORS
 headers and cache control. Auto-stop/start minimizes costs. The server
 serves the same `dist/mcp-app.html` that npm publishes.
 
@@ -629,20 +636,21 @@ import { fadeIn } from "@chuk/view-ui/animations";
 
 The design system adds ~50-100 KB to each View (Tailwind CSS + Radix
 primitives). Views that don't use Framer Motion pay zero animation cost.
-Total bundle sizes range from 542 KB (video) to 810 KB (datatable).
+Total bundle sizes range from 542 KB (video) to 9,933 KB (code, which
+includes Shiki grammars). Most Views are 806-810 KB.
 
 ---
 
 ## Storybook
 
-72 stories cover every component and View, organised in two tiers:
+92 stories cover every component and View, organised in two tiers:
 
 ### Component Stories (48 stories)
 
 Colocated in `packages/ui/src/components/*.stories.tsx`. Each shadcn/ui
 component has stories exercising its variants, sizes, and states.
 
-### View Stories (24 stories)
+### View Stories (44 stories)
 
 Colocated in `apps/*/src/*.stories.tsx`. Each View's inner component is
 exported and rendered directly with mock data, bypassing the `useView` hook.
@@ -694,7 +702,7 @@ is always the same View as `chuk-mcp-ui-views.fly.dev/map/v1`.
 
 ## View Catalogue
 
-### Shipped Views (10)
+### Shipped Views (17)
 
 | View | Status | Description |
 |------|--------|-------------|
@@ -708,6 +716,13 @@ is always the same View as `chuk-mcp-ui-views.fly.dev/map/v1`.
 | `view-dashboard` | ✓ Shipped | Multi-panel composition, cross-View communication |
 | `view-split` | ✓ Shipped | Two-panel side-by-side layout |
 | `view-tabs` | ✓ Shipped | Tabbed panel switching |
+| `view-detail` | ✓ Shipped | Detail panel display |
+| `view-counter` | ✓ Shipped | Numeric counter display |
+| `view-code` | ✓ Shipped | Syntax-highlighted code (Shiki grammars) |
+| `view-progress` | ✓ Shipped | Progress indicator display |
+| `view-confirm` | ✓ Shipped | Confirmation dialog |
+| `view-json` | ✓ Shipped | Collapsible JSON tree |
+| `view-status` | ✓ Shipped | Status indicator display |
 
 ### Planned Views
 
@@ -715,9 +730,7 @@ is always the same View as `chuk-mcp-ui-views.fly.dev/map/v1`.
 |------|------|---------|
 | `view-timeline` | Core | Events on lanes, periods |
 | `view-tree` | Core | Hierarchical explorer, lazy load |
-| `view-code` | Core | Syntax-highlighted code |
 | `view-diff` | Core | Unified/split text comparison |
-| `view-json` | Core | Collapsible JSON tree |
 | `view-log` | Core | Streaming log, level filtering |
 | `view-kanban` | Core | Card board with columns |
 | `view-compare` | Media | Before/after image slider |

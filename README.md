@@ -2,7 +2,7 @@
 
 Composable UI Views for [MCP Apps](https://modelcontextprotocol.io/specification/2025-03-26/client/apps) — independently developed, dual-distributed.
 
-10 reusable View packages that render `structuredContent` from any MCP server. One Vite build produces a single self-contained HTML file, shipped via **npm** (Node/TS servers read inline) or **Fly.io** (Python/Go servers reference by URL).
+17 reusable View packages that render `structuredContent` from any MCP server. One Vite build produces a single self-contained HTML file, shipped via **npm** (Node/TS servers read inline) or **Fly.io** (Python/Go servers reference by URL).
 
 ## Quick Start
 
@@ -68,12 +68,19 @@ Same View, same `structuredContent`, two distribution paths.
 | Dashboard | `@chuk/view-dashboard` | [`/dashboard/v1`](https://chuk-mcp-ui-views.fly.dev/dashboard/v1) | Multi-panel composition with cross-View communication |
 | Split | `@chuk/view-split` | [`/split/v1`](https://chuk-mcp-ui-views.fly.dev/split/v1) | Two-panel side-by-side layout |
 | Tabs | `@chuk/view-tabs` | [`/tabs/v1`](https://chuk-mcp-ui-views.fly.dev/tabs/v1) | Tabbed panel switching |
+| Detail | `@chuk/view-detail` | [`/detail/v1`](https://chuk-mcp-ui-views.fly.dev/detail/v1) | Key-value detail display with sections |
+| Counter | `@chuk/view-counter` | [`/counter/v1`](https://chuk-mcp-ui-views.fly.dev/counter/v1) | Interactive counter with increment/decrement |
+| Code | `@chuk/view-code` | [`/code/v1`](https://chuk-mcp-ui-views.fly.dev/code/v1) | Syntax-highlighted code viewer |
+| Progress | `@chuk/view-progress` | [`/progress/v1`](https://chuk-mcp-ui-views.fly.dev/progress/v1) | Progress bars and step indicators |
+| Confirm | `@chuk/view-confirm` | [`/confirm/v1`](https://chuk-mcp-ui-views.fly.dev/confirm/v1) | Confirmation dialog with actions |
+| Json | `@chuk/view-json` | [`/json/v1`](https://chuk-mcp-ui-views.fly.dev/json/v1) | Interactive JSON tree viewer |
+| Status | `@chuk/view-status` | [`/status/v1`](https://chuk-mcp-ui-views.fly.dev/status/v1) | Status indicators and health checks |
 
 All Views are hosted at `https://chuk-mcp-ui-views.fly.dev`.
 
 ## Demo MCP Server
 
-A live demo server showcases all 10 Views via streamable HTTP:
+A live demo server showcases all 17 Views via streamable HTTP:
 
 ```
 https://mcp-view-demo.fly.dev/mcp
@@ -153,7 +160,7 @@ Cross-View communication is built in — click a map marker, the table highlight
 
 ```bash
 pnpm install
-pnpm build            # Build all 10 Views (Turbo parallel)
+pnpm build            # Build all 17 Views (Turbo parallel)
 pnpm test             # Run all tests (183 tests)
 pnpm type-check       # TypeScript strict checking
 pnpm dev              # Dev servers with hot reload
@@ -163,10 +170,10 @@ pnpm build-storybook  # Static Storybook build
 
 ### Storybook
 
-72 stories across 25 groups cover every component and View:
+92 stories across 25 groups cover every component and View:
 
 - **15 component stories** — Button, Card, Badge, Input, Select, Checkbox, RadioGroup, Slider, Textarea, Label, Table, Tabs, ScrollArea, Separator, Tooltip
-- **10 View stories** — DataTable, DynamicForm, ChartRenderer, Markdown, Video, PDF, MapView, Dashboard, Split, Tabs
+- **17 View stories** — DataTable, DynamicForm, ChartRenderer, Markdown, Video, PDF, MapView, Dashboard, Split, Tabs, Detail, Counter, Code, Progress, Confirm, Json, Status
 
 Theme toggle (light/dark) in the toolbar via `applyTheme()`. Run `pnpm storybook` to browse.
 
@@ -185,12 +192,19 @@ chuk-mcp-ui/
     dashboard/      @chuk/view-dashboard
     split/          @chuk/view-split
     tabs/           @chuk/view-tabs
+    detail/         @chuk/view-detail
+    counter/        @chuk/view-counter
+    code/           @chuk/view-code
+    progress/       @chuk/view-progress
+    confirm/        @chuk/view-confirm
+    json/           @chuk/view-json
+    status/         @chuk/view-status
   packages/
     shared/         Shared utilities (lifecycle, theme, actions, fallback)
     ui/             Design system (Tailwind v4 + shadcn/ui + Framer Motion)
   .storybook/       Storybook config (main, preview, theme decorator)
   examples/
-    demo-server/    Python MCP server (all 10 Views, hosted on Fly.io)
+    demo-server/    Python MCP server (all 17 Views, hosted on Fly.io)
     python-heritage/ Python heritage exploration example
     ts-inline/      TypeScript inline distribution example
   chuk-view-schemas/  Python Pydantic models (PyPI)

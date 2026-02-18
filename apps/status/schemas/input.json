@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "items"],
+  "properties": {
+    "type": { "const": "status" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "status"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "status": { "enum": ["ok", "warning", "error", "unknown", "pending"] },
+          "detail": { "type": "string" },
+          "lastChecked": { "type": "string" },
+          "url": { "type": "string" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["ok", "warning", "error"],
+      "properties": {
+        "ok": { "type": "number" },
+        "warning": { "type": "number" },
+        "error": { "type": "number" }
+      }
+    }
+  }
+}

@@ -366,6 +366,13 @@ Some values come from data and can't be Tailwind classes. Use inline styles for 
 | split | 691 KB | No |
 | markdown | 583 KB | No |
 | video | 542 KB | No |
+| detail | 806 KB | Yes |
+| counter | 806 KB | Yes |
+| code | 9,933 KB | No |
+| progress | 807 KB | Yes |
+| confirm | 807 KB | Yes |
+| json | 808 KB | Yes |
+| status | 809 KB | Yes |
 
 All sizes are for the single-file `mcp-app.html` with CSS, JS, and assets inlined.
 
@@ -373,7 +380,7 @@ All sizes are for the single-file `mcp-app.html` with CSS, JS, and assets inline
 
 ## Storybook
 
-The design system is documented with 72 interactive stories across 25 groups, browsable at `localhost:6006`.
+The design system is documented with 92 interactive stories across 32 groups, browsable at `localhost:6006`.
 
 ### Running
 
@@ -387,7 +394,7 @@ The design system is documented with 72 interactive stories across 25 groups, br
 | Tier | Location | Count | Description |
 |------|----------|-------|-------------|
 | Component | `packages/ui/src/components/*.stories.tsx` | 48 stories (15 groups) | shadcn/ui primitives: variants, sizes, states |
-| View | `apps/*/src/*.stories.tsx` | 24 stories (10 groups) | Full View rendering with mock data |
+| View | `apps/*/src/*.stories.tsx` | 44 stories (17 groups) | Full View rendering with mock data |
 
 ### Theme Toggle
 

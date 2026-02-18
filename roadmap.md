@@ -61,25 +61,25 @@ of every CHUK MCP server.
 These fill the most common MCP tool output patterns that currently
 have no View. Ordered by how frequently MCP servers produce this shape.
 
-- [ ] `view-detail` — single record display. Name, image, key-value
+- [x] `view-detail` — single record display. Name, image, key-value
   fields, action buttons. The most common MCP tool pattern — every
   "get single record" tool needs this. Quick build: shadcn Card + layout.
-- [ ] `view-counter` — big number display with sparkline and comparison
+- [x] `view-counter` — big number display with sparkline and comparison
   delta. Every "count", "total", "estimate" tool. KPI cards —
   "42 sites at risk, ↑12% from last year." The simplest possible View
   but the most used dashboard widget on earth.
-- [ ] `view-code` — syntax-highlighted, copyable code/config. Every
+- [x] `view-code` — syntax-highlighted, copyable code/config. Every
   code-generating MCP tool (codegen, SQL, config) needs this.
   Quick build: highlight.js or Shiki.
-- [ ] `view-progress` — progress bars, single or multi-track with labels.
+- [x] `view-progress` — progress bars, single or multi-track with labels.
   Long-running MCP tools need to show progress. Pairs with
   `ontoolinputpartial` streaming.
-- [ ] `view-confirm` — pre-action confirmation with summary. "You're
+- [x] `view-confirm` — pre-action confirmation with summary. "You're
   about to delete 3 records." Safety pattern — should ship with every
   destructive MCP tool.
-- [ ] `view-json` — collapsible JSON tree viewer. Debug/inspect any MCP
+- [x] `view-json` — collapsible JSON tree viewer. Debug/inspect any MCP
   tool output.
-- [ ] `view-status` — traffic-light status board with labels. Multi-service
+- [x] `view-status` — traffic-light status board with labels. Multi-service
   health checks, MCP server availability, pipeline stage status.
 - [ ] `view-gallery` — card grid with thumbnails. Products, people,
   search results, portfolio items. The second most common list display
@@ -90,7 +90,7 @@ have no View. Ordered by how frequently MCP servers produce this shape.
 - [x] `view-markdown` — rich markdown with code blocks, tables, links
 - [x] Design system — Tailwind CSS v4, shadcn/ui (15 components), Framer Motion animations
 - [x] `packages/ui` — shared component library with theme bridge
-- [x] Storybook — 72 stories (15 component + 10 View), theme toggle, static build
+- [x] Storybook — 92 stories (15 component + 17 View), theme toggle, static build
 - [ ] `view-timeline` — events on lanes with zoom/pan
 - [ ] `view-tree` — hierarchical explorer with lazy loading
 - [ ] `view-diff` — unified and split diff rendering
@@ -546,19 +546,19 @@ community-contributed Views.
 
 | Milestone | Phase | Status |
 |-----------|-------|--------|
-| First View on Fly.io | 1 | ✓ Done — 10 Views at `chuk-mcp-ui-views.fly.dev` |
+| First View on Fly.io | 1 | ✓ Done — 17 Views at `chuk-mcp-ui-views.fly.dev` |
 | TS server using npm inline | 1 | ✓ Done — `examples/ts-inline` |
 | Python server using hosted Views | 1 | ✓ Done — `examples/python-heritage` |
 | Demo MCP server (streamable HTTP) | 1-2 | ✓ Done — `mcp-view-demo.fly.dev/mcp` |
 | Composed dashboard | 2 | ✓ Done — dashboard, split, tabs Views |
 | Cross-View interaction | 2 | ✓ Done — click marker -> highlight row |
 | GitHub Actions CI | — | ✓ Done — build, test, type-check |
-| Zod schemas + tests | — | ✓ Done — 10 schemas, 183 total tests |
-| Design system (Tailwind + shadcn + Framer Motion) | 3 | ✓ Done — packages/ui, all 10 Views migrated |
-| Storybook (72 stories, theme toggle) | 3 | ✓ Done — component + View stories, static build |
+| Zod schemas + tests | — | ✓ Done — 17 schemas, 183 total tests |
+| Design system (Tailwind + shadcn + Framer Motion) | 3 | ✓ Done — packages/ui, all 17 Views migrated |
+| Storybook (92 stories, theme toggle) | 3 | ✓ Done — component + View stories, static build |
 | First View on npm | 1 | Pending |
 | PyPI publish | 1 | Pending |
-| Full MCP coverage (10 → 17 Views) | 3 | Not started — Sprint 1 |
+| Full MCP coverage (10 → 17 Views) | 3 | ✓ Done — Sprint 1 |
 | Full MCP coverage (17 → 26 Views) | 3-4 | Not started — Sprint 3 |
 | `create-chuk-view` CLI | 5 | Not started — Sprint 2 |
 | Live playground MVP | 5 | Not started — Sprint 2 |
@@ -595,7 +595,7 @@ Two tracks running in parallel: **MCP-essential Views** that cover every
 common tool output pattern, and **infrastructure** that drives adoption.
 The goal is "whatever your MCP tool returns, there's a View for it."
 
-### Completed (10 Views)
+### Completed (17 Views)
 
 1. ~~**view-datatable**~~ ✓ — returns a list
 2. ~~**view-map**~~ ✓ — returns spatial data
@@ -607,20 +607,27 @@ The goal is "whatever your MCP tool returns, there's a View for it."
 8. ~~**view-pdf**~~ ✓ — returns a document
 9. ~~**view-split**~~ ✓ — two-panel composition
 10. ~~**view-tabs**~~ ✓ — tabbed composition
+11. ~~**view-detail**~~ ✓ — returns a single record
+12. ~~**view-counter**~~ ✓ — returns a number with context
+13. ~~**view-code**~~ ✓ — returns code or config
+14. ~~**view-progress**~~ ✓ — long-running tool, shows progress
+15. ~~**view-confirm**~~ ✓ — needs confirmation before action
+16. ~~**view-json**~~ ✓ — returns structured data for inspection
+17. ~~**view-status**~~ ✓ — returns health/status of multiple systems
 
-### Sprint 1 — MCP Coverage Essentials (10 → 17 Views)
+### Sprint 1 — MCP Coverage Essentials (10 → 17 Views) ✓
 
-These are all quick builds with the existing design system. They cover
-every remaining common MCP tool output pattern.
+Sprint 1 is complete. 7 new Views shipped, taking the catalogue from 10
+to 17 Views. Every common MCP tool output pattern is now covered.
 
 11. **npm publish** — all 10 packages
-12. **view-detail** — returns a single record (the most common missing pattern)
-13. **view-counter** — returns a number with context
-14. **view-code** — returns code or config
-15. **view-progress** — long-running tool, shows progress
-16. **view-confirm** — needs confirmation before action
-17. **view-json** — returns structured data for inspection
-18. **view-status** — returns health/status of multiple systems
+12. ~~**view-detail**~~ ✓ — returns a single record (the most common missing pattern)
+13. ~~**view-counter**~~ ✓ — returns a number with context
+14. ~~**view-code**~~ ✓ — returns code or config
+15. ~~**view-progress**~~ ✓ — long-running tool, shows progress
+16. ~~**view-confirm**~~ ✓ — needs confirmation before action
+17. ~~**view-json**~~ ✓ — returns structured data for inspection
+18. ~~**view-status**~~ ✓ — returns health/status of multiple systems
 
 ### Sprint 2 — Infrastructure + DX
 
@@ -677,13 +684,13 @@ The pitch: "Whatever your MCP tool returns, there's a View for it."
 | Returns a document | `view-pdf` | ✅ Shipped |
 | Returns media playback | `view-video` | ✅ Shipped |
 | Returns multiple panels | `view-dashboard` / `split` / `tabs` | ✅ Shipped |
-| Returns a single record | `view-detail` | Sprint 1 |
-| Returns a number with context | `view-counter` | Sprint 1 |
-| Returns code or config | `view-code` | Sprint 1 |
-| Is long-running | `view-progress` | Sprint 1 |
-| Needs confirmation before action | `view-confirm` | Sprint 1 |
-| Returns structured data for inspection | `view-json` | Sprint 1 |
-| Returns status/health of systems | `view-status` | Sprint 1 |
+| Returns a single record | `view-detail` | ✅ Shipped |
+| Returns a number with context | `view-counter` | ✅ Shipped |
+| Returns code or config | `view-code` | ✅ Shipped |
+| Is long-running | `view-progress` | ✅ Shipped |
+| Needs confirmation before action | `view-confirm` | ✅ Shipped |
+| Returns structured data for inspection | `view-json` | ✅ Shipped |
+| Returns status/health of systems | `view-status` | ✅ Shipped |
 | Returns card collections | `view-gallery` | Sprint 3 |
 | Returns a tree of options/entities | `view-tree` | Sprint 3 |
 | Returns events/timeline | `view-timeline` | Sprint 3 |
@@ -695,20 +702,20 @@ The pitch: "Whatever your MCP tool returns, there's a View for it."
 | Returns flow data | `view-sankey` | Sprint 4 |
 | Returns hierarchical proportion | `view-treemap` | Sprint 4 |
 
-Sprint 1 takes the catalogue from **10 → 17 Views** and covers every
-common MCP tool output pattern. Sprint 3 reaches **26 Views** for
+Sprint 1 shipped, taking the catalogue from **10 → 17 Views** and covering
+every common MCP tool output pattern. Sprint 3 reaches **26 Views** for
 complete coverage.
 
 ---
 
 ## View Catalogue Summary
 
-Total Views: **67** (10 shipped, 57 planned)
+Total Views: **67** (17 shipped, 50 planned)
 
 | Category | Views | Phase |
 |----------|-------|-------|
-| **Shipped** (10) | datatable, map, chart, form, markdown, video, pdf, dashboard, split, tabs | 1-2 |
-| **MCP-Essential** (8) | detail, counter, code, progress, confirm, json, status, gallery | 3 |
+| **Shipped** (17) | datatable, map, chart, form, markdown, video, pdf, dashboard, split, tabs, detail, counter, code, progress, confirm, json, status | 1-3 |
+| **MCP-Essential** (1) | gallery | 3 |
 | **Developer** (5) | timeline, tree, diff, log, kanban | 3 |
 | **Status & Monitoring** (2) | alert, stepper | 3 |
 | **Interactive Input** (4) | filter, settings, embed, ranked | 3 |
@@ -739,4 +746,4 @@ Total Views: **67** (10 shipped, 57 planned)
 | Schema validation | Ajv + Zod (JS) / Pydantic (Py) | Triple schema: JSON Schema, Zod, Pydantic |
 | Styling | Tailwind CSS v4 + shadcn/ui | Utility-first CSS, accessible Radix primitives, theme bridge to --chuk-* vars |
 | Animation | Framer Motion (opt-in) | Declarative enter/exit, zero cost for Views that skip it |
-| Component development | Storybook 8 | 72 stories, theme toggle, colocated with source |
+| Component development | Storybook 8 | 92 stories, theme toggle, colocated with source |

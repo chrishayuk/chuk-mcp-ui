@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "code"],
+  "properties": {
+    "type": { "const": "code" },
+    "version": { "const": "1.0" },
+    "code": { "type": "string" },
+    "language": { "type": "string" },
+    "title": { "type": "string" },
+    "lineNumbers": { "type": "boolean" },
+    "highlightLines": {
+      "type": "array",
+      "items": { "type": "number" }
+    }
+  }
+}

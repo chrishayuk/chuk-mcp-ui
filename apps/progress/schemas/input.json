@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "tracks"],
+  "properties": {
+    "type": { "const": "progress" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "overall": { "type": "number" },
+    "tracks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "value"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "value": { "type": "number" },
+          "max": { "type": "number" },
+          "status": { "enum": ["active", "complete", "error", "pending"] },
+          "detail": { "type": "string" }
+        }
+      }
+    }
+  }
+}
