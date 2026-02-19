@@ -35,6 +35,7 @@
   "dependencies": {
     "@chuk/view-shared": "workspace:*",
     "@chuk/view-ui": "workspace:*",
+    "framer-motion": "^11.0.0",
     "@modelcontextprotocol/ext-apps": "^1.0.0",
     "leaflet": "^1.9.4",
     "react": "^18.3.0",

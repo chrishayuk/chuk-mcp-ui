@@ -516,7 +516,7 @@ app.sendMessage({ type: "viewport-changed", bounds: currentBounds });
 
 ## View Hook Family
 
-Six purpose-built hooks in `packages/shared/src/hooks/` for common View
+Eleven purpose-built hooks in `packages/shared/src/hooks/` for common View
 patterns. All exported from `@chuk/view-shared`.
 
 | Hook | Purpose | Mechanism |
@@ -527,6 +527,11 @@ patterns. All exported from `@chuk/view-shared`.
 | `useViewUndo` | Undo/redo stack | `useReducer` with past/present/future |
 | `useViewExport` | PNG/CSV/JSON export | Dynamic `import("html2canvas")`, CSV escaping |
 | `useViewResize` | Responsive breakpoints | `ResizeObserver` + debounce |
+| `useViewToast` | Toast notifications with severity | Local state + auto-dismiss timer |
+| `useViewNavigation` | Navigation history and breadcrumbs | `useReducer` with entry stack |
+| `useViewAuth` | Authentication state and credentials | OAuth2, basic, bearer, API key flows |
+| `useViewLiveData` | Real-time data subscriptions | WebSocket / SSE + reconnection |
+| `useViewDrag` | Drag-and-drop handling | HTML5 Drag API + local state |
 
 ### Hook Composition
 
@@ -536,7 +541,8 @@ Hooks are designed to compose with `useView` without conflict:
   `useView`'s `ontoolresult` handler)
 - `useViewSelection`, `useViewFilter`, and `useViewExport` use `useViewBus`
   internally — they broadcast state changes and subscribe to incoming messages
-- `useViewUndo` and `useViewResize` are standalone (no bus dependency)
+- `useViewUndo`, `useViewResize`, `useViewToast`, `useViewNavigation`,
+  `useViewAuth`, `useViewLiveData`, and `useViewDrag` are standalone (no bus dependency)
 
 ---
 
@@ -754,47 +760,90 @@ is always the same View as `chuk-mcp-ui-views.fly.dev/map/v1`.
 
 ## View Catalogue
 
-### Shipped Views (17)
+### Shipped Views (51)
 
-| View | Status | Description |
-|------|--------|-------------|
-| `view-map` | ✓ Shipped | Leaflet map, GeoJSON layers, clustering, popups, actions |
-| `view-datatable` | ✓ Shipped | Sortable, filterable table, badges, CSV export |
-| `view-chart` | ✓ Shipped | Bar, line, scatter, pie, doughnut, area, radar, bubble |
-| `view-form` | ✓ Shipped | JSON Schema driven forms, widget hints, callServerTool |
-| `view-markdown` | ✓ Shipped | Rich markdown with code blocks, tables, links |
-| `view-video` | ✓ Shipped | HTML5 player with poster and start time |
-| `view-pdf` | ✓ Shipped | PDF.js viewer with page navigation and zoom |
-| `view-dashboard` | ✓ Shipped | Multi-panel composition, cross-View communication |
-| `view-split` | ✓ Shipped | Two-panel side-by-side layout |
-| `view-tabs` | ✓ Shipped | Tabbed panel switching |
-| `view-detail` | ✓ Shipped | Detail panel display |
-| `view-counter` | ✓ Shipped | Numeric counter display |
-| `view-code` | ✓ Shipped | Syntax-highlighted code (Shiki grammars) |
-| `view-progress` | ✓ Shipped | Progress indicator display |
-| `view-confirm` | ✓ Shipped | Confirmation dialog |
-| `view-json` | ✓ Shipped | Collapsible JSON tree |
-| `view-status` | ✓ Shipped | Status indicator display |
+**Core (17)**
+
+| View | Description |
+|------|-------------|
+| `view-map` | Leaflet map, GeoJSON layers, clustering, popups, actions |
+| `view-datatable` | Sortable, filterable table, badges, CSV export |
+| `view-chart` | Bar, line, scatter, pie, doughnut, area, radar, bubble |
+| `view-form` | JSON Schema driven forms, widget hints, callServerTool |
+| `view-markdown` | Rich markdown with code blocks, tables, links |
+| `view-video` | HTML5 player with poster and start time |
+| `view-pdf` | PDF.js viewer with page navigation and zoom |
+| `view-dashboard` | Multi-panel composition, cross-View communication |
+| `view-split` | Two-panel side-by-side layout |
+| `view-tabs` | Tabbed panel switching |
+| `view-detail` | Key-value detail display with sections |
+| `view-counter` | Interactive counter with increment/decrement |
+| `view-code` | Syntax-highlighted code viewer (Shiki grammars) |
+| `view-progress` | Progress bars and step indicators |
+| `view-confirm` | Confirmation dialog with actions |
+| `view-json` | Collapsible JSON tree viewer |
+| `view-status` | Status indicators and health checks |
+
+**Interactive (10)**
+
+| View | Description |
+|------|-------------|
+| `view-compare` | Side-by-side comparison with slider |
+| `view-gallery` | Image gallery with lightbox and grid layout |
+| `view-ranked` | Ranked list with scores and movement indicators |
+| `view-poll` | Interactive poll with live results |
+| `view-quiz` | Multi-question quiz with scoring |
+| `view-chat` | Chat message thread with avatars |
+| `view-image` | Image viewer with annotations and zoom |
+| `view-log` | Log viewer with severity filtering |
+| `view-timeline` | Chronological event timeline |
+| `view-tree` | Expandable tree with icons and search |
+
+**Developer & Config (7)**
+
+| View | Description |
+|------|-------------|
+| `view-alert` | Notification cards with severity levels |
+| `view-diff` | Unified and split diff rendering |
+| `view-embed` | Generic iframe wrapper with toolbar |
+| `view-filter` | Standalone filter bar with bus integration |
+| `view-kanban` | Card board with drag-and-drop |
+| `view-settings` | Configuration panel with sections |
+| `view-stepper` | Multi-step progress indicator |
+
+**Data Visualization (10)**
+
+| View | Description |
+|------|-------------|
+| `view-gauge` | Single-value arc metric with thresholds |
+| `view-heatmap` | Grid heatmap with color scales |
+| `view-crosstab` | Matrix with conditional formatting |
+| `view-scatter` | Scatter/bubble plot (Chart.js) |
+| `view-boxplot` | Box-and-whisker diagrams (SVG) |
+| `view-timeseries` | Time-axis chart with annotations (Chart.js) |
+| `view-treemap` | Nested rectangles with drill-down (Canvas) |
+| `view-sunburst` | Radial hierarchical chart (SVG) |
+| `view-pivot` | Pivot table with aggregation engine |
+| `view-profile` | Elevation/cross-section line (Chart.js) |
+
+**Specialist (7)**
+
+| View | Description |
+|------|-------------|
+| `view-audio` | Audio player with canvas waveform |
+| `view-carousel` | Image/content carousel with auto-play |
+| `view-terminal` | Terminal with ANSI color support |
+| `view-gis-legend` | Cartographic legend with symbology |
+| `view-layers` | Multi-layer map with legend (Leaflet) |
+| `view-minimap` | Overview-detail dual map (Leaflet) |
+| `view-spectrogram` | Audio frequency visualization (Canvas) |
 
 ### Planned Views
 
 | View | Tier | Renders |
 |------|------|---------|
-| `view-timeline` | Core | Events on lanes, periods |
-| `view-tree` | Core | Hierarchical explorer, lazy load |
-| `view-diff` | Core | Unified/split text comparison |
-| `view-log` | Core | Streaming log, level filtering |
-| `view-kanban` | Core | Card board with columns |
-| `view-compare` | Media | Before/after image slider |
-| `view-audio` | Media | Audio with waveform, regions |
-| `view-image` | Media | Zoomable image with overlays |
-| `view-layers` | Specialist | Multi-layer map, legend, temporal |
 | `view-globe` | Specialist | 3D CesiumJS globe |
 | `view-graph` | Specialist | Force-directed network graph |
-| `view-heatmap` | Specialist | Grid heatmap (not spatial) |
-| `view-timeseries` | Specialist | Time-axis optimised, zoom/pan |
-| `view-gauge` | Specialist | Single-value metric display |
-| `view-profile` | Specialist | Elevation/cross-section line |
 | `view-calendar` | Specialist | Date-grid, event density |
 | `view-transcript` | Specialist | Timestamped speaker text |
 | `view-wizard` | Specialist | Multi-step conditional form |

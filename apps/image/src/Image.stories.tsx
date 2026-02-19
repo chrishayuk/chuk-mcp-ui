@@ -3,7 +3,7 @@ import { ImageRenderer } from "./App";
 import type { ImageContent } from "./schema";
 
 const meta = {
-  title: "Views/ImageRenderer",
+  title: "Views/Image",
   component: ImageRenderer,
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },

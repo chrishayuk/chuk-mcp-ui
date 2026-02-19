@@ -3,7 +3,7 @@ import { TimeseriesRenderer } from "./App";
 import type { TimeseriesContent } from "./schema";
 
 const meta = {
-  title: "Views/TimeseriesRenderer",
+  title: "Views/Timeseries",
   component: TimeseriesRenderer,
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },

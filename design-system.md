@@ -494,7 +494,7 @@ All sizes are for the single-file `mcp-app.html` with CSS, JS, and assets inline
 
 ## Storybook
 
-The design system is documented with 101 interactive stories across 31 groups, browsable at `localhost:6006`.
+The design system is documented with 231 interactive stories across 77 groups, browsable at `localhost:6006`.
 
 ### Running
 

@@ -4,7 +4,7 @@ import { mockCallTool } from "../../../.storybook/mock-call-tool";
 import type { FormContent } from "./schema";
 
 const meta = {
-  title: "Views/DynamicForm",
+  title: "Views/Form",
   component: DynamicForm,
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },

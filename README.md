@@ -2,7 +2,7 @@
 
 Composable UI Views for [MCP Apps](https://modelcontextprotocol.io/specification/2025-03-26/client/apps) — independently developed, dual-distributed.
 
-17 reusable View packages that render `structuredContent` from any MCP server. One Vite build produces a single self-contained HTML file, shipped via **npm** (Node/TS servers read inline) or **Fly.io** (Python/Go servers reference by URL).
+51 reusable View packages that render `structuredContent` from any MCP server. One Vite build produces a single self-contained HTML file, shipped via **npm** (Node/TS servers read inline) or **Fly.io** (Python/Go servers reference by URL).
 
 ## Quick Start
 
@@ -56,6 +56,8 @@ Same View, same `structuredContent`, two distribution paths.
 
 ## Available Views
 
+### Core (17)
+
 | View | Package | URL | Description |
 |------|---------|-----|-------------|
 | Map | `@chuk/view-map` | [`/map/v1`](https://chuk-mcp-ui-views.fly.dev/map/v1) | Interactive Leaflet map with GeoJSON, clustering, popups |
@@ -70,17 +72,71 @@ Same View, same `structuredContent`, two distribution paths.
 | Tabs | `@chuk/view-tabs` | [`/tabs/v1`](https://chuk-mcp-ui-views.fly.dev/tabs/v1) | Tabbed panel switching |
 | Detail | `@chuk/view-detail` | [`/detail/v1`](https://chuk-mcp-ui-views.fly.dev/detail/v1) | Key-value detail display with sections |
 | Counter | `@chuk/view-counter` | [`/counter/v1`](https://chuk-mcp-ui-views.fly.dev/counter/v1) | Interactive counter with increment/decrement |
-| Code | `@chuk/view-code` | [`/code/v1`](https://chuk-mcp-ui-views.fly.dev/code/v1) | Syntax-highlighted code viewer |
+| Code | `@chuk/view-code` | [`/code/v1`](https://chuk-mcp-ui-views.fly.dev/code/v1) | Syntax-highlighted code viewer (Shiki) |
 | Progress | `@chuk/view-progress` | [`/progress/v1`](https://chuk-mcp-ui-views.fly.dev/progress/v1) | Progress bars and step indicators |
 | Confirm | `@chuk/view-confirm` | [`/confirm/v1`](https://chuk-mcp-ui-views.fly.dev/confirm/v1) | Confirmation dialog with actions |
 | Json | `@chuk/view-json` | [`/json/v1`](https://chuk-mcp-ui-views.fly.dev/json/v1) | Interactive JSON tree viewer |
 | Status | `@chuk/view-status` | [`/status/v1`](https://chuk-mcp-ui-views.fly.dev/status/v1) | Status indicators and health checks |
 
+### Interactive (10)
+
+| View | Package | URL | Description |
+|------|---------|-----|-------------|
+| Compare | `@chuk/view-compare` | [`/compare/v1`](https://chuk-mcp-ui-views.fly.dev/compare/v1) | Side-by-side comparison with slider |
+| Gallery | `@chuk/view-gallery` | [`/gallery/v1`](https://chuk-mcp-ui-views.fly.dev/gallery/v1) | Image gallery with lightbox and grid layout |
+| Ranked | `@chuk/view-ranked` | [`/ranked/v1`](https://chuk-mcp-ui-views.fly.dev/ranked/v1) | Ranked list with scores, badges, and movement indicators |
+| Poll | `@chuk/view-poll` | [`/poll/v1`](https://chuk-mcp-ui-views.fly.dev/poll/v1) | Interactive poll with live results |
+| Quiz | `@chuk/view-quiz` | [`/quiz/v1`](https://chuk-mcp-ui-views.fly.dev/quiz/v1) | Multi-question quiz with scoring |
+| Chat | `@chuk/view-chat` | [`/chat/v1`](https://chuk-mcp-ui-views.fly.dev/chat/v1) | Chat message thread with avatars |
+| Image | `@chuk/view-image` | [`/image/v1`](https://chuk-mcp-ui-views.fly.dev/image/v1) | Image viewer with annotations and zoom |
+| Log | `@chuk/view-log` | [`/log/v1`](https://chuk-mcp-ui-views.fly.dev/log/v1) | Log viewer with severity filtering |
+| Timeline | `@chuk/view-timeline` | [`/timeline/v1`](https://chuk-mcp-ui-views.fly.dev/timeline/v1) | Chronological event timeline |
+| Tree | `@chuk/view-tree` | [`/tree/v1`](https://chuk-mcp-ui-views.fly.dev/tree/v1) | Expandable tree with icons and search |
+
+### Developer & Config (7)
+
+| View | Package | URL | Description |
+|------|---------|-----|-------------|
+| Alert | `@chuk/view-alert` | [`/alert/v1`](https://chuk-mcp-ui-views.fly.dev/alert/v1) | Notification cards with severity levels |
+| Diff | `@chuk/view-diff` | [`/diff/v1`](https://chuk-mcp-ui-views.fly.dev/diff/v1) | Unified and split diff rendering |
+| Embed | `@chuk/view-embed` | [`/embed/v1`](https://chuk-mcp-ui-views.fly.dev/embed/v1) | Generic iframe wrapper with toolbar |
+| Filter | `@chuk/view-filter` | [`/filter/v1`](https://chuk-mcp-ui-views.fly.dev/filter/v1) | Standalone filter bar with bus integration |
+| Kanban | `@chuk/view-kanban` | [`/kanban/v1`](https://chuk-mcp-ui-views.fly.dev/kanban/v1) | Card board with drag-and-drop |
+| Settings | `@chuk/view-settings` | [`/settings/v1`](https://chuk-mcp-ui-views.fly.dev/settings/v1) | Configuration panel with sections |
+| Stepper | `@chuk/view-stepper` | [`/stepper/v1`](https://chuk-mcp-ui-views.fly.dev/stepper/v1) | Multi-step progress indicator |
+
+### Data Visualization (10)
+
+| View | Package | URL | Description |
+|------|---------|-----|-------------|
+| Gauge | `@chuk/view-gauge` | [`/gauge/v1`](https://chuk-mcp-ui-views.fly.dev/gauge/v1) | Single-value arc metric with thresholds |
+| Heatmap | `@chuk/view-heatmap` | [`/heatmap/v1`](https://chuk-mcp-ui-views.fly.dev/heatmap/v1) | Grid heatmap with color scales |
+| Crosstab | `@chuk/view-crosstab` | [`/crosstab/v1`](https://chuk-mcp-ui-views.fly.dev/crosstab/v1) | Matrix with conditional formatting |
+| Scatter | `@chuk/view-scatter` | [`/scatter/v1`](https://chuk-mcp-ui-views.fly.dev/scatter/v1) | Scatter/bubble plot (Chart.js) |
+| Boxplot | `@chuk/view-boxplot` | [`/boxplot/v1`](https://chuk-mcp-ui-views.fly.dev/boxplot/v1) | Box-and-whisker diagrams (SVG) |
+| Timeseries | `@chuk/view-timeseries` | [`/timeseries/v1`](https://chuk-mcp-ui-views.fly.dev/timeseries/v1) | Time-axis chart with annotations (Chart.js) |
+| Treemap | `@chuk/view-treemap` | [`/treemap/v1`](https://chuk-mcp-ui-views.fly.dev/treemap/v1) | Nested rectangles with drill-down (Canvas) |
+| Sunburst | `@chuk/view-sunburst` | [`/sunburst/v1`](https://chuk-mcp-ui-views.fly.dev/sunburst/v1) | Radial hierarchical chart (SVG) |
+| Pivot | `@chuk/view-pivot` | [`/pivot/v1`](https://chuk-mcp-ui-views.fly.dev/pivot/v1) | Pivot table with aggregation engine |
+| Profile | `@chuk/view-profile` | [`/profile/v1`](https://chuk-mcp-ui-views.fly.dev/profile/v1) | Elevation/cross-section line (Chart.js) |
+
+### Specialist (7)
+
+| View | Package | URL | Description |
+|------|---------|-----|-------------|
+| Audio | `@chuk/view-audio` | [`/audio/v1`](https://chuk-mcp-ui-views.fly.dev/audio/v1) | Audio player with canvas waveform |
+| Carousel | `@chuk/view-carousel` | [`/carousel/v1`](https://chuk-mcp-ui-views.fly.dev/carousel/v1) | Image/content carousel with auto-play |
+| Terminal | `@chuk/view-terminal` | [`/terminal/v1`](https://chuk-mcp-ui-views.fly.dev/terminal/v1) | Terminal with ANSI color support |
+| GIS Legend | `@chuk/view-gis-legend` | [`/gis-legend/v1`](https://chuk-mcp-ui-views.fly.dev/gis-legend/v1) | Cartographic legend with symbology |
+| Layers | `@chuk/view-layers` | [`/layers/v1`](https://chuk-mcp-ui-views.fly.dev/layers/v1) | Multi-layer map with legend (Leaflet) |
+| Minimap | `@chuk/view-minimap` | [`/minimap/v1`](https://chuk-mcp-ui-views.fly.dev/minimap/v1) | Overview-detail dual map (Leaflet) |
+| Spectrogram | `@chuk/view-spectrogram` | [`/spectrogram/v1`](https://chuk-mcp-ui-views.fly.dev/spectrogram/v1) | Audio frequency visualization (Canvas) |
+
 All Views are hosted at `https://chuk-mcp-ui-views.fly.dev`.
 
 ## Demo MCP Server
 
-A live demo server showcases all 17 Views via streamable HTTP:
+A live demo server showcases Views via streamable HTTP:
 
 ```
 https://mcp-view-demo.fly.dev/mcp
@@ -202,7 +258,7 @@ Wrap a composition in `<ViewBusProvider>`, then call `useViewBus()` inside any c
 
 ### View Hook Family
 
-Six purpose-built hooks for common View patterns, all exported from `@chuk/view-shared`:
+Eleven purpose-built hooks for common View patterns, all exported from `@chuk/view-shared`:
 
 | Hook | Purpose |
 |------|---------|
@@ -212,6 +268,11 @@ Six purpose-built hooks for common View patterns, all exported from `@chuk/view-
 | `useViewUndo` | Undo/redo stack for interactive Views (form edits, drawing on map) |
 | `useViewExport` | Standardised export (PNG screenshot, CSV data, JSON payload) from any View |
 | `useViewResize` | Responsive breakpoint detection inside the iframe |
+| `useViewToast` | Toast notifications with severity levels |
+| `useViewNavigation` | Navigation history and breadcrumb tracking |
+| `useViewAuth` | Authentication state and credential management |
+| `useViewLiveData` | Real-time data subscriptions and live updates |
+| `useViewDrag` | Drag-and-drop handling for interactive Views |
 
 ```typescript
 import { useViewSelection, useViewResize } from "@chuk/view-shared";
@@ -227,8 +288,8 @@ const { width, breakpoint } = useViewResize({ ref: containerRef });
 
 ```bash
 pnpm install
-pnpm build            # Build all 17 Views (Turbo parallel)
-pnpm test             # Run all tests (343 tests)
+pnpm build            # Build all 51 Views (Turbo parallel)
+pnpm test             # Run all tests (1000+ tests)
 pnpm type-check       # TypeScript strict checking
 pnpm dev              # Dev servers with hot reload
 pnpm storybook        # Storybook dev server on port 6006
@@ -237,11 +298,11 @@ pnpm build-storybook  # Static Storybook build
 
 ### Storybook
 
-101 stories across 31 groups cover every component, View, and hook:
+231 stories across 77 groups cover every component, View, and hook:
 
 - **15 component stories** — Button, Card, Badge, Input, Select, Checkbox, RadioGroup, Slider, Textarea, Label, Table, Tabs, ScrollArea, Separator, Tooltip
-- **17 View stories** — DataTable, DynamicForm, ChartRenderer, Markdown, Video, PDF, MapView, Dashboard, Split, Tabs, Detail, Counter, Code, Progress, Confirm, Json, Status
-- **6 hook stories** — useViewResize, useViewUndo, useViewStream, useViewSelection, useViewFilter, useViewExport
+- **51 View stories** — Map, Chart, DataTable, Form, Markdown, Video, PDF, Dashboard, Split, Tabs, Detail, Counter, Code, Progress, Confirm, Json, Status, Compare, Gallery, Ranked, Poll, Quiz, Chat, Image, Log, Timeline, Tree, Alert, Diff, Embed, Filter, Kanban, Settings, Stepper, Gauge, Heatmap, Crosstab, Scatter, Boxplot, Timeseries, Treemap, Sunburst, Pivot, Profile, Audio, Carousel, Terminal, GIS Legend, Layers, Minimap, Spectrogram
+- **11 hook stories** — useViewResize, useViewUndo, useViewStream, useViewSelection, useViewFilter, useViewExport, useViewToast, useViewNavigation, useViewAuth, useViewLiveData, useViewDrag
 
 Theme toggle (light/dark) in the toolbar via `applyTheme()`. Run `pnpm storybook` to browse.
 
@@ -249,35 +310,75 @@ Theme toggle (light/dark) in the toolbar via `applyTheme()`. Run `pnpm storybook
 
 ```
 chuk-mcp-ui/
-  apps/
-    map/            @chuk/view-map
-    chart/          @chuk/view-chart
-    datatable/      @chuk/view-datatable
-    form/           @chuk/view-form
-    markdown/       @chuk/view-markdown
-    video/          @chuk/view-video
-    pdf/            @chuk/view-pdf
-    dashboard/      @chuk/view-dashboard
-    split/          @chuk/view-split
-    tabs/           @chuk/view-tabs
-    detail/         @chuk/view-detail
-    counter/        @chuk/view-counter
-    code/           @chuk/view-code
-    progress/       @chuk/view-progress
-    confirm/        @chuk/view-confirm
-    json/           @chuk/view-json
-    status/         @chuk/view-status
-    playground/     Developer playground (deployed at /playground)
+  apps/                     51 View packages + playground
+    # Core (17)
+    map/                    @chuk/view-map
+    chart/                  @chuk/view-chart
+    datatable/              @chuk/view-datatable
+    form/                   @chuk/view-form
+    markdown/               @chuk/view-markdown
+    video/                  @chuk/view-video
+    pdf/                    @chuk/view-pdf
+    dashboard/              @chuk/view-dashboard
+    split/                  @chuk/view-split
+    tabs/                   @chuk/view-tabs
+    detail/                 @chuk/view-detail
+    counter/                @chuk/view-counter
+    code/                   @chuk/view-code
+    progress/               @chuk/view-progress
+    confirm/                @chuk/view-confirm
+    json/                   @chuk/view-json
+    status/                 @chuk/view-status
+    # Interactive (10)
+    compare/                @chuk/view-compare
+    gallery/                @chuk/view-gallery
+    ranked/                 @chuk/view-ranked
+    poll/                   @chuk/view-poll
+    quiz/                   @chuk/view-quiz
+    chat/                   @chuk/view-chat
+    image/                  @chuk/view-image
+    log/                    @chuk/view-log
+    timeline/               @chuk/view-timeline
+    tree/                   @chuk/view-tree
+    # Developer & Config (7)
+    alert/                  @chuk/view-alert
+    diff/                   @chuk/view-diff
+    embed/                  @chuk/view-embed
+    filter/                 @chuk/view-filter
+    kanban/                 @chuk/view-kanban
+    settings/               @chuk/view-settings
+    stepper/                @chuk/view-stepper
+    # Data Visualization (10)
+    gauge/                  @chuk/view-gauge
+    heatmap/                @chuk/view-heatmap
+    crosstab/               @chuk/view-crosstab
+    scatter/                @chuk/view-scatter
+    boxplot/                @chuk/view-boxplot
+    timeseries/             @chuk/view-timeseries
+    treemap/                @chuk/view-treemap
+    sunburst/               @chuk/view-sunburst
+    pivot/                  @chuk/view-pivot
+    profile/                @chuk/view-profile
+    # Specialist (7)
+    audio/                  @chuk/view-audio
+    carousel/               @chuk/view-carousel
+    terminal/               @chuk/view-terminal
+    gis-legend/             @chuk/view-gis-legend
+    layers/                 @chuk/view-layers
+    minimap/                @chuk/view-minimap
+    spectrogram/            @chuk/view-spectrogram
+    # Other
+    playground/             Developer playground (deployed at /playground)
   packages/
-    shared/         Hooks, message bus, theme, actions, fallback
-    ui/             Design system (Tailwind v4 + shadcn/ui + Framer Motion)
-    create-chuk-view/ CLI scaffolder for new Views
-  .storybook/       Storybook config (main, preview, theme decorator)
+    shared/                 Hooks, message bus, theme, actions, fallback
+    ui/                     Design system (Tailwind v4 + shadcn/ui + Framer Motion)
+    create-chuk-view/       CLI scaffolder for new Views
+  .storybook/               Storybook config (main, preview, theme decorator)
   examples/
-    demo-server/    Python MCP server (all 17 Views, hosted on Fly.io)
-    python-heritage/ Python heritage exploration example
-    ts-inline/      TypeScript inline distribution example
-  chuk-view-schemas/  Python Pydantic models (PyPI)
+    demo-server/            Python MCP server (hosted on Fly.io)
+    python-heritage/        Python heritage exploration example
+    ts-inline/              TypeScript inline distribution example
+  chuk-view-schemas/        Python Pydantic models (PyPI)
 ```
 
 ## Architecture

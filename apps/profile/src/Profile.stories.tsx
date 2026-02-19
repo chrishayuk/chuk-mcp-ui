@@ -3,7 +3,7 @@ import { ProfileRenderer } from "./App";
 import type { ProfileContent } from "./schema";
 
 const meta = {
-  title: "Views/ProfileRenderer",
+  title: "Views/Profile",
   component: ProfileRenderer,
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },

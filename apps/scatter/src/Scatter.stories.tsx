@@ -3,7 +3,7 @@ import { ScatterRenderer } from "./App";
 import type { ScatterContent } from "./schema";
 
 const meta = {
-  title: "Views/ScatterRenderer",
+  title: "Views/Scatter",
   component: ScatterRenderer,
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },

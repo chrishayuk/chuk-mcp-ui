@@ -3,7 +3,7 @@ import { ChartRenderer } from "./App";
 import type { ChartContent } from "./schema";
 
 const meta = {
-  title: "Views/ChartRenderer",
+  title: "Views/Chart",
   component: ChartRenderer,
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },

@@ -3,6 +3,8 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useView, Fallback } from "@chuk/view-shared";
 import { Card, CardContent, ScrollArea, cn } from "@chuk/view-ui";
+import { motion } from "framer-motion";
+import { fadeIn } from "@chuk/view-ui/animations";
 import type { LayersContent, LayerDef, LayerPopup } from "./schema";
 
 // Fix Leaflet default icon paths (broken when bundled)
@@ -215,7 +217,7 @@ export function LayersRenderer({ data }: LayersRendererProps) {
   }, [layerState, data.layers]);
 
   return (
-    <div className="relative w-full h-full font-sans animate-in fade-in duration-300">
+    <motion.div variants={fadeIn} initial="hidden" animate="visible" className="relative w-full h-full font-sans">
       {/* Map container */}
       <div ref={containerRef} className="absolute inset-0" />
 
@@ -260,7 +262,7 @@ export function LayersRenderer({ data }: LayersRendererProps) {
           </Card>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
