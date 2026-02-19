@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "url"],
+  "properties": {
+    "type": { "const": "audio" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "url": { "type": "string" },
+    "waveform": {
+      "type": "array",
+      "items": { "type": "number", "minimum": 0, "maximum": 1 }
+    },
+    "duration": { "type": "number", "minimum": 0 },
+    "regions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "start", "end"],
+        "properties": {
+          "id": { "type": "string" },
+          "start": { "type": "number", "minimum": 0 },
+          "end": { "type": "number", "minimum": 0 },
+          "label": { "type": "string" },
+          "color": { "type": "string" }
+        }
+      }
+    },
+    "autoplay": { "type": "boolean", "default": false },
+    "loop": { "type": "boolean", "default": false }
+  }
+}

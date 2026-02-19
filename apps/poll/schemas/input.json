@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "title", "questions", "voteTool"],
+  "properties": {
+    "type": { "const": "poll" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "prompt", "options"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "enum": ["single-choice", "multi-choice", "rating", "ranking"] },
+          "prompt": { "type": "string" },
+          "image": {
+            "type": "object",
+            "properties": {
+              "url": { "type": "string" },
+              "alt": { "type": "string" }
+            },
+            "required": ["url"]
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "label"],
+              "properties": {
+                "id": { "type": "string" },
+                "label": { "type": "string" },
+                "image": {
+                  "type": "object",
+                  "properties": {
+                    "url": { "type": "string" },
+                    "alt": { "type": "string" }
+                  },
+                  "required": ["url"]
+                },
+                "color": { "type": "string" }
+              }
+            }
+          },
+          "maxSelections": { "type": "number" }
+        }
+      }
+    },
+    "settings": {
+      "type": "object",
+      "properties": {
+        "showResults": { "enum": ["after-vote", "live", "after-close"] },
+        "allowChange": { "type": "boolean" },
+        "multiQuestion": { "type": "boolean" },
+        "anonymous": { "type": "boolean" },
+        "closedMessage": { "type": "string" }
+      }
+    },
+    "voteTool": { "type": "string" },
+    "resultsTool": { "type": "string" }
+  }
+}

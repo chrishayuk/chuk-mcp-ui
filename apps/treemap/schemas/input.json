@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "root"],
+  "properties": {
+    "type": { "const": "treemap" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "root": { "$ref": "#/definitions/TreemapNode" },
+    "colorField": { "type": "string" },
+    "showLabels": { "type": "boolean" },
+    "interactive": { "type": "boolean" }
+  },
+  "definitions": {
+    "TreemapNode": {
+      "type": "object",
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "value": { "type": "number" },
+        "color": { "type": "string" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/TreemapNode" }
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    }
+  }
+}

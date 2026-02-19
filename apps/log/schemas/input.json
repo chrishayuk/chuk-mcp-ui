@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "entries"],
+  "properties": {
+    "type": { "const": "log" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "level", "message"],
+        "properties": {
+          "id": { "type": "string" },
+          "timestamp": { "type": "string" },
+          "level": { "enum": ["debug", "info", "warn", "error", "fatal"] },
+          "message": { "type": "string" },
+          "source": { "type": "string" },
+          "metadata": { "type": "object" }
+        }
+      }
+    },
+    "levels": {
+      "type": "array",
+      "items": { "enum": ["debug", "info", "warn", "error", "fatal"] }
+    },
+    "searchable": { "type": "boolean" },
+    "autoScroll": { "type": "boolean" },
+    "maxEntries": { "type": "number" },
+    "showTimestamp": { "type": "boolean" },
+    "monospace": { "type": "boolean" }
+  }
+}

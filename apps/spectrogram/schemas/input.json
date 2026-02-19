@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "data"],
+  "properties": {
+    "type": { "const": "spectrogram" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "data": {
+      "type": "object",
+      "required": ["sampleRate", "fftSize", "hopSize", "magnitudes"],
+      "properties": {
+        "sampleRate": { "type": "number" },
+        "fftSize": { "type": "number" },
+        "hopSize": { "type": "number" },
+        "magnitudes": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": { "type": "number" }
+          }
+        }
+      }
+    },
+    "frequencyRange": {
+      "type": "object",
+      "required": ["min", "max"],
+      "properties": {
+        "min": { "type": "number" },
+        "max": { "type": "number" }
+      }
+    },
+    "timeRange": {
+      "type": "object",
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "number" },
+        "end": { "type": "number" }
+      }
+    },
+    "colorMap": {
+      "enum": ["viridis", "magma", "inferno", "grayscale"]
+    },
+    "showFrequencyAxis": { "type": "boolean" },
+    "showTimeAxis": { "type": "boolean" }
+  }
+}

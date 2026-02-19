@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "sections"],
+  "properties": {
+    "type": { "const": "settings" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "fields"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "collapsible": { "type": "boolean" },
+          "collapsed": { "type": "boolean" },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "label", "type", "value"],
+              "properties": {
+                "id": { "type": "string" },
+                "label": { "type": "string" },
+                "description": { "type": "string" },
+                "type": {
+                  "enum": ["toggle", "select", "text", "number", "slider", "radio", "color"]
+                },
+                "value": {},
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["value", "label"],
+                    "properties": {
+                      "value": { "type": "string" },
+                      "label": { "type": "string" }
+                    }
+                  }
+                },
+                "min": { "type": "number" },
+                "max": { "type": "number" },
+                "step": { "type": "number" },
+                "disabled": { "type": "boolean" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "saveTool": { "type": "string" },
+    "autoSave": { "type": "boolean" }
+  }
+}

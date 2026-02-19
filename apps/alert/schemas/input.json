@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "alerts"],
+  "properties": {
+    "type": { "const": "alert" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "alerts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "severity", "title"],
+        "properties": {
+          "id": { "type": "string" },
+          "severity": { "enum": ["info", "success", "warning", "error", "critical"] },
+          "title": { "type": "string" },
+          "message": { "type": "string" },
+          "source": { "type": "string" },
+          "category": { "type": "string" },
+          "timestamp": { "type": "string" },
+          "dismissible": { "type": "boolean" },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label", "tool", "arguments"],
+              "properties": {
+                "label": { "type": "string" },
+                "tool": { "type": "string" },
+                "arguments": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                },
+                "variant": { "enum": ["default", "destructive"] }
+              }
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        }
+      }
+    },
+    "groupBy": { "enum": ["severity", "category", "source"] },
+    "dismissible": { "type": "boolean" }
+  }
+}

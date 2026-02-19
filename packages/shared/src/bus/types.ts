@@ -32,6 +32,24 @@ export interface ExportRequestMessage {
   format: "png" | "csv" | "json";
 }
 
+export interface DragStartMessage {
+  type: "drag-start";
+  source: string;
+  item: { dragType: string; data: Record<string, unknown> };
+}
+
+export interface DragEndMessage {
+  type: "drag-end";
+  source: string;
+}
+
+export interface DropMessage {
+  type: "drop";
+  source: string;
+  item: { dragType: string; data: Record<string, unknown> };
+  targetPanelId: string;
+}
+
 // ── Union ────────────────────────────────────────────────────────
 
 export type ViewMessage =
@@ -39,7 +57,10 @@ export type ViewMessage =
   | FilterMessage
   | HighlightMessage
   | NavigateMessage
-  | ExportRequestMessage;
+  | ExportRequestMessage
+  | DragStartMessage
+  | DragEndMessage
+  | DropMessage;
 
 // ── Message type string literal ──────────────────────────────────
 
@@ -53,6 +74,9 @@ export interface ViewMessageMap {
   highlight: HighlightMessage;
   navigate: NavigateMessage;
   "export-request": ExportRequestMessage;
+  "drag-start": DragStartMessage;
+  "drag-end": DragEndMessage;
+  drop: DropMessage;
 }
 
 // ── Wire envelope (what actually goes over postMessage) ──────────

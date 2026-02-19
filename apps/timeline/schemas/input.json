@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "events"],
+  "properties": {
+    "type": { "const": "timeline" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "date"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "date": { "type": "string" },
+          "endDate": { "type": "string" },
+          "group": { "type": "string" },
+          "icon": { "type": "string" },
+          "color": { "type": "string" },
+          "severity": { "enum": ["info", "success", "warning", "error"] },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "action": {
+            "type": "object",
+            "required": ["label", "tool", "arguments"],
+            "properties": {
+              "label": { "type": "string" },
+              "tool": { "type": "string" },
+              "arguments": {
+                "type": "object",
+                "additionalProperties": { "type": "string" }
+              }
+            }
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label", "value"],
+              "properties": {
+                "label": { "type": "string" },
+                "value": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "color": { "type": "string" }
+        }
+      }
+    },
+    "orientation": { "enum": ["vertical", "horizontal"] }
+  }
+}

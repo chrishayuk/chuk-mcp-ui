@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "series"],
+  "properties": {
+    "type": { "const": "timeseries" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "subtitle": { "type": "string" },
+    "series": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "data"],
+        "properties": {
+          "label": { "type": "string" },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["t", "v"],
+              "properties": {
+                "t": { "type": "string" },
+                "v": { "type": "number" }
+              }
+            }
+          },
+          "color": { "type": "string" },
+          "fill": { "type": "boolean" },
+          "type": { "enum": ["line", "bar", "area"] }
+        }
+      }
+    },
+    "xAxis": {
+      "type": "object",
+      "properties": {
+        "label": { "type": "string" },
+        "min": { "type": "string" },
+        "max": { "type": "string" }
+      }
+    },
+    "yAxis": {
+      "type": "object",
+      "properties": {
+        "label": { "type": "string" },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "type": { "enum": ["linear", "logarithmic"] }
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "start"],
+        "properties": {
+          "type": { "enum": ["line", "range"] },
+          "start": { "type": "string" },
+          "end": { "type": "string" },
+          "label": { "type": "string" },
+          "color": { "type": "string" }
+        }
+      }
+    },
+    "zoom": { "type": "boolean", "default": false }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "messages", "respondTool"],
+  "properties": {
+    "type": { "const": "chat" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "role", "content"],
+        "properties": {
+          "id": { "type": "string" },
+          "role": { "enum": ["user", "assistant", "system"] },
+          "content": { "type": "string" },
+          "timestamp": { "type": "string" },
+          "status": { "enum": ["sending", "sent", "error"] }
+        }
+      }
+    },
+    "respondTool": { "type": "string" },
+    "placeholder": { "type": "string" },
+    "suggestions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "showTypingIndicator": { "type": "boolean" }
+  }
+}

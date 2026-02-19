@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "lines"],
+  "properties": {
+    "type": { "const": "terminal" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text"],
+        "properties": {
+          "text": { "type": "string" },
+          "timestamp": { "type": "string" }
+        }
+      }
+    },
+    "scrollback": { "type": "number" },
+    "fontSize": { "enum": ["xs", "sm", "md", "lg"] },
+    "showLineNumbers": { "type": "boolean" },
+    "theme": { "enum": ["dark", "light", "green", "amber"] }
+  }
+}

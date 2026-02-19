@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "overview", "detail"],
+  "properties": {
+    "type": { "const": "minimap" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "overview": { "$ref": "#/$defs/panel" },
+    "detail": { "$ref": "#/$defs/panel" },
+    "linkZoom": { "type": "boolean" },
+    "layout": { "enum": ["horizontal", "vertical"] },
+    "ratio": { "type": "string" }
+  },
+  "$defs": {
+    "panel": {
+      "type": "object",
+      "required": ["layers"],
+      "properties": {
+        "center": {
+          "type": "object",
+          "required": ["lat", "lon"],
+          "properties": {
+            "lat": { "type": "number" },
+            "lon": { "type": "number" }
+          }
+        },
+        "zoom": { "type": "integer", "minimum": 1, "maximum": 22 },
+        "basemap": { "enum": ["osm", "satellite", "terrain", "dark"] },
+        "layers": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/layer" }
+        }
+      }
+    },
+    "layer": {
+      "type": "object",
+      "required": ["id", "label", "features"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "visible": { "type": "boolean", "default": true },
+        "features": { "type": "object" },
+        "style": {
+          "type": "object",
+          "properties": {
+            "color": { "type": "string" },
+            "weight": { "type": "number" },
+            "fillColor": { "type": "string" },
+            "fillOpacity": { "type": "number" },
+            "radius": { "type": "number" }
+          }
+        },
+        "popup": {
+          "type": "object",
+          "required": ["title"],
+          "properties": {
+            "title": { "type": "string" },
+            "fields": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    }
+  }
+}

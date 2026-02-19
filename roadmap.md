@@ -51,7 +51,7 @@ multi-panel dashboard from pure JSON.
 
 ---
 
-## Phase 3 — Core Library (in progress)
+## Phase 3 — Core Library ✓
 
 **Goal:** Fill out the most broadly useful Views. Cover the output types
 of every CHUK MCP server.
@@ -81,7 +81,7 @@ have no View. Ordered by how frequently MCP servers produce this shape.
   tool output.
 - [x] `view-status` — traffic-light status board with labels. Multi-service
   health checks, MCP server availability, pipeline stage status.
-- [ ] `view-gallery` — card grid with thumbnails. Products, people,
+- [x] `view-gallery` — card grid with thumbnails. Products, people,
   search results, portfolio items. The second most common list display
   after tables.
 
@@ -91,28 +91,28 @@ have no View. Ordered by how frequently MCP servers produce this shape.
 - [x] Design system — Tailwind CSS v4, shadcn/ui (15 components), Framer Motion animations
 - [x] `packages/ui` — shared component library with theme bridge
 - [x] Storybook — 101 stories (15 component + 17 View + 6 hook), theme toggle, static build
-- [ ] `view-timeline` — events on lanes with zoom/pan
-- [ ] `view-tree` — hierarchical explorer with lazy loading
-- [ ] `view-diff` — unified and split diff rendering
-- [ ] `view-log` — streaming log with level filtering
-- [ ] `view-kanban` — card board with drag-and-drop
+- [x] `view-timeline` — events on a timeline with groups and severity
+- [x] `view-tree` — hierarchical explorer with lazy loading and search
+- [x] `view-diff` — unified and split diff rendering
+- [x] `view-log` — streaming log with level filtering and search
+- [x] `view-kanban` — card board with drag-and-drop
 
 ### Status & Monitoring Views
 
-- [ ] `view-alert` — notification/alert cards with severity levels.
+- [x] `view-alert` — notification/alert cards with severity levels.
   Heritage at risk alerts, system warnings, threshold breaches.
-- [ ] `view-stepper` — multi-step progress indicator with current state.
+- [x] `view-stepper` — multi-step progress indicator with current state.
   Tool execution progress, pipeline stages, guided workflows.
 
 ### Interactive Input Views
 
-- [ ] `view-filter` — standalone filter bar that broadcasts to sibling
+- [x] `view-filter` — standalone filter bar that broadcasts to sibling
   Views. Shared filters across a dashboard — date range, category, search.
-- [ ] `view-settings` — configuration panel for View preferences.
+- [x] `view-settings` — configuration panel for View preferences.
   User-adjustable parameters — units, projections, display modes.
-- [ ] `view-embed` — generic iframe wrapper for external URLs. Embed any
+- [x] `view-embed` — generic iframe wrapper for external URLs. Embed any
   existing web content — external dashboards, documentation pages.
-- [ ] `view-ranked` — ranked/prioritised list with scores. Search results
+- [x] `view-ranked` — ranked/prioritised list with scores. Search results
   with relevance scores, recommendations, sorted comparisons.
 
 ### Deliverables
@@ -127,7 +127,7 @@ package covers all published Views.
 
 ---
 
-## Phase 4 — Media and Specialist (in progress)
+## Phase 4 — Media and Specialist ✓
 
 **Goal:** Cover media types and domain-specialist visualisations.
 
@@ -135,50 +135,50 @@ package covers all published Views.
 
 - [x] `view-video` — HTML5 player with poster and start time
 - [x] `view-pdf` — PDF.js viewer with page navigation and zoom
-- [ ] `view-image` — zoomable with pan, annotation overlays, IIIF support
-- [ ] `view-compare` — before/after image slider
-- [ ] `view-audio` — waveform, regions, playback
-- [ ] `view-carousel` — image/content carousel with captions and
+- [x] `view-image` — zoomable with pan, annotation overlays, multi-image thumbnails
+- [x] `view-compare` — before/after image slider with horizontal/vertical orientation
+- [x] `view-audio` — waveform, regions, playback
+- [x] `view-carousel` — image/content carousel with captions and
   navigation. Site photo galleries, before/after sequences, multi-view
   comparisons.
 
 ### Data-Dense Visualisation
 
-- [ ] `view-heatmap` — grid heatmap (confusion matrices, retention)
-- [ ] `view-gauge` — single-value metric display
-- [ ] `view-treemap` — nested rectangles showing hierarchical proportion.
+- [x] `view-heatmap` — grid heatmap (confusion matrices, retention)
+- [x] `view-gauge` — single-value metric display
+- [x] `view-treemap` — nested rectangles showing hierarchical proportion.
   Disk usage, budget breakdown, model parameter distribution, code
   coverage.
-- [ ] `view-sunburst` — radial hierarchical chart (treemap in polar
+- [x] `view-sunburst` — radial hierarchical chart (treemap in polar
   coordinates). Taxonomy browsing, layer-by-layer model structure,
   heritage classification hierarchies.
-- [ ] `view-scatter` — dedicated scatter/bubble plot with zoom, selection,
+- [x] `view-scatter` — dedicated scatter/bubble plot with zoom, selection,
   tooltips. Embedding spaces, feature correlations, site distribution by
   risk/period — interpretability outputs.
-- [ ] `view-boxplot` — distribution summaries with quartiles, outliers.
+- [x] `view-boxplot` — distribution summaries with quartiles, outliers.
   Model performance comparison, statistical analysis results.
-- [ ] `view-pivot` — pivot table with row/column grouping, aggregation,
+- [x] `view-pivot` — pivot table with row/column grouping, aggregation,
   drill-down. The spreadsheet power-user's View — summarise any tabular
   data dynamically.
-- [ ] `view-crosstab` — matrix of values with conditional formatting.
+- [x] `view-crosstab` — matrix of values with conditional formatting.
   Confusion matrices, correlation tables, period × monument-type counts.
 
 ### Geo-Specialist
 
-- [ ] `view-layers` — multi-layer map with legend, temporal filtering
-- [ ] `view-timeseries` — time-axis optimised chart with zoom/pan
-- [ ] `view-profile` — elevation/cross-section line chart
-- [ ] `view-minimap` — small overview map + detail map linked together.
+- [x] `view-layers` — multi-layer map with legend, temporal filtering
+- [x] `view-timeseries` — time-axis optimised chart with zoom/pan
+- [x] `view-profile` — elevation/cross-section line chart
+- [x] `view-minimap` — small overview map + detail map linked together.
   Large-area heritage surveys — overview of Essex coast with detail panel
   for specific sites.
-- [ ] `view-gis-legend` — standalone cartographic legend with symbology.
+- [x] `view-gis-legend` — standalone cartographic legend with symbology.
   Paired with view-layers for proper cartographic output.
 
 ### Specialist
 
-- [ ] `view-terminal` — terminal emulator display with ANSI colour
+- [x] `view-terminal` — terminal emulator display with ANSI colour
   support. Tool execution output, mcp-cli integration, live logs.
-- [ ] `view-spectrogram` — audio frequency visualisation over time.
+- [x] `view-spectrogram` — audio frequency visualisation over time.
   Audio analysis from Remotion/audacity MCP servers.
 
 ### Deliverables
@@ -215,16 +215,21 @@ adoption — remove the setup friction entirely.
 
 ### 5.2 `useView` Hook Family ✓
 
-**Sprint 2: shipped.** Implemented at `packages/shared/src/hooks/` — 6 purpose-built hooks with 46 tests and 18 interactive Storybook stories.
+**Sprint 2: shipped (6 hooks). Sprint 3: expanded to 11 hooks.** Implemented at `packages/shared/src/hooks/` — 11 purpose-built hooks with 127 tests and interactive Storybook stories.
 
-| Hook | Purpose |
-|------|---------|
-| `useViewStream` | Progressive rendering from `ontoolinputpartial` — show data as it arrives |
-| `useViewSelection` | Shared selection state across composed Views (click map → highlight table row) |
-| `useViewFilter` | Cross-View filtering (filter in datatable → map updates, chart updates) |
-| `useViewUndo` | Undo/redo stack for interactive Views (form edits, drawing on map) |
-| `useViewExport` | Standardised export (PNG screenshot, CSV data, JSON payload) from any View |
-| `useViewResize` | Responsive breakpoint detection inside the iframe |
+| Hook | Purpose | Sprint |
+|------|---------|--------|
+| `useViewStream` | Progressive rendering from `ontoolinputpartial` — show data as it arrives | 2 |
+| `useViewSelection` | Shared selection state across composed Views (click map → highlight table row) | 2 |
+| `useViewFilter` | Cross-View filtering (filter in datatable → map updates, chart updates) | 2 |
+| `useViewUndo` | Undo/redo stack for interactive Views (form edits, drawing on map) | 2 |
+| `useViewExport` | Standardised export (PNG screenshot, CSV data, JSON payload) from any View | 2 |
+| `useViewResize` | Responsive breakpoint detection inside the iframe | 2 |
+| `useViewToast` | In-View feedback notifications with severity levels and auto-dismiss | 3 |
+| `useViewNavigation` | In-View navigation stack with push/replace/back/forward | 3 |
+| `useViewAuth` | Credential gating for tool calls with validation flow | 3 |
+| `useViewLiveData` | Server-pushed continuous updates with streaming and polling modes | 3 |
+| `useViewDrag` | Cross-View drag and drop with bus-based coordination | 3 |
 
 These hooks are the real lock-in. Once people build Views using the hook
 ecosystem, they don't switch.
@@ -562,20 +567,21 @@ community-contributed Views.
 
 | Milestone | Phase | Status |
 |-----------|-------|--------|
-| First View on Fly.io | 1 | ✓ Done — 17 Views at `chuk-mcp-ui-views.fly.dev` |
+| First View on Fly.io | 1 | ✓ Done — 51 Views at `chuk-mcp-ui-views.fly.dev` |
 | TS server using npm inline | 1 | ✓ Done — `examples/ts-inline` |
 | Python server using hosted Views | 1 | ✓ Done — `examples/python-heritage` |
 | Demo MCP server (streamable HTTP) | 1-2 | ✓ Done — `mcp-view-demo.fly.dev/mcp` |
 | Composed dashboard | 2 | ✓ Done — dashboard, split, tabs Views |
 | Cross-View interaction | 2 | ✓ Done — click marker -> highlight row |
 | GitHub Actions CI | — | ✓ Done — build, test, type-check |
-| Zod schemas + tests | — | ✓ Done — 17 schemas, 343 total tests |
+| Zod schemas + tests | — | ✓ Done — 51 schemas, 1000+ total tests |
 | Design system (Tailwind + shadcn + Framer Motion) | 3 | ✓ Done — packages/ui, all 17 Views migrated, dark mode compliant |
 | Storybook (101 stories, theme toggle) | 3 | ✓ Done — component + View + hook stories, static build |
 | First View on npm | 1 | Pending |
 | PyPI publish | 1 | Pending |
 | Full MCP coverage (10 → 17 Views) | 3 | ✓ Done — Sprint 1 |
-| Full MCP coverage (17 → 26 Views) | 3-4 | Not started — Sprint 3 |
+| Full MCP coverage (17 → 27 Views) | 3-4 | ✅ Done — Sprint 3 |
+| Full catalogue (27 → 51 Views) | 3-4 | ✅ Done — Sprint 4 |
 | `create-chuk-view` CLI | 5 | ✅ Done — Sprint 2 |
 | Live playground MVP | 5 | ✅ Done — Sprint 2 |
 | Hook family (`useViewStream`, etc.) | 5 | ✅ Done — Sprint 2 |
@@ -611,7 +617,7 @@ Two tracks running in parallel: **MCP-essential Views** that cover every
 common tool output pattern, and **infrastructure** that drives adoption.
 The goal is "whatever your MCP tool returns, there's a View for it."
 
-### Completed (17 Views)
+### Completed (51 Views)
 
 1. ~~**view-datatable**~~ ✓ — returns a list
 2. ~~**view-map**~~ ✓ — returns spatial data
@@ -630,6 +636,40 @@ The goal is "whatever your MCP tool returns, there's a View for it."
 15. ~~**view-confirm**~~ ✓ — needs confirmation before action
 16. ~~**view-json**~~ ✓ — returns structured data for inspection
 17. ~~**view-status**~~ ✓ — returns health/status of multiple systems
+18. ~~**view-gallery**~~ ✓ — returns card collections
+19. ~~**view-tree**~~ ✓ — returns a tree of options/entities
+20. ~~**view-timeline**~~ ✓ — returns events on a timeline
+21. ~~**view-log**~~ ✓ — returns streaming output with level filtering
+22. ~~**view-image**~~ ✓ — returns images with annotations
+23. ~~**view-compare**~~ ✓ — returns before/after comparison
+24. ~~**view-chat**~~ ✓ — embeds a conversation
+25. ~~**view-ranked**~~ ✓ — returns ranked/scored list
+26. ~~**view-quiz**~~ ✓ — interactive quiz with timer and validation
+27. ~~**view-poll**~~ ✓ — live polling/voting with results
+28. ~~**view-alert**~~ ✓ — notification cards with severity
+29. ~~**view-stepper**~~ ✓ — multi-step progress indicator
+30. ~~**view-settings**~~ ✓ — configuration panel
+31. ~~**view-embed**~~ ✓ — generic iframe wrapper
+32. ~~**view-gauge**~~ ✓ — single-value arc metric
+33. ~~**view-crosstab**~~ ✓ — matrix with conditional formatting
+34. ~~**view-gis-legend**~~ ✓ — cartographic legend
+35. ~~**view-profile**~~ ✓ — elevation/cross-section line chart
+36. ~~**view-carousel**~~ ✓ — image/content carousel
+37. ~~**view-terminal**~~ ✓ — terminal with ANSI colours
+38. ~~**view-diff**~~ ✓ — unified and split diff rendering
+39. ~~**view-filter**~~ ✓ — standalone filter bar with bus
+40. ~~**view-heatmap**~~ ✓ — grid heatmap
+41. ~~**view-scatter**~~ ✓ — scatter/bubble plot
+42. ~~**view-boxplot**~~ ✓ — box-and-whisker chart
+43. ~~**view-audio**~~ ✓ — audio player with waveform
+44. ~~**view-timeseries**~~ ✓ — time-axis chart
+45. ~~**view-kanban**~~ ✓ — card board with drag-and-drop
+46. ~~**view-treemap**~~ ✓ — nested rectangles
+47. ~~**view-sunburst**~~ ✓ — radial hierarchical chart
+48. ~~**view-layers**~~ ✓ — multi-layer map with controls
+49. ~~**view-minimap**~~ ✓ — overview + detail map
+50. ~~**view-pivot**~~ ✓ — pivot table with aggregation
+51. ~~**view-spectrogram**~~ ✓ — audio frequency visualization
 
 ### Sprint 1 — MCP Coverage Essentials (10 → 17 Views) ✓
 
@@ -652,16 +692,18 @@ to 17 Views. Every common MCP tool output pattern is now covered.
 21. **Server-side decorators** (Python + TS) — the "20 lines to a working MCP App" story
 22. **Cross-View message bus** — the thing that makes composition a platform
 
-### Sprint 3 — Complete Coverage (17 → 26 Views)
+### Sprint 3 — Complete Coverage (17 → 27 Views) ✓
 
-23. **view-gallery** — returns card collections (second most common list display)
-24. **view-tree** — returns a tree of options/entities
-25. **view-timeline** — returns a sequence of events
-26. **view-log** — returns streaming output
-27. **view-image** — returns images with annotations
-28. **view-compare** — returns before/after comparison
-29. **view-chat** — embeds a conversation
-30. **view-ranked** — returns ranked/scored list
+23. ~~**view-gallery**~~ ✓ — returns card collections (second most common list display)
+24. ~~**view-tree**~~ ✓ — returns a tree of options/entities
+25. ~~**view-timeline**~~ ✓ — returns a sequence of events
+26. ~~**view-log**~~ ✓ — returns streaming output
+27. ~~**view-image**~~ ✓ — returns images with annotations
+28. ~~**view-compare**~~ ✓ — returns before/after comparison
+29. ~~**view-chat**~~ ✓ — embeds a conversation
+30. ~~**view-ranked**~~ ✓ — returns ranked/scored list
+31. ~~**view-quiz**~~ ✓ — interactive quiz with timer and server validation
+32. ~~**view-poll**~~ ✓ — live polling/voting with results visualization
 
 ### Sprint 4 — Wow Factor & Differentiation
 
@@ -707,42 +749,63 @@ The pitch: "Whatever your MCP tool returns, there's a View for it."
 | Needs confirmation before action | `view-confirm` | ✅ Shipped |
 | Returns structured data for inspection | `view-json` | ✅ Shipped |
 | Returns status/health of systems | `view-status` | ✅ Shipped |
-| Returns card collections | `view-gallery` | Sprint 3 |
-| Returns a tree of options/entities | `view-tree` | Sprint 3 |
-| Returns events/timeline | `view-timeline` | Sprint 3 |
-| Returns streaming output | `view-log` | Sprint 3 |
-| Returns images with annotations | `view-image` | Sprint 3 |
-| Returns before/after comparison | `view-compare` | Sprint 3 |
-| Embeds a conversation | `view-chat` | Sprint 3 |
-| Returns ranked/scored list | `view-ranked` | Sprint 3 |
-| Returns flow data | `view-sankey` | Sprint 4 |
-| Returns hierarchical proportion | `view-treemap` | Sprint 4 |
+| Returns card collections | `view-gallery` | ✅ Shipped |
+| Returns a tree of options/entities | `view-tree` | ✅ Shipped |
+| Returns events/timeline | `view-timeline` | ✅ Shipped |
+| Returns streaming output | `view-log` | ✅ Shipped |
+| Returns images with annotations | `view-image` | ✅ Shipped |
+| Returns before/after comparison | `view-compare` | ✅ Shipped |
+| Embeds a conversation | `view-chat` | ✅ Shipped |
+| Returns ranked/scored list | `view-ranked` | ✅ Shipped |
+| Interactive quiz | `view-quiz` | ✅ Shipped |
+| Live polling/voting | `view-poll` | ✅ Shipped |
+| Returns waveform/audio | `view-audio` | ✅ Shipped |
+| Returns grid/matrix data | `view-heatmap` / `view-crosstab` | ✅ Shipped |
+| Returns metric/KPI | `view-gauge` | ✅ Shipped |
+| Returns hierarchical proportion | `view-treemap` / `view-sunburst` | ✅ Shipped |
+| Returns scatter/correlation data | `view-scatter` | ✅ Shipped |
+| Returns distribution stats | `view-boxplot` | ✅ Shipped |
+| Returns pivot/aggregation | `view-pivot` | ✅ Shipped |
+| Returns time-series data | `view-timeseries` | ✅ Shipped |
+| Returns multi-layer spatial | `view-layers` / `view-minimap` | ✅ Shipped |
+| Returns elevation profile | `view-profile` | ✅ Shipped |
+| Returns cartographic legend | `view-gis-legend` | ✅ Shipped |
+| Returns frequency data | `view-spectrogram` | ✅ Shipped |
+| Returns terminal output | `view-terminal` | ✅ Shipped |
+| Returns code diff | `view-diff` | ✅ Shipped |
+| Returns task board | `view-kanban` | ✅ Shipped |
+| Returns image carousel | `view-carousel` | ✅ Shipped |
+| Returns notification/alerts | `view-alert` | ✅ Shipped |
+| Returns step progress | `view-stepper` | ✅ Shipped |
+| Returns filter controls | `view-filter` | ✅ Shipped |
+| Returns configuration | `view-settings` | ✅ Shipped |
+| Returns external content | `view-embed` | ✅ Shipped |
+| Returns flow data | `view-sankey` | Phase 6 |
 
-Sprint 1 shipped, taking the catalogue from **10 → 17 Views** and covering
-every common MCP tool output pattern. Sprint 3 reaches **26 Views** for
-complete coverage.
+Sprint 1 shipped, taking the catalogue from **10 → 17 Views**. Sprint 3 reached
+**27 Views** with 10 new Views and 5 new hooks (11 total). Sprint 4 completed
+Phases 3 and 4, reaching **51 Views** with 24 new Views and 563 new tests.
 
 ---
 
 ## View Catalogue Summary
 
-Total Views: **67** (17 shipped, 50 planned)
+Total Views: **67** (51 shipped, 16 planned)
 
-| Category | Views | Phase |
-|----------|-------|-------|
-| **Shipped** (17) | datatable, map, chart, form, markdown, video, pdf, dashboard, split, tabs, detail, counter, code, progress, confirm, json, status | 1-3 |
-| **MCP-Essential** (1) | gallery | 3 |
-| **Developer** (5) | timeline, tree, diff, log, kanban | 3 |
-| **Status & Monitoring** (2) | alert, stepper | 3 |
-| **Interactive Input** (4) | filter, settings, embed, ranked | 3 |
-| **Media** (4) | image, compare, audio, carousel | 4 |
-| **Data-Dense** (8) | heatmap, gauge, treemap, sunburst, scatter, boxplot, pivot, crosstab | 4 |
-| **Geo-Specialist** (5) | layers, timeseries, profile, minimap, gis-legend | 4 |
-| **Specialist** (2) | terminal, spectrogram | 4 |
-| **Novel Compound** (4) | notebook, investigation, chat, annotation | 6 |
-| **Flow & Process** (5) | sankey, funnel, gantt, swimlane, flowchart | 6 |
-| **Content & Narrative** (3) | geostory, slides, neural | 6 |
-| **Advanced** (7) | globe, 3d, graph, calendar, wizard, transcript, shader | 6 |
+| Category | Views | Phase | Status |
+|----------|-------|-------|--------|
+| **Core** (27) | datatable, map, chart, form, markdown, video, pdf, dashboard, split, tabs, detail, counter, code, progress, confirm, json, status, gallery, tree, timeline, log, image, compare, chat, ranked, quiz, poll | 1-3 | ✅ Shipped |
+| **Developer** (2) | diff, kanban | 3 | ✅ Shipped |
+| **Status & Monitoring** (2) | alert, stepper | 3 | ✅ Shipped |
+| **Interactive Input** (3) | filter, settings, embed | 3 | ✅ Shipped |
+| **Media** (2) | audio, carousel | 4 | ✅ Shipped |
+| **Data-Dense** (8) | heatmap, gauge, treemap, sunburst, scatter, boxplot, pivot, crosstab | 4 | ✅ Shipped |
+| **Geo-Specialist** (5) | layers, timeseries, profile, minimap, gis-legend | 4 | ✅ Shipped |
+| **Specialist** (2) | terminal, spectrogram | 4 | ✅ Shipped |
+| **Novel Compound** (3) | notebook, investigation, annotation | 6 | Planned |
+| **Flow & Process** (5) | sankey, funnel, gantt, swimlane, flowchart | 6 | Planned |
+| **Content & Narrative** (3) | geostory, slides, neural | 6 | Planned |
+| **Advanced** (5) | globe, 3d, graph, calendar, wizard | 6 | Planned |
 
 ---
 

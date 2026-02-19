@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "roots"],
+  "properties": {
+    "type": { "const": "tree" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "roots": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/TreeNode" }
+    },
+    "selection": { "enum": ["none", "single", "multi"] },
+    "searchable": { "type": "boolean" },
+    "expandDepth": { "type": "number" },
+    "loadChildrenTool": { "type": "string" }
+  },
+  "definitions": {
+    "TreeBadge": {
+      "type": "object",
+      "required": ["label"],
+      "properties": {
+        "label": { "type": "string" },
+        "color": { "type": "string" }
+      }
+    },
+    "TreeNode": {
+      "type": "object",
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "icon": { "type": "string" },
+        "badge": { "$ref": "#/definitions/TreeBadge" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/TreeNode" }
+        },
+        "hasChildren": { "type": "boolean" },
+        "disabled": { "type": "boolean" },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

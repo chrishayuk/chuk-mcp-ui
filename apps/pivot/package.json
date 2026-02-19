@@ -1,0 +1,42 @@
+{
+  "name": "@chuk/view-pivot",
+  "version": "1.0.0",
+  "description": "Pivot table View for MCP Apps — aggregation engine with sortable columns and totals",
+  "type": "module",
+  "main": "dist/mcp-app.html",
+  "exports": {
+    ".": "./dist/mcp-app.html",
+    "./schema": "./schemas/input.json",
+    "./types": "./src/schema.ts",
+    "./zod": "./src/zod.ts"
+  },
+  "files": ["dist/mcp-app.html", "schemas/input.json", "src/schema.ts", "src/zod.ts"],
+  "keywords": ["mcp", "mcp-apps", "ext-apps", "view", "pivot"],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@chuk/view-shared": "workspace:*",
+    "@chuk/view-ui": "workspace:*",
+    "framer-motion": "^11.0.0",
+    "@modelcontextprotocol/ext-apps": "^1.0.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0",
+    "vite-plugin-singlefile": "^2.0.0",
+    "vitest": "^3.0.0",
+    "ajv": "^8.17.0"
+  }
+}

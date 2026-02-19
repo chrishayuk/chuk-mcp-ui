@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "images"],
+  "properties": {
+    "type": { "const": "image" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "url"],
+        "properties": {
+          "id": { "type": "string" },
+          "url": { "type": "string" },
+          "alt": { "type": "string" },
+          "caption": { "type": "string" },
+          "width": { "type": "number" },
+          "height": { "type": "number" }
+        }
+      }
+    },
+    "activeIndex": { "type": "number" },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "imageId", "type", "x", "y"],
+        "properties": {
+          "id": { "type": "string" },
+          "imageId": { "type": "string" },
+          "type": { "enum": ["circle", "rect", "point", "text"] },
+          "x": { "type": "number" },
+          "y": { "type": "number" },
+          "width": { "type": "number" },
+          "height": { "type": "number" },
+          "radius": { "type": "number" },
+          "label": { "type": "string" },
+          "color": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "controls": {
+      "type": "object",
+      "properties": {
+        "zoom": { "type": "boolean" },
+        "fullscreen": { "type": "boolean" },
+        "thumbnails": { "type": "boolean" }
+      }
+    }
+  }
+}

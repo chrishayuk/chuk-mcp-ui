@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "filters"],
+  "properties": {
+    "type": { "const": "filter" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "filters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "type"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "type": {
+            "enum": [
+              "text",
+              "select",
+              "multi-select",
+              "date-range",
+              "number-range",
+              "toggle",
+              "checkbox-group"
+            ]
+          },
+          "placeholder": { "type": "string" },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["value", "label"],
+              "properties": {
+                "value": { "type": "string" },
+                "label": { "type": "string" },
+                "count": { "type": "number" }
+              }
+            }
+          },
+          "min": { "type": "number" },
+          "max": { "type": "number" },
+          "defaultValue": {}
+        }
+      }
+    },
+    "layout": { "enum": ["horizontal", "vertical", "wrap"] },
+    "submitMode": { "enum": ["instant", "button"] },
+    "resetLabel": { "type": "string" }
+  }
+}

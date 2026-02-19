@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "rowHeaders", "columnHeaders", "values"],
+  "properties": {
+    "type": { "const": "crosstab" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "rowHeaders": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "columnHeaders": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "values": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": { "type": "number" }
+      }
+    },
+    "formatting": {
+      "enum": ["none", "heatmap", "bars", "percentage"]
+    },
+    "colorScale": {
+      "type": "object",
+      "required": ["min", "max"],
+      "properties": {
+        "min": { "type": "string" },
+        "max": { "type": "string" }
+      }
+    },
+    "showTotals": { "type": "boolean" },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["row", "col"],
+        "properties": {
+          "row": { "type": "number" },
+          "col": { "type": "number" },
+          "label": { "type": "string" },
+          "highlight": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

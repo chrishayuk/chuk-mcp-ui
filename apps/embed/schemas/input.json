@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "url"],
+  "properties": {
+    "type": { "const": "embed" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "url": { "type": "string" },
+    "sandbox": { "type": "string" },
+    "allow": { "type": "string" },
+    "aspectRatio": { "type": "string" },
+    "toolbar": { "type": "boolean", "default": false },
+    "fallbackText": { "type": "string" }
+  }
+}

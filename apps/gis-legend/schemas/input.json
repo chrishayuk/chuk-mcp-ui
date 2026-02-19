@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "sections"],
+  "properties": {
+    "type": { "const": "gis-legend" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["items"],
+        "properties": {
+          "title": { "type": "string" },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type", "label"],
+              "properties": {
+                "type": { "enum": ["point", "line", "polygon", "gradient", "icon"] },
+                "label": { "type": "string" },
+                "color": { "type": "string" },
+                "fillColor": { "type": "string" },
+                "strokeColor": { "type": "string" },
+                "strokeWidth": { "type": "number" },
+                "size": { "type": "number" },
+                "icon": { "type": "string" },
+                "gradientStops": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["value", "color"],
+                    "properties": {
+                      "value": { "type": "string" },
+                      "color": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "orientation": { "enum": ["vertical", "horizontal"] }
+  }
+}

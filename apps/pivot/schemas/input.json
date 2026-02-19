@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "data", "rows", "columns", "values"],
+  "properties": {
+    "type": { "const": "pivot" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "data": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "rows": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "columns": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "values": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["field", "aggregate"],
+        "properties": {
+          "field": { "type": "string" },
+          "aggregate": {
+            "enum": ["sum", "count", "avg", "min", "max"]
+          },
+          "label": { "type": "string" },
+          "format": {
+            "enum": ["number", "percent", "currency"]
+          }
+        }
+      }
+    },
+    "sortable": { "type": "boolean" },
+    "showTotals": { "type": "boolean" }
+  }
+}

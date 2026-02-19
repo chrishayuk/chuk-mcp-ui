@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "datasets"],
+  "properties": {
+    "type": { "const": "scatter" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "subtitle": { "type": "string" },
+    "datasets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "points"],
+        "properties": {
+          "label": { "type": "string" },
+          "points": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["x", "y"],
+              "properties": {
+                "x": { "type": "number" },
+                "y": { "type": "number" },
+                "r": { "type": "number" },
+                "label": { "type": "string" },
+                "metadata": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          },
+          "color": { "type": "string" },
+          "pointStyle": {
+            "enum": ["circle", "cross", "rect", "triangle", "star"]
+          },
+          "pointRadius": { "type": "number" }
+        }
+      }
+    },
+    "xAxis": {
+      "type": "object",
+      "properties": {
+        "label": { "type": "string" },
+        "type": { "enum": ["linear", "logarithmic"] },
+        "min": { "type": "number" },
+        "max": { "type": "number" }
+      }
+    },
+    "yAxis": {
+      "type": "object",
+      "properties": {
+        "label": { "type": "string" },
+        "type": { "enum": ["linear", "logarithmic"] },
+        "min": { "type": "number" },
+        "max": { "type": "number" }
+      }
+    },
+    "legend": {
+      "type": "object",
+      "properties": {
+        "position": { "enum": ["top", "bottom", "left", "right", "none"] }
+      }
+    },
+    "zoom": { "type": "boolean" }
+  }
+}

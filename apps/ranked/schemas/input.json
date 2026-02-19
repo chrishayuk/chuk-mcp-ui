@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "items"],
+  "properties": {
+    "type": { "const": "ranked" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "rank", "title", "score"],
+        "properties": {
+          "id": { "type": "string" },
+          "rank": { "type": "number" },
+          "title": { "type": "string" },
+          "subtitle": { "type": "string" },
+          "score": { "type": "number" },
+          "previousRank": { "type": "number" },
+          "badges": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label"],
+              "properties": {
+                "label": { "type": "string" },
+                "variant": { "enum": ["default", "secondary", "outline"] }
+              }
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          },
+          "image": {
+            "type": "object",
+            "required": ["url"],
+            "properties": {
+              "url": { "type": "string" },
+              "alt": { "type": "string" }
+            }
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label", "tool", "arguments"],
+              "properties": {
+                "label": { "type": "string" },
+                "tool": { "type": "string" },
+                "arguments": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "maxScore": { "type": "number" },
+    "showDelta": { "type": "boolean" },
+    "scoreLabel": { "type": "string" },
+    "scoreSuffix": { "type": "string" }
+  }
+}

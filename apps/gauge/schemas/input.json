@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "value"],
+  "properties": {
+    "type": { "const": "gauge" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "value": { "type": "number" },
+    "min": { "type": "number" },
+    "max": { "type": "number" },
+    "unit": { "type": "string" },
+    "thresholds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["value", "color"],
+        "properties": {
+          "value": { "type": "number" },
+          "color": { "type": "string" },
+          "label": { "type": "string" }
+        }
+      }
+    },
+    "format": { "enum": ["number", "percent"] },
+    "size": { "enum": ["sm", "md", "lg"] },
+    "subtitle": { "type": "string" }
+  }
+}

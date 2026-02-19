@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "columns"],
+  "properties": {
+    "type": { "const": "kanban" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "moveTool": { "type": "string" },
+    "columns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "cards"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "color": { "type": "string" },
+          "limit": { "type": "number" },
+          "cards": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "title"],
+              "properties": {
+                "id": { "type": "string" },
+                "title": { "type": "string" },
+                "description": { "type": "string" },
+                "assignee": { "type": "string" },
+                "labels": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["text"],
+                    "properties": {
+                      "text": { "type": "string" },
+                      "color": { "type": "string" }
+                    }
+                  }
+                },
+                "priority": { "enum": ["low", "medium", "high", "critical"] },
+                "image": { "type": "string" },
+                "metadata": {
+                  "type": "object",
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

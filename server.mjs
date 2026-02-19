@@ -6,9 +6,17 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const VIEWS = [
-  "chart", "code", "confirm", "counter", "dashboard", "datatable",
-  "detail", "form", "json", "map", "markdown", "pdf", "progress",
-  "split", "status", "tabs", "video",
+  // Phase 1-2 (original 27)
+  "chart", "chat", "code", "compare", "confirm", "counter", "dashboard",
+  "datatable", "detail", "form", "gallery", "image", "json", "log", "map",
+  "markdown", "pdf", "poll", "progress", "quiz", "ranked", "split",
+  "status", "tabs", "timeline", "tree", "video",
+  // Phase 3 (7 new)
+  "alert", "diff", "embed", "filter", "kanban", "settings", "stepper",
+  // Phase 4 (17 new)
+  "audio", "boxplot", "carousel", "crosstab", "gauge", "gis-legend",
+  "heatmap", "layers", "minimap", "pivot", "profile", "scatter",
+  "spectrogram", "sunburst", "terminal", "timeseries", "treemap",
 ];
 
 // Pre-load all HTML into memory at startup
@@ -62,7 +70,7 @@ const server = createServer((req, res) => {
   }
 
   // View routes: /<view>/v1
-  const match = path.match(/^\/([a-z]+)\/v1$/);
+  const match = path.match(/^\/([a-z][a-z0-9-]*)\/v1$/);
   if (match && viewHtml[match[1]]) {
     res.writeHead(200, {
       "Content-Type": "text/html; charset=utf-8",
