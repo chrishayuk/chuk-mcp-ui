@@ -156,12 +156,79 @@ async def overview() -> dict:
 
 Cross-View communication is built in — click a map marker, the table highlights the row.
 
+## Developer Experience
+
+### Playground
+
+Browse and test every View interactively at [`/playground`](https://chuk-mcp-ui-views.fly.dev/playground). Source lives in `apps/playground/`.
+
+### CLI Scaffolder
+
+```bash
+pnpm create chuk-view my-widget
+```
+
+Generates a ready-to-develop View workspace with schema, tests, and Storybook story. Source lives in `packages/create-chuk-view/`.
+
+### Server-Side Helpers
+
+**Python** — decorate any FastMCP tool to auto-attach View metadata:
+
+```python
+from chuk_view_schemas.fastmcp import map_tool
+
+@map_tool(mcp)
+async def show_locations() -> dict:
+    ...
+```
+
+**TypeScript** — build View metadata in one call:
+
+```typescript
+import { buildViewMeta } from "@chuk/view-shared/server";
+
+const meta = buildViewMeta("map", { version: "1.0" });
+```
+
+### Cross-View Message Bus
+
+Views can publish and subscribe to a shared event bus for inter-panel coordination:
+
+```typescript
+import { useViewBus, ViewBusProvider } from "@chuk/view-shared";
+```
+
+Wrap a composition in `<ViewBusProvider>`, then call `useViewBus()` inside any child View to send or receive messages.
+
+### View Hook Family
+
+Six purpose-built hooks for common View patterns, all exported from `@chuk/view-shared`:
+
+| Hook | Purpose |
+|------|---------|
+| `useViewStream` | Progressive rendering from `ontoolinputpartial` — show data as it arrives |
+| `useViewSelection` | Shared selection state across composed Views (click map -> highlight table row) |
+| `useViewFilter` | Cross-View filtering (filter in datatable -> map updates, chart updates) |
+| `useViewUndo` | Undo/redo stack for interactive Views (form edits, drawing on map) |
+| `useViewExport` | Standardised export (PNG screenshot, CSV data, JSON payload) from any View |
+| `useViewResize` | Responsive breakpoint detection inside the iframe |
+
+```typescript
+import { useViewSelection, useViewResize } from "@chuk/view-shared";
+
+// Shared selection across composed Views
+const { selectedIds, highlightedId, select, highlight } = useViewSelection();
+
+// Responsive layout inside an iframe
+const { width, breakpoint } = useViewResize({ ref: containerRef });
+```
+
 ## Development
 
 ```bash
 pnpm install
 pnpm build            # Build all 17 Views (Turbo parallel)
-pnpm test             # Run all tests (183 tests)
+pnpm test             # Run all tests (343 tests)
 pnpm type-check       # TypeScript strict checking
 pnpm dev              # Dev servers with hot reload
 pnpm storybook        # Storybook dev server on port 6006
@@ -170,10 +237,11 @@ pnpm build-storybook  # Static Storybook build
 
 ### Storybook
 
-92 stories across 25 groups cover every component and View:
+101 stories across 31 groups cover every component, View, and hook:
 
 - **15 component stories** — Button, Card, Badge, Input, Select, Checkbox, RadioGroup, Slider, Textarea, Label, Table, Tabs, ScrollArea, Separator, Tooltip
 - **17 View stories** — DataTable, DynamicForm, ChartRenderer, Markdown, Video, PDF, MapView, Dashboard, Split, Tabs, Detail, Counter, Code, Progress, Confirm, Json, Status
+- **6 hook stories** — useViewResize, useViewUndo, useViewStream, useViewSelection, useViewFilter, useViewExport
 
 Theme toggle (light/dark) in the toolbar via `applyTheme()`. Run `pnpm storybook` to browse.
 
@@ -199,9 +267,11 @@ chuk-mcp-ui/
     confirm/        @chuk/view-confirm
     json/           @chuk/view-json
     status/         @chuk/view-status
+    playground/     Developer playground (deployed at /playground)
   packages/
-    shared/         Shared utilities (lifecycle, theme, actions, fallback)
+    shared/         Hooks, message bus, theme, actions, fallback
     ui/             Design system (Tailwind v4 + shadcn/ui + Framer Motion)
+    create-chuk-view/ CLI scaffolder for new Views
   .storybook/       Storybook config (main, preview, theme decorator)
   examples/
     demo-server/    Python MCP server (all 17 Views, hosted on Fly.io)

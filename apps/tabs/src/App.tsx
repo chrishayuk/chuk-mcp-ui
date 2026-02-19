@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView, Fallback, ViewBusProvider, useViewBusContainer } from "@chuk/view-shared";
 import { cn } from "@chuk/view-ui";
 import type { TabsContent, Tab } from "./schema";
 
@@ -10,7 +10,11 @@ export function TabsView() {
   if (!isConnected) return <Fallback message="Connecting..." />;
   if (!data) return <Fallback content={content ?? undefined} />;
 
-  return <TabsInner data={data} />;
+  return (
+    <ViewBusProvider>
+      <TabsInner data={data} />
+    </ViewBusProvider>
+  );
 }
 
 export function TabsInner({ data }: { data: TabsContent }) {
@@ -52,6 +56,14 @@ export function TabsInner({ data }: { data: TabsContent }) {
 
 function TabPanel({ tab }: { tab: Tab }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const { registerChild, unregisterChild } = useViewBusContainer();
+
+  useEffect(() => {
+    if (iframeRef.current) {
+      registerChild(tab.id, iframeRef.current);
+    }
+    return () => unregisterChild(tab.id);
+  }, [tab.id, registerChild, unregisterChild]);
 
   const handleLoad = useCallback(() => {
     iframeRef.current?.contentWindow?.postMessage(
@@ -59,10 +71,11 @@ function TabPanel({ tab }: { tab: Tab }) {
         type: "mcp-app:tool-result",
         content: [],
         structuredContent: tab.structuredContent,
+        __chuk_panel_id: tab.id,
       },
       "*"
     );
-  }, [tab.structuredContent]);
+  }, [tab.structuredContent, tab.id]);
 
   // Re-send data if structuredContent changes (tab switch with same URL)
   useEffect(() => {
@@ -72,11 +85,12 @@ function TabPanel({ tab }: { tab: Tab }) {
           type: "mcp-app:tool-result",
           content: [],
           structuredContent: tab.structuredContent,
+          __chuk_panel_id: tab.id,
         },
         "*"
       );
     }
-  }, [tab.structuredContent]);
+  }, [tab.structuredContent, tab.id]);
 
   return (
     <iframe

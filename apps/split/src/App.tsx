@@ -1,5 +1,5 @@
-import { useRef, useCallback } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useRef, useEffect, useCallback } from "react";
+import { useView, Fallback, ViewBusProvider, useViewBusContainer } from "@chuk/view-shared";
 import { cn } from "@chuk/view-ui";
 import type { SplitContent, SplitPanel } from "./schema";
 
@@ -10,7 +10,11 @@ export function SplitView() {
   if (!isConnected) return <Fallback message="Connecting..." />;
   if (!data) return <Fallback content={content ?? undefined} />;
 
-  return <Split data={data} />;
+  return (
+    <ViewBusProvider>
+      <Split data={data} />
+    </ViewBusProvider>
+  );
 }
 
 export function Split({ data }: { data: SplitContent }) {
@@ -25,20 +29,30 @@ export function Split({ data }: { data: SplitContent }) {
         isHorizontal ? "flex-row" : "flex-col"
       )}
     >
-      <ChildPanel
-        panel={left}
-        flex={leftRatio}
-      />
-      <ChildPanel
-        panel={right}
-        flex={rightRatio}
-      />
+      <ChildPanel panel={left} panelId="left" flex={leftRatio} />
+      <ChildPanel panel={right} panelId="right" flex={rightRatio} />
     </div>
   );
 }
 
-function ChildPanel({ panel, flex }: { panel: SplitPanel; flex: number }) {
+function ChildPanel({
+  panel,
+  panelId,
+  flex,
+}: {
+  panel: SplitPanel;
+  panelId: string;
+  flex: number;
+}) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const { registerChild, unregisterChild } = useViewBusContainer();
+
+  useEffect(() => {
+    if (iframeRef.current) {
+      registerChild(panelId, iframeRef.current);
+    }
+    return () => unregisterChild(panelId);
+  }, [panelId, registerChild, unregisterChild]);
 
   const handleLoad = useCallback(() => {
     iframeRef.current?.contentWindow?.postMessage(
@@ -46,10 +60,11 @@ function ChildPanel({ panel, flex }: { panel: SplitPanel; flex: number }) {
         type: "mcp-app:tool-result",
         content: [],
         structuredContent: panel.structuredContent,
+        __chuk_panel_id: panelId,
       },
       "*"
     );
-  }, [panel.structuredContent]);
+  }, [panel.structuredContent, panelId]);
 
   return (
     <div

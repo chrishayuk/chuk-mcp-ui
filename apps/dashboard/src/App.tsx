@@ -1,5 +1,5 @@
 import { useRef, useEffect, useCallback } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView, Fallback, ViewBusProvider, useViewBusContainer } from "@chuk/view-shared";
 import { cn } from "@chuk/view-ui";
 import type { DashboardContent, Panel } from "./schema";
 
@@ -8,7 +8,7 @@ import type { DashboardContent, Panel } from "./schema";
  *
  * Embeds child Views in iframes, passes structuredContent to each
  * via postMessage, and routes messages between children for
- * cross-View communication.
+ * cross-View communication via the ViewBusProvider.
  */
 export function DashboardView() {
   const { data, content, isConnected } =
@@ -17,46 +17,15 @@ export function DashboardView() {
   if (!isConnected) return <Fallback message="Connecting..." />;
   if (!data) return <Fallback content={content ?? undefined} />;
 
-  return <Dashboard data={data} />;
+  return (
+    <ViewBusProvider>
+      <Dashboard data={data} />
+    </ViewBusProvider>
+  );
 }
 
 export function Dashboard({ data }: { data: DashboardContent }) {
   const { title, layout, panels, gap = "8px" } = data;
-  const iframeRefs = useRef<Map<string, HTMLIFrameElement>>(new Map());
-
-  // Route messages between child Views
-  useEffect(() => {
-    function handleMessage(event: MessageEvent) {
-      const msg = event.data;
-      if (!msg || typeof msg !== "object" || !msg.__chuk_panel_id) return;
-
-      const sourcePanelId = msg.__chuk_panel_id;
-
-      // Broadcast to all other panels
-      for (const [panelId, iframe] of iframeRefs.current.entries()) {
-        if (panelId !== sourcePanelId && iframe.contentWindow) {
-          iframe.contentWindow.postMessage(
-            { ...msg, __chuk_source_panel: sourcePanelId },
-            "*"
-          );
-        }
-      }
-    }
-
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, []);
-
-  const setIframeRef = useCallback(
-    (panelId: string, el: HTMLIFrameElement | null) => {
-      if (el) {
-        iframeRefs.current.set(panelId, el);
-      } else {
-        iframeRefs.current.delete(panelId);
-      }
-    },
-    []
-  );
 
   return (
     <div className="h-full flex flex-col">
@@ -74,12 +43,7 @@ export function Dashboard({ data }: { data: DashboardContent }) {
         style={{ gap, padding: gap }}
       >
         {panels.map((panel) => (
-          <PanelFrame
-            key={panel.id}
-            panel={panel}
-            layout={layout}
-            onRef={(el) => setIframeRef(panel.id, el)}
-          />
+          <PanelFrame key={panel.id} panel={panel} layout={layout} />
         ))}
       </div>
     </div>
@@ -89,20 +53,26 @@ export function Dashboard({ data }: { data: DashboardContent }) {
 function PanelFrame({
   panel,
   layout,
-  onRef,
 }: {
   panel: Panel;
   layout: string;
-  onRef: (el: HTMLIFrameElement | null) => void;
 }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const { registerChild, unregisterChild } = useViewBusContainer();
+
+  // Register iframe with the message bus
+  useEffect(() => {
+    if (iframeRef.current) {
+      registerChild(panel.id, iframeRef.current);
+    }
+    return () => unregisterChild(panel.id);
+  }, [panel.id, registerChild, unregisterChild]);
 
   // When iframe loads, send it the structuredContent
   const handleLoad = useCallback(() => {
     const iframe = iframeRef.current;
     if (!iframe?.contentWindow) return;
 
-    // Send a synthetic tool result to the child View
     iframe.contentWindow.postMessage(
       {
         type: "mcp-app:tool-result",
@@ -112,12 +82,7 @@ function PanelFrame({
       },
       "*"
     );
-  }, [panel.structuredContent]);
-
-  useEffect(() => {
-    onRef(iframeRef.current);
-    return () => onRef(null);
-  }, [onRef]);
+  }, [panel.structuredContent, panel.id]);
 
   return (
     <div

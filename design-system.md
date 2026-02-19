@@ -180,6 +180,14 @@ Step-by-step process for creating a new View that uses the design system.
 
 ### 1. Scaffold the View
 
+The fastest way is the **create-chuk-view** CLI, which generates all 14 boilerplate files:
+
+```bash
+pnpm create chuk-view my-view
+```
+
+Or scaffold manually:
+
 ```bash
 mkdir -p apps/my-view/src
 ```
@@ -352,6 +360,112 @@ Some values come from data and can't be Tailwind classes. Use inline styles for 
 
 ---
 
+## View Compliance Spec
+
+Every View must satisfy these requirements to pass a design system audit.
+
+### Required
+
+| # | Rule | Example |
+|---|------|---------|
+| 1 | Entry point imports theme styles | `import "@chuk/view-ui/styles"` in `mcp-app.tsx` |
+| 2 | Root container uses theme tokens | `className="bg-background text-foreground font-sans"` |
+| 3 | UI chrome uses semantic colors | `bg-muted`, `text-muted-foreground`, `border-border` — not hex values |
+| 4 | `useView` hook for data lifecycle | `const { data, content, callTool, isConnected } = useView<T>(type, version)` |
+| 5 | Fallback states for loading/empty | `if (!isConnected) return <Fallback message="Connecting..." />` |
+| 6 | Third-party renderers read theme | Leaflet popups, Chart.js text/grid use `--chuk-*` CSS variables |
+
+### Recommended
+
+| # | Rule | Example |
+|---|------|---------|
+| 7 | Use `@chuk/view-ui` components | `<Button>`, `<Card>`, `<Table>`, `<Badge>` instead of raw HTML |
+| 8 | Use `cn()` for conditionals | `cn("base-class", isActive && "bg-primary/15")` |
+| 9 | Use shared animation variants | `import { fadeIn } from "@chuk/view-ui/animations"` |
+
+---
+
+## Third-Party Library Integration
+
+Some Views use libraries that render outside React's DOM tree (canvas, custom DOM nodes). These need special handling for theme compliance.
+
+### Pattern 1: CSS Variable Injection
+
+For libraries that create their own DOM elements (Leaflet popups, CodeMirror editors):
+
+```typescript
+function injectThemeStyles(container: HTMLElement) {
+  const id = "chuk-library-theme";
+  if (container.querySelector(`#${id}`)) return;
+  const style = document.createElement("style");
+  style.id = id;
+  style.textContent = `
+    .library-popup {
+      background: var(--chuk-color-background, #fff);
+      color: var(--chuk-color-text, #1a1a1a);
+      border: 1px solid var(--chuk-color-border, #e0e0e0);
+    }
+  `;
+  container.appendChild(style);
+}
+```
+
+The styles auto-update when `applyTheme()` changes CSS variable values — no re-injection needed.
+
+**Used by:** Map View (Leaflet popup styling)
+
+### Pattern 2: Read Variables at Render Time
+
+For canvas-based libraries (Chart.js) that accept color values in their config:
+
+```typescript
+function getThemeColors() {
+  const s = getComputedStyle(document.documentElement);
+  return {
+    text: s.getPropertyValue("--chuk-color-text").trim() || "#1a1a1a",
+    textSecondary: s.getPropertyValue("--chuk-color-text-secondary").trim() || "#666",
+    border: s.getPropertyValue("--chuk-color-border").trim() || "#e0e0e0",
+  };
+}
+
+// In useEffect:
+const theme = getThemeColors();
+new ChartJS(canvas, {
+  options: { color: theme.text, scales: { x: { ticks: { color: theme.textSecondary } } } }
+});
+```
+
+Re-reads on every data change since the `useEffect` re-runs.
+
+**Used by:** Chart View (axis labels, legend, grid lines)
+
+### Data Visualization Colors
+
+Colors for data points (chart datasets, map markers, status indicators) are **not** required to follow theme tokens. These are:
+
+- **Server-provided** via `structuredContent` (e.g. `layer.style.color`, `dataset.color`)
+- **Vibrant and distinguishable** — designed to contrast with any background
+- **Functional, not decorative** — encode meaning (status, category, value)
+
+The `DEFAULT_COLORS` palette in Chart and Leaflet's `#3388ff` default are acceptable fallbacks. Tailwind semantic color tokens (`text-emerald-600`, `text-amber-600`, `text-red-600`) are also fine for status indicators.
+
+---
+
+## Dark Mode Checklist
+
+Use this to verify a View works correctly in both themes. Toggle the Storybook toolbar switcher to test.
+
+- [ ] Text is readable on `bg-background` — no hardcoded `color: black` or `color: white`
+- [ ] Borders use `border-border` — no hardcoded `#ccc`, `#e0e0e0`, `#ddd`
+- [ ] Surfaces use `bg-muted` or `bg-card` — no hardcoded `#fff` or `#f5f5f5`
+- [ ] Third-party popups/overlays reference `--chuk-*` CSS variables
+- [ ] Canvas/chart text and grid lines read theme colors at render time
+- [ ] Status colors are Tailwind semantic tokens (`emerald`, `amber`, `red`) — acceptable
+- [ ] Data visualization colors (chart datasets, map markers) are vibrant on both backgrounds
+- [ ] No `style={{ color: "#..." }}` for UI chrome elements
+
+---
+
 ## Bundle Sizes
 
 | View | Bundle Size | Uses Framer Motion |
@@ -380,7 +494,7 @@ All sizes are for the single-file `mcp-app.html` with CSS, JS, and assets inline
 
 ## Storybook
 
-The design system is documented with 92 interactive stories across 32 groups, browsable at `localhost:6006`.
+The design system is documented with 101 interactive stories across 31 groups, browsable at `localhost:6006`.
 
 ### Running
 
@@ -395,6 +509,7 @@ The design system is documented with 92 interactive stories across 32 groups, br
 |------|----------|-------|-------------|
 | Component | `packages/ui/src/components/*.stories.tsx` | 48 stories (15 groups) | shadcn/ui primitives: variants, sizes, states |
 | View | `apps/*/src/*.stories.tsx` | 44 stories (17 groups) | Full View rendering with mock data |
+| Hook | `packages/shared/src/hooks/*.stories.tsx` | 18 stories (6 groups) | Interactive hook demos: resize, undo, stream, selection, filter, export |
 
 ### Theme Toggle
 
@@ -438,6 +553,8 @@ View stories render the inner component directly (e.g. `DataTable`, `DynamicForm
 
 | Package | Owns | Does NOT Own |
 |---------|------|-------------|
-| `packages/shared` | App protocol, `useView` hook, `applyTheme()`, `Fallback`, template resolver | Components, styling, animations |
+| `packages/shared` | App protocol, `useView` hook, `applyTheme()`, `Fallback`, template resolver, cross-View message bus (`useViewBus`, `ViewBusProvider`), server-side helpers (`getViewUrl`, `buildViewMeta`, `wrapViewResult` via `@chuk/view-shared/server`) | Components, styling, animations |
 | `packages/ui` | shadcn components, Tailwind theme bridge, animation variants, `cn()` | Protocol, data fetching, business logic |
+| `packages/create-chuk-view` | CLI scaffolder — generates all boilerplate files for a new View | Runtime code, components |
 | `apps/*` | View-specific rendering, schema types, Zod validation | Shared components, theme infrastructure |
+| `apps/playground` | Interactive sandbox for testing Views with live theme/data controls (dev-only, not shipped as a View) | Production Views, shared infrastructure |

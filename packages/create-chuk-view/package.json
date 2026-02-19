@@ -1,0 +1,22 @@
+{
+  "name": "create-chuk-view",
+  "version": "0.1.0",
+  "description": "Scaffold a new chuk-mcp-ui View with all 14 boilerplate files",
+  "type": "module",
+  "bin": {
+    "create-chuk-view": "./dist/cli.js"
+  },
+  "main": "./dist/cli.js",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "keywords": ["mcp", "mcp-apps", "ext-apps", "scaffolder", "create"],
+  "license": "MIT"
+}

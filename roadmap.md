@@ -90,7 +90,7 @@ have no View. Ordered by how frequently MCP servers produce this shape.
 - [x] `view-markdown` — rich markdown with code blocks, tables, links
 - [x] Design system — Tailwind CSS v4, shadcn/ui (15 components), Framer Motion animations
 - [x] `packages/ui` — shared component library with theme bridge
-- [x] Storybook — 92 stories (15 component + 17 View), theme toggle, static build
+- [x] Storybook — 101 stories (15 component + 17 View + 6 hook), theme toggle, static build
 - [ ] `view-timeline` — events on lanes with zoom/pan
 - [ ] `view-tree` — hierarchical explorer with lazy loading
 - [ ] `view-diff` — unified and split diff rendering
@@ -193,13 +193,15 @@ STAC imagery comparison, multi-layer investigations).
 
 ---
 
-## Phase 5 — Developer Experience & Infrastructure
+## Phase 5 — Developer Experience & Infrastructure (in progress)
 
 **Goal:** The tools and infrastructure that make chuk-mcp-ui sticky.
 Views win on capability; DX wins on adoption. This phase is what turns
 "useful library" into "the thing everyone reaches for."
 
-### 5.1 `create-chuk-view` CLI Scaffolder
+### 5.1 `create-chuk-view` CLI Scaffolder ✓
+
+**Sprint 2: shipped.** Implemented at `packages/create-chuk-view/`.
 
 ```bash
 npx create-chuk-view my-custom-view
@@ -211,10 +213,9 @@ schema, test stubs. A developer goes from zero to a working custom View
 in under a minute. This is what shadcn's `npx shadcn-ui add` did for
 adoption — remove the setup friction entirely.
 
-### 5.2 `useView` Hook Family
+### 5.2 `useView` Hook Family ✓
 
-Expand the existing `useView` hook in `packages/shared` into a family
-of purpose-built hooks:
+**Sprint 2: shipped.** Implemented at `packages/shared/src/hooks/` — 6 purpose-built hooks with 46 tests and 18 interactive Storybook stories.
 
 | Hook | Purpose |
 |------|---------|
@@ -228,7 +229,9 @@ of purpose-built hooks:
 These hooks are the real lock-in. Once people build Views using the hook
 ecosystem, they don't switch.
 
-### 5.3 Cross-View Message Bus
+### 5.3 Cross-View Message Bus ✓
+
+**Sprint 2: shipped.** Implemented at `packages/shared/src/bus/` — `useViewBus` hook, `ViewBusProvider`, and typed `ViewMessage` protocol. Container Views (dashboard, split, tabs) migrated to `ViewBusProvider`.
 
 Formalise the existing cross-View communication (click marker → highlight
 row) into a typed message protocol that any View can participate in:
@@ -245,7 +248,9 @@ type ViewMessage =
 This becomes a spec within a spec — the View-to-View interaction
 protocol. Document it, publish it, let third-party Views plug in.
 
-### 5.4 Server-Side Helpers
+### 5.4 Server-Side Helpers ✓
+
+**Sprint 2: shipped.** Python FastMCP decorators at `chuk-view-schemas/chuk_view_schemas/fastmcp.py` (17 per-view decorators). TypeScript server helpers at `packages/shared/src/server/` (`getViewUrl`, `buildViewMeta`, `wrapViewResult`).
 
 Wrap the `meta={"ui": {"resourceUri": ...}}` boilerplate in
 framework-specific decorators:
@@ -263,9 +268,18 @@ async def show_sites() -> MapContent:
     )
 ```
 
-The decorator handles `_meta.ui` wiring, `structuredContent` envelope,
-and text fallback. One decorator, done. Same pattern for TypeScript with
-`registerChukView()`.
+**TypeScript:**
+
+```typescript
+import { getViewUrl, buildViewMeta, wrapViewResult } from "@chuk/shared/server";
+
+const url = getViewUrl("map");
+const meta = buildViewMeta(url);
+const result = wrapViewResult(meta, mapData, "Map of heritage sites");
+```
+
+The decorators handle `_meta.ui` wiring, `structuredContent` envelope,
+and text fallback. One decorator (Python) or three helper calls (TypeScript), done.
 
 ### 5.5 Theme Presets
 
@@ -279,7 +293,9 @@ Presets: `default`, `dark`, `discovery` (Discovery Channel branding),
 `ibm` (IBM Carbon feel), `academic` (clean scholarly), `terminal`
 (green-on-black). Same data, different looks, zero code changes.
 
-### 5.6 Live Playground MVP
+### 5.6 Live Playground MVP ✓
+
+**Sprint 2: shipped.** Implemented at `apps/playground/`.
 
 A stripped-down early version of the Phase 9 catalogue: dropdown of Views
 + JSON editor + live iframe preview. Ship this before more Views.
@@ -316,18 +332,18 @@ full host. Also powers Phase 9 catalogue thumbnails.
 
 ### Deliverables
 
-- [ ] `create-chuk-view` CLI scaffolder (npm package)
-- [ ] `useViewStream` — progressive rendering hook
-- [ ] `useViewSelection` — shared selection state hook
-- [ ] `useViewFilter` — cross-View filtering hook
-- [ ] `useViewUndo` — undo/redo stack hook
-- [ ] `useViewExport` — standardised export hook
-- [ ] `useViewResize` — responsive breakpoint hook
-- [ ] Typed cross-View message bus protocol
-- [ ] Python FastMCP decorators (`@map_tool`, `@chart_tool`, etc.)
-- [ ] TypeScript `registerChukView()` helper
+- [x] `create-chuk-view` CLI scaffolder (npm package)
+- [x] `useViewStream` — progressive rendering hook
+- [x] `useViewSelection` — shared selection state hook
+- [x] `useViewFilter` — cross-View filtering hook
+- [x] `useViewUndo` — undo/redo stack hook
+- [x] `useViewExport` — standardised export hook
+- [x] `useViewResize` — responsive breakpoint hook
+- [x] Typed cross-View message bus protocol
+- [x] Python FastMCP decorators (`@map_tool`, `@chart_tool`, etc.)
+- [x] TypeScript server helpers (`getViewUrl`, `buildViewMeta`, `wrapViewResult`)
 - [ ] Theme presets (default, dark, discovery, ibm, academic, terminal)
-- [ ] Live playground MVP at `chuk-mcp-ui-views.fly.dev/playground`
+- [x] Live playground MVP at `apps/playground/`
 - [ ] `infer_view()` inference helper (Python + TypeScript)
 - [ ] `chuk-view-test` snapshot testing CLI
 - [ ] Publish all to npm + PyPI
@@ -553,18 +569,18 @@ community-contributed Views.
 | Composed dashboard | 2 | ✓ Done — dashboard, split, tabs Views |
 | Cross-View interaction | 2 | ✓ Done — click marker -> highlight row |
 | GitHub Actions CI | — | ✓ Done — build, test, type-check |
-| Zod schemas + tests | — | ✓ Done — 17 schemas, 183 total tests |
-| Design system (Tailwind + shadcn + Framer Motion) | 3 | ✓ Done — packages/ui, all 17 Views migrated |
-| Storybook (92 stories, theme toggle) | 3 | ✓ Done — component + View stories, static build |
+| Zod schemas + tests | — | ✓ Done — 17 schemas, 343 total tests |
+| Design system (Tailwind + shadcn + Framer Motion) | 3 | ✓ Done — packages/ui, all 17 Views migrated, dark mode compliant |
+| Storybook (101 stories, theme toggle) | 3 | ✓ Done — component + View + hook stories, static build |
 | First View on npm | 1 | Pending |
 | PyPI publish | 1 | Pending |
 | Full MCP coverage (10 → 17 Views) | 3 | ✓ Done — Sprint 1 |
 | Full MCP coverage (17 → 26 Views) | 3-4 | Not started — Sprint 3 |
-| `create-chuk-view` CLI | 5 | Not started — Sprint 2 |
-| Live playground MVP | 5 | Not started — Sprint 2 |
-| Hook family (`useViewStream`, etc.) | 5 | Not started |
-| Cross-View message bus | 5 | Not started — Sprint 2 |
-| Server-side decorators (Python + TS) | 5 | Not started — Sprint 2 |
+| `create-chuk-view` CLI | 5 | ✅ Done — Sprint 2 |
+| Live playground MVP | 5 | ✅ Done — Sprint 2 |
+| Hook family (`useViewStream`, etc.) | 5 | ✅ Done — Sprint 2 |
+| Cross-View message bus | 5 | ✅ Done — Sprint 2 |
+| Server-side decorators (Python + TS) | 5 | ✅ Done — Sprint 2 |
 | `view-notebook` | 6 | Not started — Sprint 4 |
 | `view-sankey` | 6 | Not started — Sprint 4 |
 | `view-geostory` | 6 | Not started — Sprint 4 |
@@ -746,4 +762,4 @@ Total Views: **67** (17 shipped, 50 planned)
 | Schema validation | Ajv + Zod (JS) / Pydantic (Py) | Triple schema: JSON Schema, Zod, Pydantic |
 | Styling | Tailwind CSS v4 + shadcn/ui | Utility-first CSS, accessible Radix primitives, theme bridge to --chuk-* vars |
 | Animation | Framer Motion (opt-in) | Declarative enter/exit, zero cost for Views that skip it |
-| Component development | Storybook 8 | 92 stories, theme toggle, colocated with source |
+| Component development | Storybook 8 | 101 stories, theme toggle, colocated with source |

@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Dashboard } from "./App";
+import { ViewBusProvider } from "@chuk/view-shared";
 
 const meta = {
   title: "Views/Dashboard",
   component: Dashboard,
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },
-  decorators: [(Story) => <div style={{ height: "600px" }}><Story /></div>],
+  decorators: [(Story) => <ViewBusProvider><div style={{ height: "600px" }}><Story /></div></ViewBusProvider>],
 } satisfies Meta<typeof Dashboard>;
 
 export default meta;

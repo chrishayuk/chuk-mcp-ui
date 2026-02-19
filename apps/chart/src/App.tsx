@@ -53,6 +53,15 @@ const DEFAULT_COLORS = [
   "#4bc0c0", "#9966ff", "#ff9f40", "#c9cbcf",
 ];
 
+function getThemeColors() {
+  const s = getComputedStyle(document.documentElement);
+  return {
+    text: s.getPropertyValue("--chuk-color-text").trim() || "#1a1a1a",
+    textSecondary: s.getPropertyValue("--chuk-color-text-secondary").trim() || "#666666",
+    border: s.getPropertyValue("--chuk-color-border").trim() || "#e0e0e0",
+  };
+}
+
 export function ChartView() {
   const { data, content, isConnected } =
     useView<ChartContent>("chart", "1.0");
@@ -77,6 +86,7 @@ export function ChartRenderer({ data }: { data: ChartContent }) {
     const isPie = data.chartType === "pie" || data.chartType === "doughnut";
     const isRadar = data.chartType === "radar";
     const chartType = data.chartType === "area" ? "line" : data.chartType;
+    const theme = getThemeColors();
 
     const labels = extractLabels(data.data);
 
@@ -94,7 +104,7 @@ export function ChartRenderer({ data }: { data: ChartContent }) {
             : data.chartType === "area" || ds.fill
               ? withAlpha(typeof bg === "string" ? bg : color, 0.2)
               : bg,
-        borderColor: isPie ? "#fff" : color,
+        borderColor: isPie ? theme.text : color,
         borderWidth: ds.borderWidth ?? (isPie ? 2 : 2),
         fill: data.chartType === "area" || ds.fill || false,
         tension: ds.tension ?? (data.chartType === "area" ? 0.4 : 0),
@@ -112,6 +122,7 @@ export function ChartRenderer({ data }: { data: ChartContent }) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        color: theme.text,
         interaction: {
           intersect: false,
           mode: "index",
@@ -120,16 +131,19 @@ export function ChartRenderer({ data }: { data: ChartContent }) {
           title: {
             display: !!data.title,
             text: data.title,
+            color: theme.text,
             font: { size: 16, weight: "bold" as const },
           },
           subtitle: {
             display: !!data.subtitle,
             text: data.subtitle,
+            color: theme.textSecondary,
             font: { size: 13 },
           },
           legend: {
             display: data.legend?.position !== "none",
             position: data.legend?.position ?? "top",
+            labels: { color: theme.text },
           },
           tooltip: {
             enabled: data.interactive !== false,
@@ -143,7 +157,10 @@ export function ChartRenderer({ data }: { data: ChartContent }) {
                 title: {
                   display: !!data.xAxis?.label,
                   text: data.xAxis?.label,
+                  color: theme.text,
                 },
+                ticks: { color: theme.textSecondary },
+                grid: { color: theme.border },
                 type: (data.xAxis?.type ?? "category") as never,
                 min: data.xAxis?.min,
                 max: data.xAxis?.max,
@@ -154,7 +171,10 @@ export function ChartRenderer({ data }: { data: ChartContent }) {
                 title: {
                   display: !!data.yAxis?.label,
                   text: data.yAxis?.label,
+                  color: theme.text,
                 },
+                ticks: { color: theme.textSecondary },
+                grid: { color: theme.border },
                 type: (data.yAxis?.type ?? "linear") as never,
                 min: data.yAxis?.min,
                 max: data.yAxis?.max,

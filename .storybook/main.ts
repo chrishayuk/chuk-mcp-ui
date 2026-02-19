@@ -6,6 +6,7 @@ const root = path.resolve(__dirname, "..");
 const config: StorybookConfig = {
   stories: [
     "../packages/ui/src/**/*.stories.@(ts|tsx)",
+    "../packages/shared/src/**/*.stories.@(ts|tsx)",
     "../apps/*/src/**/*.stories.@(ts|tsx)",
   ],
   framework: "@storybook/react-vite",

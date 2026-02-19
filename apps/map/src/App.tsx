@@ -114,6 +114,7 @@ export function LeafletMap({ data, onCallTool }: LeafletMapProps) {
     }
 
     mapRef.current = map;
+    injectLeafletThemeStyles(containerRef.current);
 
     return () => {
       map.remove();
@@ -285,7 +286,7 @@ function bindPopup(
     for (const field of popup.fields) {
       const val = properties[field];
       if (val !== undefined && val !== null) {
-        html += `<div style="margin:2px 0;font-size:13px"><span style="color:#888">${escapeHtml(field)}:</span> ${escapeHtml(String(val))}</div>`;
+        html += `<div style="margin:2px 0;font-size:13px"><span class="popup-field-label">${escapeHtml(field)}:</span> ${escapeHtml(String(val))}</div>`;
       }
     }
   }
@@ -293,7 +294,7 @@ function bindPopup(
   if (popup.actions && popup.actions.length > 0) {
     html += '<div style="margin-top:8px;display:flex;gap:4px">';
     popup.actions.forEach((action, i) => {
-      html += `<button class="popup-action" data-action-index="${i}" style="padding:4px 8px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;font-size:12px">${escapeHtml(action.label)}</button>`;
+      html += `<button class="popup-action" data-action-index="${i}">${escapeHtml(action.label)}</button>`;
     });
     html += "</div>";
   }
@@ -316,6 +317,41 @@ function bindPopup(
       });
     });
   }
+}
+
+function injectLeafletThemeStyles(container: HTMLElement) {
+  const id = "chuk-leaflet-theme";
+  if (container.querySelector(`#${id}`)) return;
+  const style = document.createElement("style");
+  style.id = id;
+  style.textContent = `
+    .leaflet-popup-content-wrapper {
+      background: var(--chuk-color-background, #fff);
+      color: var(--chuk-color-text, #1a1a1a);
+      border: 1px solid var(--chuk-color-border, #e0e0e0);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .leaflet-popup-tip {
+      background: var(--chuk-color-background, #fff);
+    }
+    .popup-field-label {
+      color: var(--chuk-color-text-secondary, #888);
+    }
+    .popup-action {
+      padding: 4px 8px;
+      border: 1px solid var(--chuk-color-border, #ccc);
+      border-radius: 4px;
+      background: var(--chuk-color-surface, #f5f5f5);
+      color: var(--chuk-color-text, #1a1a1a);
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .popup-action:hover {
+      background: var(--chuk-color-primary, #3388ff);
+      color: #fff;
+    }
+  `;
+  container.appendChild(style);
 }
 
 function escapeHtml(str: string): string {

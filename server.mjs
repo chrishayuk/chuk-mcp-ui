@@ -1,13 +1,14 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { createServer } from "node:http";
-import { resolve, dirname } from "node:path";
+import { resolve, dirname, extname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const VIEWS = [
-  "chart", "dashboard", "datatable", "form", "map",
-  "split", "tabs", "video", "pdf", "markdown",
+  "chart", "code", "confirm", "counter", "dashboard", "datatable",
+  "detail", "form", "json", "map", "markdown", "pdf", "progress",
+  "split", "status", "tabs", "video",
 ];
 
 // Pre-load all HTML into memory at startup
@@ -69,6 +70,27 @@ const server = createServer((req, res) => {
     });
     res.end(viewHtml[match[1]]);
     return;
+  }
+
+  // Playground: serve static files from apps/playground/dist
+  if (path === "/playground" || path.startsWith("/playground/")) {
+    const MIME = { ".html": "text/html", ".js": "application/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml" };
+    const subPath = path === "/playground" || path === "/playground/"
+      ? "/index.html"
+      : path.replace("/playground", "");
+    const filePath = resolve(__dirname, "apps", "playground", "dist", subPath.slice(1));
+    if (existsSync(filePath)) {
+      try {
+        const content = readFileSync(filePath);
+        const ext = extname(filePath);
+        res.writeHead(200, {
+          "Content-Type": MIME[ext] || "application/octet-stream",
+          "Cache-Control": "public, max-age=3600",
+        });
+        res.end(content);
+        return;
+      } catch { /* fall through to 404 */ }
+    }
   }
 
   // 404

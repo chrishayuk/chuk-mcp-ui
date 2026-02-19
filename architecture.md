@@ -213,7 +213,8 @@ chuk-mcp-ui/
 │   ├── progress/               # @chuk/view-progress — progress indicator display
 │   ├── confirm/                # @chuk/view-confirm — confirmation dialog
 │   ├── json/                   # @chuk/view-json — collapsible JSON tree
-│   └── status/                 # @chuk/view-status — status indicator display
+│   ├── status/                 # @chuk/view-status — status indicator display
+│   └── playground/              # Live Playground SPA — interactive View explorer
 │
 ├── .storybook/                # Storybook config
 │   ├── main.ts                # Story discovery, Vite + Tailwind plugin
@@ -227,9 +228,24 @@ chuk-mcp-ui/
 │   │   │   ├── use-view.ts     # useView hook (App protocol, theme, errors)
 │   │   │   ├── theme.ts        # CSS custom property mapping
 │   │   │   ├── actions.ts      # template resolver for callServerTool
-│   │   │   └── fallback.tsx    # graceful degradation component
+│   │   │   ├── fallback.tsx    # graceful degradation component
+│   │   │   ├── bus/            # Cross-View message bus
+│   │   │   │   ├── useViewBus.ts   # useViewBus hook
+│   │   │   │   ├── ViewBusProvider.tsx # React context provider
+│   │   │   │   └── types.ts        # Typed bus message definitions
+│   │   │   ├── hooks/          # Purpose-built View hooks (6 hooks, 46 tests)
+│   │   │   │   ├── use-view-stream.ts     # Progressive rendering
+│   │   │   │   ├── use-view-selection.ts  # Shared selection state
+│   │   │   │   ├── use-view-filter.ts     # Cross-View filtering
+│   │   │   │   ├── use-view-undo.ts       # Undo/redo stack
+│   │   │   │   ├── use-view-export.ts     # PNG/CSV/JSON export
+│   │   │   │   └── use-view-resize.ts     # Responsive breakpoints
+│   │   │   └── server/         # Server-side helpers
+│   │   │       ├── getViewUrl.ts    # Resolve View CDN/local URL
+│   │   │       ├── buildViewMeta.ts # Build ui meta for tool registration
+│   │   │       └── wrapViewResult.ts # Wrap structuredContent response
 │   │   └── package.json
-│   └── ui/                      # @chuk/view-ui
+│   ├── ui/                      # @chuk/view-ui
 │       ├── src/
 │       │   ├── index.ts         # barrel export (15 components + cn)
 │       │   ├── lib/utils.ts     # cn() — clsx + tailwind-merge
@@ -247,7 +263,10 @@ chuk-mcp-ui/
 │       │       └── transitions.ts # springSnappy, easeOut, easeInOut
 │       └── package.json
 │
-├── chuk-view-schemas/          # Python Pydantic v2 models (PyPI)
+│   └── create-chuk-view/        # CLI scaffolder for new Views
+│       ├── index.ts             # CLI entry point
+│       ├── templates/           # View boilerplate templates
+│       └── package.json├── chuk-view-schemas/          # Python Pydantic v2 models (PyPI)
 │   ├── chuk_view_schemas/
 │   │   ├── map.py
 │   │   ├── chart.py
@@ -266,7 +285,7 @@ chuk-mcp-ui/
 │
 ├── .github/
 │   └── workflows/
-│       └── ci.yml              # Build, test (183), type-check
+│       └── ci.yml              # Build, test (343), type-check
 │
 ├── Dockerfile                  # Views static server (Fly.io)
 ├── fly.toml                    # chuk-mcp-ui-views.fly.dev
@@ -495,6 +514,32 @@ app.sendMessage({ type: "viewport-changed", bounds: currentBounds });
 
 ---
 
+## View Hook Family
+
+Six purpose-built hooks in `packages/shared/src/hooks/` for common View
+patterns. All exported from `@chuk/view-shared`.
+
+| Hook | Purpose | Mechanism |
+|------|---------|-----------|
+| `useViewStream` | Progressive rendering as data arrives | `app.ontoolinputpartial` / `app.ontoolinput` |
+| `useViewSelection` | Shared selection state across Views | `useViewBus` + local state |
+| `useViewFilter` | Cross-View filtering | `useViewBus` + `Record<string, unknown>` |
+| `useViewUndo` | Undo/redo stack | `useReducer` with past/present/future |
+| `useViewExport` | PNG/CSV/JSON export | Dynamic `import("html2canvas")`, CSV escaping |
+| `useViewResize` | Responsive breakpoints | `ResizeObserver` + debounce |
+
+### Hook Composition
+
+Hooks are designed to compose with `useView` without conflict:
+
+- `useViewStream` uses `ontoolinputpartial`/`ontoolinput` (separate from
+  `useView`'s `ontoolresult` handler)
+- `useViewSelection`, `useViewFilter`, and `useViewExport` use `useViewBus`
+  internally — they broadcast state changes and subscribe to incoming messages
+- `useViewUndo` and `useViewResize` are standalone (no bus dependency)
+
+---
+
 ## Hosting and Distribution
 
 ### URL Convention
@@ -643,7 +688,7 @@ includes Shiki grammars). Most Views are 806-810 KB.
 
 ## Storybook
 
-92 stories cover every component and View, organised in two tiers:
+101 stories cover every component, View, and hook, organised in three tiers:
 
 ### Component Stories (48 stories)
 
@@ -657,6 +702,13 @@ exported and rendered directly with mock data, bypassing the `useView` hook.
 Views that use `callServerTool` pass a `mockCallTool` (Storybook `fn()`)
 for the Actions panel.
 
+### Hook Stories (18 stories)
+
+Colocated in `packages/shared/src/hooks/*.stories.tsx`. Interactive demos
+for all 6 `useView*` hooks — resize, undo, stream, selection, filter, export.
+Each story wraps the hook in a small React component with buttons/inputs
+to trigger hook methods and display current state.
+
 ### Theme Toggle
 
 A toolbar decorator applies `applyTheme("light" | "dark")` from
@@ -666,7 +718,7 @@ A toolbar decorator applies `applyTheme("light" | "dark")` from
 
 ```
 .storybook/
-  main.ts           # Stories from packages/ui + apps/*, Tailwind v4 plugin
+  main.ts           # Stories from packages/ui + packages/shared + apps/*, Tailwind v4 plugin
   preview.ts        # Theme toolbar, centered layout, CSS import
   theme-decorator   # Applies --chuk-* vars via applyTheme()
   mock-call-tool    # fn() mock for callServerTool actions
