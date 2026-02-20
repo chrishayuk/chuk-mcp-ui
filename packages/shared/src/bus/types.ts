@@ -50,6 +50,13 @@ export interface DropMessage {
   targetPanelId: string;
 }
 
+export interface UpdateMessage {
+  type: "update";
+  source: string;
+  field: string;
+  value: unknown;
+}
+
 // ── Union ────────────────────────────────────────────────────────
 
 export type ViewMessage =
@@ -60,7 +67,8 @@ export type ViewMessage =
   | ExportRequestMessage
   | DragStartMessage
   | DragEndMessage
-  | DropMessage;
+  | DropMessage
+  | UpdateMessage;
 
 // ── Message type string literal ──────────────────────────────────
 
@@ -77,6 +85,7 @@ export interface ViewMessageMap {
   "drag-start": DragStartMessage;
   "drag-end": DragEndMessage;
   drop: DropMessage;
+  update: UpdateMessage;
 }
 
 // ── Wire envelope (what actually goes over postMessage) ──────────

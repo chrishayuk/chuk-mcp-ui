@@ -13,6 +13,7 @@ export type {
   DragStartMessage,
   DragEndMessage,
   DropMessage,
+  UpdateMessage,
 } from "./types";
 export { BUS_VERSION, BUS_DISCRIMINATOR } from "./constants";
 export { useViewBus } from "./use-view-bus";

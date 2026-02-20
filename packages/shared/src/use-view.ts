@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   useApp,
   useHostStyles,
@@ -25,6 +25,7 @@ interface ViewState<T> {
  * - Applies host styles and theme
  * - Provides typed data access
  * - Handles fallback state
+ * - Listens for update-structured-content messages from parent dashboard
  */
 export function useView<T>(
   expectedType: string,
@@ -70,6 +71,34 @@ export function useView<T>(
       };
     },
   });
+
+  // Listen for update-structured-content messages from parent dashboard.
+  // This allows the dashboard's patch engine to update a panel's data
+  // without recreating the iframe.
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      const msg = event.data;
+      if (!msg || typeof msg !== "object") return;
+      if (msg.type !== "update-structured-content") return;
+
+      const incoming = msg.content as (T & { type?: string }) | undefined;
+      if (!incoming) return;
+
+      const action: string = msg.action ?? "replace";
+
+      if (action === "replace") {
+        setData(incoming);
+      } else if (action === "merge") {
+        setData((prev) => {
+          if (!prev || typeof prev !== "object") return incoming;
+          return { ...prev, ...incoming };
+        });
+      }
+    }
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
 
   useHostStyles(app, app?.getHostContext());
   const themeStr = useDocumentTheme();

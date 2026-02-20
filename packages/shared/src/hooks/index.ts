@@ -9,6 +9,7 @@ export { useViewToast } from "./use-view-toast";
 export { useViewNavigation } from "./use-view-navigation";
 export { useViewLiveData } from "./use-view-live-data";
 export { useViewDrag } from "./use-view-drag";
+export { useViewEvents } from "./use-view-events";
 
 export type { Breakpoint, ViewResizeState } from "./use-view-resize";
 export type { ViewUndoState } from "./use-view-undo";
@@ -21,3 +22,4 @@ export type { ViewToastState, ToastMessage, ToastSeverity } from "./use-view-toa
 export type { ViewNavigationState, NavigationEntry } from "./use-view-navigation";
 export type { LiveDataStatus, ViewLiveDataState } from "./use-view-live-data";
 export type { ViewDragState, DragItem, DragSourceHandle, DropTargetHandle } from "./use-view-drag";
+export type { ViewEventsState, ViewEventType, ViewEventPayload } from "./use-view-events";

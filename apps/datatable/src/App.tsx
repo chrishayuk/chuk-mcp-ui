@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { useView, Fallback, resolveTemplates } from "@chuk/view-shared";
+import { useView, Fallback, resolveTemplates, useViewEvents } from "@chuk/view-shared";
 import {
   Button,
   Input,
@@ -38,6 +38,7 @@ export interface DataTableProps {
 }
 
 export function DataTable({ data, onCallTool }: DataTableProps) {
+  const { emitSelect } = useViewEvents();
   const {
     title,
     columns,
@@ -238,6 +239,7 @@ export function DataTable({ data, onCallTool }: DataTableProps) {
                       onClick={() => {
                         if (rowId && panelId) {
                           setHighlightedId(rowId);
+                          emitSelect([rowId], "id");
                           window.parent.postMessage(
                             {
                               __chuk_panel_id: panelId,

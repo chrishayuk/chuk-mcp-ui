@@ -41,6 +41,7 @@ export {
   useViewNavigation,
   useViewLiveData,
   useViewDrag,
+  useViewEvents,
 } from "./hooks";
 export type {
   Breakpoint,
@@ -66,4 +67,7 @@ export type {
   DragItem,
   DragSourceHandle,
   DropTargetHandle,
+  ViewEventsState,
+  ViewEventType,
+  ViewEventPayload,
 } from "./hooks";

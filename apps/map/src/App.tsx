@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-import { useView, Fallback, resolveTemplates } from "@chuk/view-shared";
+import { useView, Fallback, resolveTemplates, useViewEvents } from "@chuk/view-shared";
 import type { MapContent, MapLayer, PopupAction } from "./schema";
 
 // Fix Leaflet default icon paths (broken when bundled)
@@ -50,6 +50,7 @@ export function LeafletMap({ data, onCallTool }: LeafletMapProps) {
   const layerGroupsRef = useRef<Map<string, L.LayerGroup>>(new Map());
   const featureLayersRef = useRef<Map<string, L.Layer>>(new Map());
   const [panelId, setPanelId] = useState<string | null>(null);
+  const { emitSelect } = useViewEvents();
 
   const handleAction = useCallback(
     async (action: PopupAction, properties: Record<string, unknown>) => {
@@ -143,7 +144,7 @@ export function LeafletMap({ data, onCallTool }: LeafletMapProps) {
     featureLayersRef.current.clear();
 
     for (const layer of data.layers) {
-      const group = createLayerGroup(layer, handleAction, featureLayersRef.current, panelId);
+      const group = createLayerGroup(layer, handleAction, featureLayersRef.current, panelId, emitSelect);
 
       if (layer.visible !== false) {
         group.addTo(map);
@@ -180,7 +181,7 @@ export function LeafletMap({ data, onCallTool }: LeafletMapProps) {
     } else if (data.center) {
       map.setView([data.center.lat, data.center.lon], data.zoom ?? 10);
     }
-  }, [data, handleAction, panelId]);
+  }, [data, handleAction, panelId, emitSelect]);
 
   return (
     <div
@@ -194,7 +195,8 @@ function createLayerGroup(
   layer: MapLayer,
   onAction: (action: PopupAction, properties: Record<string, unknown>) => void,
   featureLayers: Map<string, L.Layer>,
-  panelId: string | null
+  panelId: string | null,
+  emitSelect: (ids: string[], field?: string) => void
 ): L.LayerGroup {
   const style = layer.style ?? {};
 
@@ -209,6 +211,10 @@ function createLayerGroup(
 
       // Emit feature-click for cross-View communication
       leafletLayer.on("click", () => {
+        // Typed event via ViewBus (new pattern)
+        emitSelect([featureId], "feature_id");
+
+        // Legacy postMessage fallback for panels not yet migrated
         if (panelId) {
           window.parent.postMessage(
             {

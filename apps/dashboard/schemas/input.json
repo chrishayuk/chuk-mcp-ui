@@ -2,28 +2,123 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "required": ["type", "version", "layout", "panels"],
-  "properties": {
-    "type": { "const": "dashboard" },
-    "version": { "const": "1.0" },
-    "title": { "type": "string" },
-    "layout": { "enum": ["split-horizontal", "split-vertical", "grid"] },
-    "gap": { "type": "string" },
-    "panels": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["id", "viewUrl", "structuredContent"],
-        "properties": {
-          "id": { "type": "string" },
-          "label": { "type": "string" },
-          "viewUrl": { "type": "string" },
-          "structuredContent": {},
-          "width": { "type": "string" },
-          "height": { "type": "string" },
-          "minWidth": { "type": "string" },
-          "minHeight": { "type": "string" }
+  "oneOf": [
+    {
+      "properties": {
+        "type": { "const": "dashboard" },
+        "version": { "const": "1.0" },
+        "title": { "type": "string" },
+        "layout": { "enum": ["split-horizontal", "split-vertical", "grid"] },
+        "gap": { "type": "string" },
+        "panels": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/panelV1" }
         }
+      },
+      "required": ["type", "version", "layout", "panels"]
+    },
+    {
+      "properties": {
+        "type": { "const": "dashboard" },
+        "version": { "const": "2.0" },
+        "title": { "type": "string" },
+        "layout": { "$ref": "#/$defs/layoutConfig" },
+        "gap": { "type": "string" },
+        "panels": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/panelV2" }
+        },
+        "links": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/crossViewLink" }
+        },
+        "viewRegistry": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "required": ["type", "version", "layout", "panels"]
+    }
+  ],
+  "$defs": {
+    "panelV1": {
+      "type": "object",
+      "required": ["id", "viewUrl", "structuredContent"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "viewUrl": { "type": "string" },
+        "structuredContent": {},
+        "width": { "type": "string" },
+        "height": { "type": "string" },
+        "minWidth": { "type": "string" },
+        "minHeight": { "type": "string" }
       }
+    },
+    "panelV2": {
+      "type": "object",
+      "required": ["id", "structuredContent"],
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "viewUrl": { "type": "string" },
+        "viewType": { "type": "string" },
+        "structuredContent": {},
+        "selectionField": { "type": "string" },
+        "priority": { "type": "integer" },
+        "width": { "type": "string" },
+        "height": { "type": "string" },
+        "minWidth": { "type": "string" },
+        "minHeight": { "type": "string" },
+        "showWhen": { "$ref": "#/$defs/showCondition" },
+        "collapsed": { "type": "boolean" }
+      },
+      "anyOf": [
+        { "required": ["viewUrl"] },
+        { "required": ["viewType"] }
+      ]
+    },
+    "crossViewLink": {
+      "type": "object",
+      "required": ["source", "target", "type", "sourceField", "targetField"],
+      "properties": {
+        "source": { "type": "string" },
+        "target": { "type": "string" },
+        "type": { "enum": ["selection", "filter", "highlight", "navigate", "update"] },
+        "sourceField": { "type": "string" },
+        "targetField": { "type": "string" },
+        "bidirectional": { "type": "boolean" }
+      }
+    },
+    "showCondition": {
+      "type": "object",
+      "required": ["linkedPanelHasSelection"],
+      "properties": {
+        "linkedPanelHasSelection": { "type": "string" }
+      }
+    },
+    "layoutConfig": {
+      "oneOf": [
+        { "enum": ["auto", "split", "split-horizontal", "split-vertical", "tabs", "grid"] },
+        {
+          "type": "object",
+          "required": ["type", "columns"],
+          "properties": {
+            "type": { "const": "grid" },
+            "columns": { "type": "integer", "minimum": 1, "maximum": 12 },
+            "rows": { "type": "integer", "minimum": 1 },
+            "gap": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["type", "preset"],
+          "properties": {
+            "type": { "const": "named" },
+            "preset": { "enum": ["map-sidebar", "dashboard-kpi", "investigation", "report", "compare"] }
+          }
+        }
+      ]
     }
   }
 }
