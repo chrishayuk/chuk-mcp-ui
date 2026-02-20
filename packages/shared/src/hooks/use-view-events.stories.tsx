@@ -139,7 +139,7 @@ const btnStyle: React.CSSProperties = {
   fontSize: 14,
 };
 
-const meta = {
+const meta: Meta<typeof EventsDemo> = {
   title: "Hooks/useViewEvents",
   component: EventsDemo,
   tags: ["autodocs"],
@@ -150,7 +150,7 @@ const meta = {
       </ViewBusProvider>
     ),
   ],
-} satisfies Meta<typeof EventsDemo>;
+};
 
 export default meta;
 type Story = StoryObj<typeof meta>;

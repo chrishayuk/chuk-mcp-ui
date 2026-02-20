@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { classifyMessage, EventQueue } from "./event-queue";
+import { classifyMessage } from "./event-queue";
 import { applyOp, applyPatch } from "./patch-engine";
 import { UIStateStore, panelV2ToPanelState } from "./ui-state-store";
 import { serialiseUIState, emitState } from "./state-emitter";
