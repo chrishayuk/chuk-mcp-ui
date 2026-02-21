@@ -130,7 +130,7 @@ for _view_name, _path in VIEWS.items():
     meta={"ui": {"resourceUri": UI_URI["map"], "viewUrl": CDN_URL["map"]}},
     annotations=READ_ONLY,
 )
-async def show_map() -> dict:
+async def show_map() -> CallToolResult:
     """Show world landmarks on an interactive map."""
     landmarks = [
         ("Eiffel Tower", 48.8584, 2.2945, "Paris, France"),
@@ -193,7 +193,7 @@ async def show_map() -> dict:
     meta={"ui": {"resourceUri": UI_URI["chart"], "viewUrl": CDN_URL["chart"]}},
     annotations=READ_ONLY,
 )
-async def show_chart(chart_type: str = "bar") -> dict:
+async def show_chart(chart_type: str = "bar") -> CallToolResult:
     """Show programming language popularity as a chart. chart_type: bar, pie, or line."""
     structured = {
         "type": "chart",
@@ -232,7 +232,7 @@ async def show_chart(chart_type: str = "bar") -> dict:
     meta={"ui": {"resourceUri": UI_URI["datatable"], "viewUrl": CDN_URL["datatable"]}},
     annotations=READ_ONLY,
 )
-async def show_table() -> dict:
+async def show_table() -> CallToolResult:
     """Show country data in a sortable, filterable table with all column types."""
     countries = [
         ("Japan", "Asia", 125.7, 4940.88, "High income", True, "1956-12-18", "https://en.wikipedia.org/wiki/Japan"),
@@ -343,7 +343,7 @@ async def show_table() -> dict:
     meta={"ui": {"resourceUri": UI_URI["markdown"], "viewUrl": CDN_URL["markdown"]}},
     annotations=READ_ONLY,
 )
-async def show_markdown() -> dict:
+async def show_markdown() -> CallToolResult:
     """Show a rich markdown document with headings, code, tables, and lists."""
     md = """\
 # MCP Views Demo
@@ -459,7 +459,7 @@ _VIDEO_POSTER = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Big_b
     meta={"ui": {"resourceUri": UI_URI["video"], "viewUrl": CDN_URL["video"]}},
     annotations=READ_ONLY,
 )
-async def show_video() -> dict:
+async def show_video() -> CallToolResult:
     """Show a sample video (Big Buck Bunny — public domain).
 
     After the video loads, use these follow-up tools to control playback:
@@ -535,7 +535,7 @@ def _video_patch(**fields) -> dict:
 @mcp.tool(
     annotations=ToolAnnotations(readOnlyHint=False),
 )
-async def play_video() -> dict:
+async def play_video() -> CallToolResult:
     """Start (or resume) video playback."""
     structured = _video_patch(playing=True)
     return CallToolResult(
@@ -550,7 +550,7 @@ async def play_video() -> dict:
 @mcp.tool(
     annotations=ToolAnnotations(readOnlyHint=False),
 )
-async def pause_video() -> dict:
+async def pause_video() -> CallToolResult:
     """Pause video playback."""
     structured = _video_patch(playing=False)
     return CallToolResult(
@@ -565,7 +565,7 @@ async def pause_video() -> dict:
 @mcp.tool(
     annotations=ToolAnnotations(readOnlyHint=False),
 )
-async def seek_video(time: float = 0) -> dict:
+async def seek_video(time: float = 0) -> CallToolResult:
     """Jump to a specific time in the video. time: position in seconds."""
     structured = _video_patch(currentTime=time, playing=True)
     return CallToolResult(
@@ -580,7 +580,7 @@ async def seek_video(time: float = 0) -> dict:
 @mcp.tool(
     annotations=ToolAnnotations(readOnlyHint=False),
 )
-async def set_video_speed(rate: float = 1.0) -> dict:
+async def set_video_speed(rate: float = 1.0) -> CallToolResult:
     """Change video playback speed. rate: 0.25–4.0 (1.0 = normal)."""
     structured = _video_patch(playbackRate=rate)
     return CallToolResult(
@@ -595,7 +595,7 @@ async def set_video_speed(rate: float = 1.0) -> dict:
 @mcp.tool(
     annotations=ToolAnnotations(readOnlyHint=False),
 )
-async def set_video_volume(level: float = 1.0) -> dict:
+async def set_video_volume(level: float = 1.0) -> CallToolResult:
     """Change video volume. level: 0.0 (mute) to 1.0 (full)."""
     structured = _video_patch(volume=level)
     return CallToolResult(
@@ -614,7 +614,7 @@ async def set_video_volume(level: float = 1.0) -> dict:
     meta={"ui": {"resourceUri": UI_URI["pdf"], "viewUrl": CDN_URL["pdf"]}},
     annotations=READ_ONLY,
 )
-async def show_pdf() -> dict:
+async def show_pdf() -> CallToolResult:
     """Display a sample PDF document."""
     structured = {
         "type": "pdf",
@@ -640,7 +640,7 @@ async def show_pdf() -> dict:
     meta={"ui": {"resourceUri": UI_URI["form"], "viewUrl": CDN_URL["form"]}},
     annotations=READ_ONLY,
 )
-async def show_form() -> dict:
+async def show_form() -> CallToolResult:
     """Show an event registration form demonstrating all widget types."""
     structured = {
         "type": "form",
@@ -776,7 +776,7 @@ async def show_form() -> dict:
     meta={"ui": {"resourceUri": UI_URI["dashboard"], "viewUrl": CDN_URL["dashboard"]}},
     annotations=READ_ONLY,
 )
-async def show_dashboard() -> dict:
+async def show_dashboard() -> CallToolResult:
     """Show a composed 4-panel dashboard with map, chart, table, and markdown."""
     landmarks = [
         ("Eiffel Tower", 48.8584, 2.2945, "Europe"),
@@ -938,7 +938,7 @@ async def show_dashboard() -> dict:
     meta={"ui": {"resourceUri": UI_URI["split"], "viewUrl": CDN_URL["split"]}},
     annotations=READ_ONLY,
 )
-async def show_split() -> dict:
+async def show_split() -> CallToolResult:
     """Show a side-by-side split view: markdown on the left, chart on the right."""
     structured = {
         "type": "split",
@@ -991,7 +991,7 @@ async def show_split() -> dict:
     meta={"ui": {"resourceUri": UI_URI["tabs"], "viewUrl": CDN_URL["tabs"]}},
     annotations=READ_ONLY,
 )
-async def show_tabs() -> dict:
+async def show_tabs() -> CallToolResult:
     """Show a tabbed view with map, table, and chart tabs."""
     structured = {
         "type": "tabs",
@@ -1183,7 +1183,7 @@ async def show_tabs() -> dict:
     meta={"ui": {"resourceUri": UI_URI["detail"], "viewUrl": CDN_URL["detail"]}},
     annotations=READ_ONLY,
 )
-async def show_detail() -> dict:
+async def show_detail() -> CallToolResult:
     """Show a heritage monument detail card with key-value fields and actions."""
     structured = {
         "type": "detail",
@@ -1222,7 +1222,7 @@ async def show_detail() -> dict:
     meta={"ui": {"resourceUri": UI_URI["counter"], "viewUrl": CDN_URL["counter"]}},
     annotations=READ_ONLY,
 )
-async def show_counter() -> dict:
+async def show_counter() -> CallToolResult:
     """Show a single metric counter with trend indicator."""
     structured = {
         "type": "counter",
@@ -1250,7 +1250,7 @@ async def show_counter() -> dict:
     meta={"ui": {"resourceUri": UI_URI["code"], "viewUrl": CDN_URL["code"]}},
     annotations=READ_ONLY,
 )
-async def show_code() -> dict:
+async def show_code() -> CallToolResult:
     """Show a syntax-highlighted code block with an MCP tool example."""
     structured = {
         "type": "code",
@@ -1284,7 +1284,7 @@ async def show_code() -> dict:
     meta={"ui": {"resourceUri": UI_URI["status"], "viewUrl": CDN_URL["status"]}},
     annotations=READ_ONLY,
 )
-async def show_status() -> dict:
+async def show_status() -> CallToolResult:
     """Show a system health status board with multiple service checks."""
     structured = {
         "type": "status",
@@ -1314,7 +1314,7 @@ async def show_status() -> dict:
     meta={"ui": {"resourceUri": UI_URI["timeline"], "viewUrl": CDN_URL["timeline"]}},
     annotations=READ_ONLY,
 )
-async def show_timeline() -> dict:
+async def show_timeline() -> CallToolResult:
     """Show project milestones on a chronological timeline."""
     structured = {
         "type": "timeline",
@@ -1344,7 +1344,7 @@ async def show_timeline() -> dict:
     meta={"ui": {"resourceUri": UI_URI["gallery"], "viewUrl": CDN_URL["gallery"]}},
     annotations=READ_ONLY,
 )
-async def show_gallery() -> dict:
+async def show_gallery() -> CallToolResult:
     """Show an architecture photo gallery with lightbox support."""
     structured = {
         "type": "gallery",
@@ -1385,7 +1385,7 @@ async def show_gallery() -> dict:
     meta={"ui": {"resourceUri": UI_URI["kanban"], "viewUrl": CDN_URL["kanban"]}},
     annotations=READ_ONLY,
 )
-async def show_kanban() -> dict:
+async def show_kanban() -> CallToolResult:
     """Show a sprint board with To Do, In Progress, and Done columns."""
     structured = {
         "type": "kanban",
@@ -1499,7 +1499,7 @@ def _build_monument_rows(monuments_subset):
     meta={"ui": {"resourceUri": UI_URI["dashboard"], "viewUrl": CDN_URL["dashboard"]}},
     annotations=READ_ONLY,
 )
-async def show_composable_dashboard() -> dict:
+async def show_composable_dashboard() -> CallToolResult:
     """Show a v2.0 composable dashboard with cross-view selection linking.
 
     This is an interactive heritage investigation board. After it loads:
@@ -1642,7 +1642,7 @@ async def show_composable_dashboard() -> dict:
 @mcp.tool(
     annotations=READ_ONLY,
 )
-async def inspect_monument(monument_id: str) -> dict:
+async def inspect_monument(monument_id: str) -> CallToolResult:
     """Show detailed information about a monument in the dashboard's detail panel.
 
     Call this when the user selects a monument on the map or table.
@@ -1713,7 +1713,7 @@ async def inspect_monument(monument_id: str) -> dict:
 @mcp.tool(
     annotations=READ_ONLY,
 )
-async def filter_monuments(period: str = "", monument_type: str = "") -> dict:
+async def filter_monuments(period: str = "", monument_type: str = "") -> CallToolResult:
     """Filter the dashboard's map and table by historical period or monument type.
 
     Returns a ui_patch that updates both the map layers and the table rows.
@@ -1805,7 +1805,7 @@ async def filter_monuments(period: str = "", monument_type: str = "") -> dict:
 @mcp.tool(
     annotations=READ_ONLY,
 )
-async def add_chart_analysis() -> dict:
+async def add_chart_analysis() -> CallToolResult:
     """Add a chart panel to the dashboard showing monument breakdown by period.
 
     Returns a ui_patch with an add-panel op to insert a pie chart.
@@ -1861,7 +1861,7 @@ async def add_chart_analysis() -> dict:
 @mcp.tool(
     annotations=READ_ONLY,
 )
-async def reset_dashboard() -> dict:
+async def reset_dashboard() -> CallToolResult:
     """Reset the dashboard to its original state: remove added panels, clear filters, restore all monuments."""
     structured = {
         "type": "ui_patch",
@@ -1957,7 +1957,7 @@ async def reset_dashboard() -> dict:
 @mcp.tool(
     annotations=READ_ONLY,
 )
-async def find_nearby_monuments(monument_id: str, radius_km: float = 50) -> dict:
+async def find_nearby_monuments(monument_id: str, radius_km: float = 50) -> CallToolResult:
     """Find monuments near a given monument and update the map to highlight them.
 
     Filters the map to show the selected monument plus nearby ones within radius_km.
@@ -2059,7 +2059,7 @@ async def find_nearby_monuments(monument_id: str, radius_km: float = 50) -> dict
     meta={"ui": {"resourceUri": UI_URI["gauge"], "viewUrl": CDN_URL["gauge"]}},
     annotations=READ_ONLY,
 )
-async def show_gauge() -> dict:
+async def show_gauge() -> CallToolResult:
     """Show a radial gauge displaying system CPU usage with colour thresholds."""
     structured = {
         "type": "gauge",
@@ -2092,7 +2092,7 @@ async def show_gauge() -> dict:
     meta={"ui": {"resourceUri": UI_URI["tree"], "viewUrl": CDN_URL["tree"]}},
     annotations=READ_ONLY,
 )
-async def show_tree() -> dict:
+async def show_tree() -> CallToolResult:
     """Show a hierarchical project structure as an expandable tree."""
     structured = {
         "type": "tree",
@@ -2141,7 +2141,7 @@ async def show_tree() -> dict:
     meta={"ui": {"resourceUri": UI_URI["progress"], "viewUrl": CDN_URL["progress"]}},
     annotations=READ_ONLY,
 )
-async def show_progress() -> dict:
+async def show_progress() -> CallToolResult:
     """Show a multi-track progress display for a data pipeline."""
     structured = {
         "type": "progress",
@@ -2172,7 +2172,7 @@ async def show_progress() -> dict:
     meta={"ui": {"resourceUri": UI_URI["confirm"], "viewUrl": CDN_URL["confirm"]}},
     annotations=READ_ONLY,
 )
-async def show_confirm() -> dict:
+async def show_confirm() -> CallToolResult:
     """Show a confirmation dialog for a destructive action."""
     structured = {
         "type": "confirm",
@@ -2203,7 +2203,7 @@ async def show_confirm() -> dict:
     meta={"ui": {"resourceUri": UI_URI["json"], "viewUrl": CDN_URL["json"]}},
     annotations=READ_ONLY,
 )
-async def show_json() -> dict:
+async def show_json() -> CallToolResult:
     """Show an interactive JSON tree viewer with expandable nodes."""
     sample = {
         "server": {
@@ -2258,7 +2258,7 @@ async def show_json() -> dict:
     meta={"ui": {"resourceUri": UI_URI["compare"], "viewUrl": CDN_URL["compare"]}},
     annotations=READ_ONLY,
 )
-async def show_compare() -> dict:
+async def show_compare() -> CallToolResult:
     """Show a before/after image comparison slider."""
     structured = {
         "type": "compare",
@@ -2292,7 +2292,7 @@ async def show_compare() -> dict:
     meta={"ui": {"resourceUri": UI_URI["ranked"], "viewUrl": CDN_URL["ranked"]}},
     annotations=READ_ONLY,
 )
-async def show_ranked() -> dict:
+async def show_ranked() -> CallToolResult:
     """Show a ranked leaderboard of programming languages."""
     structured = {
         "type": "ranked",
@@ -2328,7 +2328,7 @@ async def show_ranked() -> dict:
     meta={"ui": {"resourceUri": UI_URI["poll"], "viewUrl": CDN_URL["poll"]}},
     annotations=READ_ONLY,
 )
-async def show_poll() -> dict:
+async def show_poll() -> CallToolResult:
     """Show a developer preferences poll with multiple question types."""
     structured = {
         "type": "poll",
@@ -2379,7 +2379,7 @@ async def show_poll() -> dict:
     meta={"ui": {"resourceUri": UI_URI["quiz"], "viewUrl": CDN_URL["quiz"]}},
     annotations=READ_ONLY,
 )
-async def show_quiz() -> dict:
+async def show_quiz() -> CallToolResult:
     """Show an interactive history trivia quiz."""
     structured = {
         "type": "quiz",
@@ -2446,7 +2446,7 @@ async def show_quiz() -> dict:
     meta={"ui": {"resourceUri": UI_URI["chat"], "viewUrl": CDN_URL["chat"]}},
     annotations=READ_ONLY,
 )
-async def show_chat() -> dict:
+async def show_chat() -> CallToolResult:
     """Show a chat interface with sample conversation history."""
     structured = {
         "type": "chat",
@@ -2478,7 +2478,7 @@ async def show_chat() -> dict:
     meta={"ui": {"resourceUri": UI_URI["image"], "viewUrl": CDN_URL["image"]}},
     annotations=READ_ONLY,
 )
-async def show_image() -> dict:
+async def show_image() -> CallToolResult:
     """Show an image viewer with annotations."""
     structured = {
         "type": "image",
@@ -2516,7 +2516,7 @@ async def show_image() -> dict:
     meta={"ui": {"resourceUri": UI_URI["log"], "viewUrl": CDN_URL["log"]}},
     annotations=READ_ONLY,
 )
-async def show_log() -> dict:
+async def show_log() -> CallToolResult:
     """Show a structured log viewer with multiple severity levels."""
     structured = {
         "type": "log",
@@ -2555,7 +2555,7 @@ async def show_log() -> dict:
     meta={"ui": {"resourceUri": UI_URI["alert"], "viewUrl": CDN_URL["alert"]}},
     annotations=READ_ONLY,
 )
-async def show_alert() -> dict:
+async def show_alert() -> CallToolResult:
     """Show a system alerts panel with multiple severity levels."""
     structured = {
         "type": "alert",
@@ -2586,7 +2586,7 @@ async def show_alert() -> dict:
     meta={"ui": {"resourceUri": UI_URI["diff"], "viewUrl": CDN_URL["diff"]}},
     annotations=READ_ONLY,
 )
-async def show_diff() -> dict:
+async def show_diff() -> CallToolResult:
     """Show a side-by-side code diff viewer."""
     structured = {
         "type": "diff",
@@ -2629,7 +2629,7 @@ async def show_diff() -> dict:
     meta={"ui": {"resourceUri": UI_URI["embed"], "viewUrl": CDN_URL["embed"]}},
     annotations=READ_ONLY,
 )
-async def show_embed() -> dict:
+async def show_embed() -> CallToolResult:
     """Show an embedded webpage in an iframe."""
     structured = {
         "type": "embed",
@@ -2656,7 +2656,7 @@ async def show_embed() -> dict:
     meta={"ui": {"resourceUri": UI_URI["filter"], "viewUrl": CDN_URL["filter"]}},
     annotations=READ_ONLY,
 )
-async def show_filter() -> dict:
+async def show_filter() -> CallToolResult:
     """Show a filter panel with multiple control types."""
     structured = {
         "type": "filter",
@@ -2698,7 +2698,7 @@ async def show_filter() -> dict:
     meta={"ui": {"resourceUri": UI_URI["settings"], "viewUrl": CDN_URL["settings"]}},
     annotations=READ_ONLY,
 )
-async def show_settings() -> dict:
+async def show_settings() -> CallToolResult:
     """Show an application settings panel with grouped controls."""
     structured = {
         "type": "settings",
@@ -2766,7 +2766,7 @@ async def show_settings() -> dict:
     meta={"ui": {"resourceUri": UI_URI["stepper"], "viewUrl": CDN_URL["stepper"]}},
     annotations=READ_ONLY,
 )
-async def show_stepper() -> dict:
+async def show_stepper() -> CallToolResult:
     """Show a multi-step wizard for data import."""
     structured = {
         "type": "stepper",
@@ -2798,7 +2798,7 @@ async def show_stepper() -> dict:
     meta={"ui": {"resourceUri": UI_URI["heatmap"], "viewUrl": CDN_URL["heatmap"]}},
     annotations=READ_ONLY,
 )
-async def show_heatmap() -> dict:
+async def show_heatmap() -> CallToolResult:
     """Show an activity heatmap of commit counts by day of week and hour."""
     days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     hours = [f"{h:02d}:00" for h in range(24)]
@@ -2839,7 +2839,7 @@ async def show_heatmap() -> dict:
     meta={"ui": {"resourceUri": UI_URI["crosstab"], "viewUrl": CDN_URL["crosstab"]}},
     annotations=READ_ONLY,
 )
-async def show_crosstab() -> dict:
+async def show_crosstab() -> CallToolResult:
     """Show a cross-tabulation of heritage monument counts by period vs type."""
     structured = {
         "type": "crosstab",
@@ -2873,7 +2873,7 @@ async def show_crosstab() -> dict:
     meta={"ui": {"resourceUri": UI_URI["scatter"], "viewUrl": CDN_URL["scatter"]}},
     annotations=READ_ONLY,
 )
-async def show_scatter() -> dict:
+async def show_scatter() -> CallToolResult:
     """Show a scatter plot of city population vs GDP across three regions."""
     structured = {
         "type": "scatter",
@@ -2932,7 +2932,7 @@ async def show_scatter() -> dict:
     meta={"ui": {"resourceUri": UI_URI["boxplot"], "viewUrl": CDN_URL["boxplot"]}},
     annotations=READ_ONLY,
 )
-async def show_boxplot() -> dict:
+async def show_boxplot() -> CallToolResult:
     """Show box plots for API response times across different services."""
     structured = {
         "type": "boxplot",
@@ -2964,7 +2964,7 @@ async def show_boxplot() -> dict:
     meta={"ui": {"resourceUri": UI_URI["timeseries"], "viewUrl": CDN_URL["timeseries"]}},
     annotations=READ_ONLY,
 )
-async def show_timeseries() -> dict:
+async def show_timeseries() -> CallToolResult:
     """Show server CPU and memory usage over a 24-hour period."""
     import math
 
@@ -3006,7 +3006,7 @@ async def show_timeseries() -> dict:
     meta={"ui": {"resourceUri": UI_URI["treemap"], "viewUrl": CDN_URL["treemap"]}},
     annotations=READ_ONLY,
 )
-async def show_treemap() -> dict:
+async def show_treemap() -> CallToolResult:
     """Show a treemap of disk usage by directory."""
     structured = {
         "type": "treemap",
@@ -3053,7 +3053,7 @@ async def show_treemap() -> dict:
     meta={"ui": {"resourceUri": UI_URI["sunburst"], "viewUrl": CDN_URL["sunburst"]}},
     annotations=READ_ONLY,
 )
-async def show_sunburst() -> dict:
+async def show_sunburst() -> CallToolResult:
     """Show a sunburst chart of heritage monuments by period then type."""
     structured = {
         "type": "sunburst",
@@ -3106,7 +3106,7 @@ async def show_sunburst() -> dict:
     meta={"ui": {"resourceUri": UI_URI["pivot"], "viewUrl": CDN_URL["pivot"]}},
     annotations=READ_ONLY,
 )
-async def show_pivot() -> dict:
+async def show_pivot() -> CallToolResult:
     """Show a pivot table summarising sales data by region and quarter."""
     structured = {
         "type": "pivot",
@@ -3151,7 +3151,7 @@ async def show_pivot() -> dict:
     meta={"ui": {"resourceUri": UI_URI["profile"], "viewUrl": CDN_URL["profile"]}},
     annotations=READ_ONLY,
 )
-async def show_profile() -> dict:
+async def show_profile() -> CallToolResult:
     """Show an elevation profile along a hiking trail."""
     structured = {
         "type": "profile",
@@ -3189,7 +3189,7 @@ async def show_profile() -> dict:
     meta={"ui": {"resourceUri": UI_URI["audio"], "viewUrl": CDN_URL["audio"]}},
     annotations=READ_ONLY,
 )
-async def show_audio() -> dict:
+async def show_audio() -> CallToolResult:
     """Play a public-domain audio sample (Bach Cello Suite No. 1)."""
     structured = {
         "type": "audio",
@@ -3216,7 +3216,7 @@ async def show_audio() -> dict:
     meta={"ui": {"resourceUri": UI_URI["carousel"], "viewUrl": CDN_URL["carousel"]}},
     annotations=READ_ONLY,
 )
-async def show_carousel() -> dict:
+async def show_carousel() -> CallToolResult:
     """Show an image carousel of heritage sites across Britain."""
     structured = {
         "type": "carousel",
@@ -3266,7 +3266,7 @@ async def show_carousel() -> dict:
     meta={"ui": {"resourceUri": UI_URI["terminal"], "viewUrl": CDN_URL["terminal"]}},
     annotations=READ_ONLY,
 )
-async def show_terminal() -> dict:
+async def show_terminal() -> CallToolResult:
     """Show terminal output from a deployment script."""
     structured = {
         "type": "terminal",
@@ -3310,7 +3310,7 @@ async def show_terminal() -> dict:
     meta={"ui": {"resourceUri": UI_URI["gis-legend"], "viewUrl": CDN_URL["gis-legend"]}},
     annotations=READ_ONLY,
 )
-async def show_gis_legend() -> dict:
+async def show_gis_legend() -> CallToolResult:
     """Show a map legend with point, line, polygon, and gradient symbols."""
     structured = {
         "type": "gis-legend",
@@ -3370,7 +3370,7 @@ async def show_gis_legend() -> dict:
     meta={"ui": {"resourceUri": UI_URI["layers"], "viewUrl": CDN_URL["layers"]}},
     annotations=READ_ONLY,
 )
-async def show_layers() -> dict:
+async def show_layers() -> CallToolResult:
     """Show a multi-layer map with toggleable heritage and geographic layers."""
     structured = {
         "type": "layers",
@@ -3445,7 +3445,7 @@ async def show_layers() -> dict:
     meta={"ui": {"resourceUri": UI_URI["minimap"], "viewUrl": CDN_URL["minimap"]}},
     annotations=READ_ONLY,
 )
-async def show_minimap() -> dict:
+async def show_minimap() -> CallToolResult:
     """Show an overview + detail minimap for the Salisbury Plain heritage area."""
     monuments = {
         "type": "FeatureCollection",
@@ -3493,7 +3493,7 @@ async def show_minimap() -> dict:
     meta={"ui": {"resourceUri": UI_URI["spectrogram"], "viewUrl": CDN_URL["spectrogram"]}},
     annotations=READ_ONLY,
 )
-async def show_spectrogram() -> dict:
+async def show_spectrogram() -> CallToolResult:
     """Show a spectrogram visualization of a synthetic audio signal."""
     import math
 
@@ -3570,7 +3570,7 @@ async def handle_save_settings(
     export_format: str = "json",
     email_alerts: bool = True,
     alert_threshold: str = "warning",
-) -> dict:
+) -> CallToolResult:
     """Save application settings."""
     settings = {
         "theme": theme, "font_size": font_size, "animations": animations,
@@ -3601,7 +3601,7 @@ async def handle_registration(
     badge_color: str = "",
     dietary: str = "",
     referral_code: str = "",
-) -> dict:
+) -> CallToolResult:
     """Handle event registration form submission."""
     return CallToolResult(
         content=[
@@ -3627,7 +3627,7 @@ async def handle_registration(
 )
 async def handle_feedback(
     name: str, message: str, city: str = "", visited: bool = False, rating: int = 0
-) -> dict:
+) -> CallToolResult:
     """Handle feedback form submission."""
     return CallToolResult(
         content=[
@@ -3646,7 +3646,7 @@ async def handle_feedback(
 
 
 @mcp.tool(annotations=READ_ONLY)
-async def show_country_detail(country: str) -> dict:
+async def show_country_detail(country: str) -> CallToolResult:
     """Show details about a country (triggered from table row action)."""
     details = {
         "Japan": "Japan is an island country in East Asia, known for its ancient temples, imperial palaces, and cutting-edge technology.",
@@ -3667,7 +3667,7 @@ async def show_country_detail(country: str) -> dict:
 @mcp.tool(
     annotations=ToolAnnotations(readOnlyHint=False, idempotentHint=False),
 )
-async def remove_country(country: str) -> dict:
+async def remove_country(country: str) -> CallToolResult:
     """Remove a country from the table (demo — no actual deletion)."""
     return CallToolResult(
         content=[

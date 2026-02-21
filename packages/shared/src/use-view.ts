@@ -29,6 +29,7 @@ interface ViewState<T> {
  */
 export function useView<T>(
   expectedType: string,
+  // Reserved for future schema version negotiation; part of the public API surface.
   _expectedVersion: string
 ): ViewState<T> {
   const [data, setData] = useState<T | null>(null);

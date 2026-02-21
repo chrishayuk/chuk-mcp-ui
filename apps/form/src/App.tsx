@@ -141,7 +141,7 @@ function FieldGroupSection({
   const [collapsed, setCollapsed] = useState(group.collapsed ?? false);
 
   return (
-    <fieldset className="border rounded-lg p-4 mb-4">
+    <fieldset className="border border-border rounded-lg p-4 mb-4">
       <legend
         className="text-sm font-semibold cursor-pointer select-none px-1"
         onClick={() => group.collapsible && setCollapsed((c) => !c)}
