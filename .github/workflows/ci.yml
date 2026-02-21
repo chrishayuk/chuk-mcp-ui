@@ -17,7 +17,8 @@ jobs:
         with:
           version: 9
 
-      - uses: actions/setup-node@v4
+      - id: setup-node
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
@@ -34,5 +35,13 @@ jobs:
         run: pnpm test:compat
 
       - name: Generate compatibility matrix
-        if: always()
+        if: always() && steps.setup-node.outcome == 'success'
         run: pnpm --filter @chuk/compat-harness generate:matrix
+
+      - name: Upload compatibility matrix
+        if: always() && steps.setup-node.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: compat-matrix
+          path: docs/compat-matrix.md
+          if-no-files-found: ignore
