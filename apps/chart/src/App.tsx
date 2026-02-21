@@ -22,7 +22,7 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView, Fallback, useViewEvents } from "@chuk/view-shared";
 import type { ChartContent, ChartDataset, DataPoint } from "./schema";
 
 ChartJS.register(
@@ -75,6 +75,7 @@ export function ChartView() {
 export function ChartRenderer({ data }: { data: ChartContent }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<ChartJS | null>(null);
+  const { emitSelect } = useViewEvents();
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -123,6 +124,18 @@ export function ChartRenderer({ data }: { data: ChartContent }) {
         responsive: true,
         maintainAspectRatio: false,
         color: theme.text,
+        onClick: (_event: unknown, elements: { index: number; datasetIndex: number }[]) => {
+          if (elements.length === 0) return;
+          const el = elements[0];
+          const ds = data.data[el.datasetIndex];
+          if (!ds) return;
+          const point = ds.values[el.index];
+          const label =
+            typeof point === "object" && point !== null && "label" in point
+              ? String((point as { label: string }).label)
+              : String(el.index);
+          emitSelect([label], "label");
+        },
         interaction: {
           intersect: false,
           mode: "index",

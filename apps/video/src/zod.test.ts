@@ -51,4 +51,32 @@ describe("video zod schema validation", () => {
     const data = { type: "video", version: "1.0", url: "https://example.com/video.mp4", startTime: 0 };
     expect(videoSchema.safeParse(data).success).toBe(true);
   });
+
+  it("accepts playback control fields", () => {
+    const data = {
+      type: "video", version: "1.0", url: "https://example.com/video.mp4",
+      playing: true, currentTime: 60, playbackRate: 1.5, volume: 0.8,
+    };
+    expect(videoSchema.safeParse(data).success).toBe(true);
+  });
+
+  it("accepts playing=false", () => {
+    const data = { type: "video", version: "1.0", url: "https://example.com/video.mp4", playing: false };
+    expect(videoSchema.safeParse(data).success).toBe(true);
+  });
+
+  it("rejects negative currentTime", () => {
+    const data = { type: "video", version: "1.0", url: "https://example.com/video.mp4", currentTime: -1 };
+    expect(videoSchema.safeParse(data).success).toBe(false);
+  });
+
+  it("rejects volume above 1", () => {
+    const data = { type: "video", version: "1.0", url: "https://example.com/video.mp4", volume: 1.5 };
+    expect(videoSchema.safeParse(data).success).toBe(false);
+  });
+
+  it("rejects playbackRate below 0.25", () => {
+    const data = { type: "video", version: "1.0", url: "https://example.com/video.mp4", playbackRate: 0.1 };
+    expect(videoSchema.safeParse(data).success).toBe(false);
+  });
 });

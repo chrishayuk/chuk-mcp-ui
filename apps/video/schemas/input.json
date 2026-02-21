@@ -11,6 +11,10 @@
     "muted": { "type": "boolean", "default": false },
     "loop": { "type": "boolean", "default": false },
     "poster": { "type": "string" },
-    "startTime": { "type": "number", "minimum": 0 }
+    "startTime": { "type": "number", "minimum": 0 },
+    "playing": { "type": "boolean", "description": "Runtime playback state — true = playing, false = paused" },
+    "currentTime": { "type": "number", "minimum": 0, "description": "Seek to this position (seconds)" },
+    "playbackRate": { "type": "number", "minimum": 0.25, "maximum": 4, "description": "Playback speed multiplier (default 1.0)" },
+    "volume": { "type": "number", "minimum": 0, "maximum": 1, "description": "Volume level 0.0–1.0" }
   }
 }

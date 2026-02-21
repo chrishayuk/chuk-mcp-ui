@@ -37,8 +37,10 @@ export function useView<T>(
     text?: string;
   }> | null>(null);
   const [callToolError, setCallToolError] = useState<string | null>(null);
+  // Track whether data arrived via dashboard postMessage (bypasses ext-apps)
+  const [dashboardConnected, setDashboardConnected] = useState(false);
 
-  const { app, isConnected, error } = useApp({
+  const { app, isConnected: extAppsConnected, error } = useApp({
     appInfo: {
       name: `@chuk/view-${expectedType}`,
       version: "1.0.0",
@@ -72,33 +74,53 @@ export function useView<T>(
     },
   });
 
-  // Listen for update-structured-content messages from parent dashboard.
-  // This allows the dashboard's patch engine to update a panel's data
-  // without recreating the iframe.
+  // Connected if ext-apps handshake completed OR data arrived from dashboard
+  const isConnected = extAppsConnected || dashboardConnected;
+
+  // Listen for messages from parent dashboard:
+  // - "mcp-app:tool-result": initial data delivery when iframe loads
+  // - "update-structured-content": incremental updates from patch engine
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
       const msg = event.data;
       if (!msg || typeof msg !== "object") return;
-      if (msg.type !== "update-structured-content") return;
 
-      const incoming = msg.content as (T & { type?: string }) | undefined;
-      if (!incoming) return;
+      // Dashboard sends tool-result on iframe load
+      if (msg.type === "mcp-app:tool-result") {
+        const sc = msg.structuredContent as (T & { type?: string }) | undefined;
+        if (sc && sc.type === expectedType) {
+          setData(sc);
+          setDashboardConnected(true);
+        }
+        if (msg.content) {
+          setContent(msg.content as Array<{ type: string; text?: string }>);
+        }
+        return;
+      }
 
-      const action: string = msg.action ?? "replace";
+      // Dashboard patch engine sends incremental updates
+      if (msg.type === "update-structured-content") {
+        const incoming = msg.content as (T & { type?: string }) | undefined;
+        if (!incoming) return;
 
-      if (action === "replace") {
-        setData(incoming);
-      } else if (action === "merge") {
-        setData((prev) => {
-          if (!prev || typeof prev !== "object") return incoming;
-          return { ...prev, ...incoming };
-        });
+        const action: string = msg.action ?? "replace";
+
+        if (action === "replace") {
+          setData(incoming);
+        } else if (action === "merge") {
+          setData((prev) => {
+            if (!prev || typeof prev !== "object") return incoming;
+            return { ...prev, ...incoming };
+          });
+        }
+        setDashboardConnected(true);
+        return;
       }
     }
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  }, [expectedType]);
 
   useHostStyles(app, app?.getHostContext());
   const themeStr = useDocumentTheme();

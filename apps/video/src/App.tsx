@@ -15,6 +15,7 @@ export function VideoView() {
 export function VideoPlayer({ data }: { data: VideoContent }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // Set initial startTime on first metadata load
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !data.startTime) return;
@@ -26,6 +27,42 @@ export function VideoPlayer({ data }: { data: VideoContent }) {
     video.addEventListener("loadedmetadata", handleMetadata);
     return () => video.removeEventListener("loadedmetadata", handleMetadata);
   }, [data.startTime]);
+
+  // React to playing state changes (from patches)
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || data.playing === undefined) return;
+
+    if (data.playing) {
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
+  }, [data.playing]);
+
+  // React to currentTime seek commands (from patches)
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || data.currentTime === undefined) return;
+
+    video.currentTime = data.currentTime;
+  }, [data.currentTime]);
+
+  // React to playbackRate changes
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || data.playbackRate === undefined) return;
+
+    video.playbackRate = data.playbackRate;
+  }, [data.playbackRate]);
+
+  // React to volume changes
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || data.volume === undefined) return;
+
+    video.volume = data.volume;
+  }, [data.volume]);
 
   return (
     <div className="flex flex-col h-full font-sans bg-background text-foreground">

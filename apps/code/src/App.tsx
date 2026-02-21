@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useView, Fallback } from "@chuk/view-shared";
 import { Button, ScrollArea, cn } from "@chuk/view-ui";
-import { codeToHtml } from "shiki";
+import { highlight } from "./highlighter";
 import type { CodeContent } from "./schema";
 
 export function CodeView() {
@@ -27,22 +27,9 @@ export function CodeRenderer({ data }: CodeRendererProps) {
     let cancelled = false;
 
     const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const theme = isDark ? "github-dark" : "github-light";
 
-    codeToHtml(code, {
-      lang: language ?? "text",
-      theme: isDark ? "github-dark" : "github-light",
-      transformers: highlightLines
-        ? [
-            {
-              line(node, line) {
-                if (highlightLines.includes(line)) {
-                  this.addClassToHast(node, "highlighted-line");
-                }
-              },
-            },
-          ]
-        : [],
-    })
+    highlight(code, language ?? "text", theme)
       .then((result) => {
         if (!cancelled) setHtml(result);
       })

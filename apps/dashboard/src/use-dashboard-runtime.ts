@@ -51,6 +51,8 @@ export function useDashboardRuntime(): DashboardRuntime {
   const [changedPanels, setChangedPanels] = useState<Set<string>>(
     () => new Set(),
   );
+  // Track whether data arrived via postMessage (bypasses ext-apps)
+  const [postMessageConnected, setPostMessageConnected] = useState(false);
 
   // Store ref — initialized when first v2.0 dashboard arrives
   const storeRef = useRef<UIStateStore | null>(null);
@@ -60,7 +62,63 @@ export function useDashboardRuntime(): DashboardRuntime {
   );
   const appRef = useRef<App | null>(null);
 
-  const { app, isConnected, error } = useApp({
+  // Process incoming structured content (shared by ext-apps and postMessage paths)
+  const handleStructuredContent = (
+    sc: Record<string, unknown>,
+    sourceApp?: App,
+  ) => {
+    // v1.0 or v2.0 dashboard — initial render
+    if (sc.type === "dashboard") {
+      setData(sc as unknown as DashboardContent);
+
+      // Initialize runtime for v2.0
+      if (sc.version === "2.0") {
+        const store = UIStateStore.fromDashboard(
+          sc as unknown as DashboardContentV2,
+        );
+        storeRef.current = store;
+
+        // Set up event queue
+        const queue = new EventQueue();
+        eventQueueRef.current = queue;
+
+        if (sourceApp) {
+          // Set up rate-limited emitter
+          const emitter = createRateLimitedEmitter(sourceApp);
+          emitterRef.current = emitter;
+
+          // Emit on every queued event
+          queue.onEvent(() => {
+            const events = queue.drain();
+            emitter.emit(store.getState(), events);
+          });
+
+          // Push initial state
+          emitter.emit(store.getState(), []);
+        }
+      }
+      return;
+    }
+
+    // v3.0 patch — apply to existing store
+    if (sc.type === "ui_patch" && sc.version === "3.0") {
+      const store = storeRef.current;
+      if (!store) return;
+
+      const oldState = store.getState();
+      const newState = applyPatch(oldState, sc as unknown as UIPatch);
+      store.setState(() => newState);
+
+      // Track which panels changed
+      setChangedPanels(changedPanelIds(oldState, newState));
+
+      // Push updated state
+      emitterRef.current?.emit(newState, []);
+      return;
+    }
+  };
+
+  const { app, isConnected: extAppsConnected, error } = useApp({
     appInfo: {
       name: "@chuk/view-dashboard",
       version: "1.0.0",
@@ -78,54 +136,8 @@ export function useDashboardRuntime(): DashboardRuntime {
           );
         }
 
-        if (!sc) return;
-
-        // v1.0 or v2.0 dashboard — initial render
-        if (sc.type === "dashboard") {
-          setData(sc as unknown as DashboardContent);
-
-          // Initialize runtime for v2.0
-          if (sc.version === "2.0") {
-            const store = UIStateStore.fromDashboard(
-              sc as unknown as DashboardContentV2,
-            );
-            storeRef.current = store;
-
-            // Set up event queue
-            const queue = new EventQueue();
-            eventQueueRef.current = queue;
-
-            // Set up rate-limited emitter
-            const emitter = createRateLimitedEmitter(createdApp);
-            emitterRef.current = emitter;
-
-            // Emit on every queued event
-            queue.onEvent(() => {
-              const events = queue.drain();
-              emitter.emit(store.getState(), events);
-            });
-
-            // Push initial state
-            emitter.emit(store.getState(), []);
-          }
-          return;
-        }
-
-        // v3.0 patch — apply to existing store
-        if (sc.type === "ui_patch" && sc.version === "3.0") {
-          const store = storeRef.current;
-          if (!store) return;
-
-          const oldState = store.getState();
-          const newState = applyPatch(oldState, sc as unknown as UIPatch);
-          store.setState(() => newState);
-
-          // Track which panels changed
-          setChangedPanels(changedPanelIds(oldState, newState));
-
-          // Push updated state
-          emitterRef.current?.emit(newState, []);
-          return;
+        if (sc) {
+          handleStructuredContent(sc, createdApp);
         }
       };
 
@@ -175,6 +187,33 @@ export function useDashboardRuntime(): DashboardRuntime {
       };
     },
   });
+
+  // Connected if ext-apps handshake completed OR data arrived via postMessage
+  const isConnected = extAppsConnected || postMessageConnected;
+
+  // Listen for host postMessage delivery (fallback when ext-apps is unavailable)
+  useEffect(() => {
+    function handleHostMessage(event: MessageEvent) {
+      const msg = event.data;
+      if (!msg || typeof msg !== "object") return;
+
+      // Host delivers tool result via postMessage
+      if (msg.type === "mcp-app:tool-result") {
+        const sc = msg.structuredContent as Record<string, unknown> | undefined;
+        if (msg.content) {
+          setContent(msg.content as Array<{ type: string; text?: string }>);
+        }
+        if (sc) {
+          handleStructuredContent(sc);
+          setPostMessageConnected(true);
+        }
+        return;
+      }
+    }
+
+    window.addEventListener("message", handleHostMessage);
+    return () => window.removeEventListener("message", handleHostMessage);
+  }, []);
 
   // Register get_ui_state tool handler
   useEffect(() => {

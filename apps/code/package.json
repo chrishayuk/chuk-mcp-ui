@@ -22,7 +22,10 @@
   "dependencies": {
     "@chuk/view-shared": "workspace:*",
     "@chuk/view-ui": "workspace:*",
-    "shiki": "^3.0.0",
+    "@shikijs/core": "^3.0.0",
+    "@shikijs/engine-javascript": "^3.0.0",
+    "@shikijs/langs": "^3.0.0",
+    "@shikijs/themes": "^3.0.0",
     "@modelcontextprotocol/ext-apps": "^1.0.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",

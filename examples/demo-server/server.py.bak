@@ -24,7 +24,7 @@ import os
 
 import httpx
 from mcp.server.fastmcp import FastMCP
-from mcp.types import CallToolResult, TextContent, ToolAnnotations
+from mcp.types import ToolAnnotations
 
 
 class _QuietFastMCP(FastMCP):
@@ -119,7 +119,7 @@ for _view_name, _path in VIEWS.items():
     _uri = f"ui://view-demo/{_view_name}"
     _desc = f"{_view_name.replace('-', ' ').title()} View"
     mcp.resource(
-        _uri, name=f"{_view_name} View", mime_type="text/html;profile=mcp-app", description=_desc
+        _uri, name=f"{_view_name} View", mime_type="text/html", description=_desc
     )(_make_resource_handler(_view_name))
 
 
@@ -177,13 +177,13 @@ async def show_map() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text=f"Showing {len(landmarks)} world landmarks."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": f"Showing {len(landmarks)} world landmarks."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 2. Chart ────────────────────────────────────────────────────────────────
@@ -216,13 +216,13 @@ async def show_chart(chart_type: str = "bar") -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text=f"Programming language popularity ({chart_type} chart)."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": f"Programming language popularity ({chart_type} chart)."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 3. DataTable ────────────────────────────────────────────────────────────
@@ -327,13 +327,13 @@ async def show_table() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text=f"Showing {len(countries)} countries with all column types."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": f"Showing {len(countries)} countries with all column types."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 4. Markdown ─────────────────────────────────────────────────────────────
@@ -397,9 +397,9 @@ mcp = FastMCP("my-server")
 
 @mcp.tool(meta={"ui": {"resourceUri": "ui://my-server/map"}})
 async def show_map() -> dict:
-    return CallToolResult(
-        content=[TextContent(type="text", text="Here's a map!")],
-        structuredContent={
+    return {
+        "content": [{"type": "text", "text": "Here's a map!"}],
+        "structuredContent": {
             "type": "map", "version": "1.0",
             "center": {"lat": 51.5, "lon": -0.1}, "zoom": 12,
             "layers": [...]
@@ -440,13 +440,13 @@ async def show_map() -> dict:
         "content": md,
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Showing MCP Views documentation."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Showing MCP Views documentation."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 5. Video ────────────────────────────────────────────────────────────────
@@ -493,20 +493,20 @@ async def show_video() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(
-                type="text",
-                text=(
+    return {
+        "content": [
+            {
+                "type": "text",
+                "text": (
                     "Showing Big Buck Bunny sample video.\n\n"
                     "Follow-up actions: play_video, pause_video, seek_video, "
                     "set_video_speed, set_video_volume."
                 ),
-            ),
-            TextContent(type="text", text=json.dumps(structured)),
+            },
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 def _video_patch(**fields) -> dict:
@@ -538,13 +538,13 @@ def _video_patch(**fields) -> dict:
 async def play_video() -> dict:
     """Start (or resume) video playback."""
     structured = _video_patch(playing=True)
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Video playback started."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Video playback started."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 @mcp.tool(
@@ -553,13 +553,13 @@ async def play_video() -> dict:
 async def pause_video() -> dict:
     """Pause video playback."""
     structured = _video_patch(playing=False)
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Video paused."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Video paused."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 @mcp.tool(
@@ -568,13 +568,13 @@ async def pause_video() -> dict:
 async def seek_video(time: float = 0) -> dict:
     """Jump to a specific time in the video. time: position in seconds."""
     structured = _video_patch(currentTime=time, playing=True)
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text=f"Seeked to {time:.1f}s and playing."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": f"Seeked to {time:.1f}s and playing."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 @mcp.tool(
@@ -583,13 +583,13 @@ async def seek_video(time: float = 0) -> dict:
 async def set_video_speed(rate: float = 1.0) -> dict:
     """Change video playback speed. rate: 0.25–4.0 (1.0 = normal)."""
     structured = _video_patch(playbackRate=rate)
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text=f"Playback speed set to {rate}x."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": f"Playback speed set to {rate}x."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 @mcp.tool(
@@ -598,13 +598,13 @@ async def set_video_speed(rate: float = 1.0) -> dict:
 async def set_video_volume(level: float = 1.0) -> dict:
     """Change video volume. level: 0.0 (mute) to 1.0 (full)."""
     structured = _video_patch(volume=level)
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text=f"Volume set to {int(level * 100)}%."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": f"Volume set to {int(level * 100)}%."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 6. PDF ──────────────────────────────────────────────────────────────────
@@ -624,13 +624,13 @@ async def show_pdf() -> dict:
         "initialPage": 1,
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Showing sample PDF document."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Showing sample PDF document."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 7. Form ─────────────────────────────────────────────────────────────────
@@ -760,13 +760,13 @@ async def show_form() -> dict:
         },
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Showing event registration form with 10 widget types."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Showing event registration form with 10 widget types."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 8. Dashboard ────────────────────────────────────────────────────────────
@@ -922,13 +922,16 @@ async def show_dashboard() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text=f"Dashboard: {len(landmarks)} landmarks across {len(continent_counts)} continents in 4 panels."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {
+                "type": "text",
+                "text": f"Dashboard: {len(landmarks)} landmarks across {len(continent_counts)} continents in 4 panels.",
+            },
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 9. Split ────────────────────────────────────────────────────────────────
@@ -975,13 +978,13 @@ async def show_split() -> dict:
         },
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Split view: documentation + chart."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Split view: documentation + chart."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 10. Tabs ────────────────────────────────────────────────────────────────
@@ -1167,13 +1170,13 @@ async def show_tabs() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Tabbed view: 4 tabs (map, table, chart, form)."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Tabbed view: 4 tabs (map, table, chart, form)."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 11. Detail ──────────────────────────────────────────────────────────────
@@ -1206,13 +1209,13 @@ async def show_detail() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Showing detail card for Stonehenge — a Scheduled Monument."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Showing detail card for Stonehenge — a Scheduled Monument."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 12. Counter ─────────────────────────────────────────────────────────────
@@ -1234,13 +1237,13 @@ async def show_counter() -> dict:
         "trend": {"direction": "up", "value": 2.3, "label": "vs last year"},
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Counter: 376,842 Listed Buildings (+2.3% vs last year)."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Counter: 376,842 Listed Buildings (+2.3% vs last year)."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 13. Code ────────────────────────────────────────────────────────────────
@@ -1268,13 +1271,13 @@ async def show_code() -> dict:
         ),
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Showing syntax-highlighted Python code for an MCP tool."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Showing syntax-highlighted Python code for an MCP tool."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 14. Status ──────────────────────────────────────────────────────────────
@@ -1298,13 +1301,13 @@ async def show_status() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="System Health: API ok, Database ok, CDN warning, Worker Queue error."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "System Health: API ok, Database ok, CDN warning, Worker Queue error."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 15. Timeline ────────────────────────────────────────────────────────────
@@ -1328,13 +1331,13 @@ async def show_timeline() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Timeline: 4 project milestones from kickoff to v3.0."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Timeline: 4 project milestones from kickoff to v3.0."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 16. Gallery ─────────────────────────────────────────────────────────────
@@ -1369,13 +1372,13 @@ async def show_gallery() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Gallery: 3 architectural landmarks with lightbox."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Gallery: 3 architectural landmarks with lightbox."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 17. Kanban ──────────────────────────────────────────────────────────────
@@ -1418,13 +1421,13 @@ async def show_kanban() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Kanban: Sprint board with 3 columns and 5 items."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Kanban: Sprint board with 3 columns and 5 items."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 18. Composable Dashboard (v2.0) ────────────────────────────────────────
@@ -1616,11 +1619,11 @@ async def show_composable_dashboard() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(
-                type="text",
-                text=(
+    return {
+        "content": [
+            {
+                "type": "text",
+                "text": (
                     f"Heritage Investigation Board: {len(MONUMENTS)} monuments across "
                     f"{len(period_counts)} historical periods.\n\n"
                     "Interactive tools available:\n"
@@ -1629,11 +1632,11 @@ async def show_composable_dashboard() -> dict:
                     "- add_chart_analysis() — add a chart panel showing period breakdown\n"
                     "- reset_dashboard() — reset all panels to original state"
                 ),
-            ),
-            TextContent(type="text", text=json.dumps(structured)),
+            },
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── Interactive dashboard tools (return ui_patch to modify live dashboard) ──
@@ -1650,9 +1653,9 @@ async def inspect_monument(monument_id: str) -> dict:
     """
     m = _MONUMENT_BY_ID.get(monument_id)
     if not m:
-        return CallToolResult(
-            content=[TextContent(type="text", text=f"Monument '{monument_id}' not found.")],
-        )
+        return {
+            "content": [{"type": "text", "text": f"Monument '{monument_id}' not found."}],
+        }
 
     mid, name, mtype, period, lat, lon, desc, grade, custodian = m
 
@@ -1701,13 +1704,13 @@ async def inspect_monument(monument_id: str) -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text=f"Showing details for {name} ({period} {mtype})."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": f"Showing details for {name} ({period} {mtype})."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 @mcp.tool(
@@ -1793,13 +1796,16 @@ async def filter_monuments(period: str = "", monument_type: str = "") -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text=f"Filtered to {len(filtered)} monuments. {filter_label}."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {
+                "type": "text",
+                "text": f"Filtered to {len(filtered)} monuments. {filter_label}.",
+            },
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 @mcp.tool(
@@ -1849,13 +1855,16 @@ async def add_chart_analysis() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text=f"Added chart panel: {len(period_counts)} periods across {len(MONUMENTS)} monuments."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {
+                "type": "text",
+                "text": f"Added chart panel: {len(period_counts)} periods across {len(MONUMENTS)} monuments.",
+            },
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 @mcp.tool(
@@ -1945,13 +1954,13 @@ async def reset_dashboard() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Dashboard reset to original state."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Dashboard reset to original state."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 @mcp.tool(
@@ -1967,9 +1976,9 @@ async def find_nearby_monuments(monument_id: str, radius_km: float = 50) -> dict
 
     source = _MONUMENT_BY_ID.get(monument_id)
     if not source:
-        return CallToolResult(
-            content=[TextContent(type="text", text=f"Monument '{monument_id}' not found.")],
-        )
+        return {
+            "content": [{"type": "text", "text": f"Monument '{monument_id}' not found."}],
+        }
 
     src_lat, src_lon = source[4], source[5]
 
@@ -2043,13 +2052,16 @@ async def find_nearby_monuments(monument_id: str, radius_km: float = 50) -> dict
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text=f"Found {len(nearby)} monuments within {radius_km}km of {source[1]}."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {
+                "type": "text",
+                "text": f"Found {len(nearby)} monuments within {radius_km}km of {source[1]}.",
+            },
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 19. Gauge ───────────────────────────────────────────────────────────────
@@ -2076,13 +2088,13 @@ async def show_gauge() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Gauge: System CPU at 67% (green < 60, amber < 80, red >= 80)."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Gauge: System CPU at 67% (green < 60, amber < 80, red >= 80)."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 20. Tree ────────────────────────────────────────────────────────────────
@@ -2125,13 +2137,13 @@ async def show_tree() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Tree: chuk-mcp-ui project structure with apps/ and packages/ branches."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Tree: chuk-mcp-ui project structure with apps/ and packages/ branches."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 21. Progress ───────────────────────────────────────────────────────────
@@ -2156,13 +2168,13 @@ async def show_progress() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Progress: Data pipeline at 68% — ingestion and validation complete, transform in progress."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Progress: Data pipeline at 68% — ingestion and validation complete, transform in progress."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 22. Confirm ────────────────────────────────────────────────────────────
@@ -2187,13 +2199,13 @@ async def show_confirm() -> dict:
         "confirmArgs": {"dataset_id": "heritage-2024"},
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Confirm: Delete 'Heritage Monuments 2024' dataset (12,480 records)?"),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Confirm: Delete 'Heritage Monuments 2024' dataset (12,480 records)?"},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 23. JSON Viewer ────────────────────────────────────────────────────────
@@ -2242,13 +2254,13 @@ async def show_json() -> dict:
         "searchable": True,
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="JSON viewer: Server configuration with 3 top-level sections."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "JSON viewer: Server configuration with 3 top-level sections."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 24. Compare ────────────────────────────────────────────────────────────
@@ -2276,13 +2288,13 @@ async def show_compare() -> dict:
         "initialPosition": 50,
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Compare: Before/after restoration slider for the Wilton Diptych."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Compare: Before/after restoration slider for the Wilton Diptych."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 25. Ranked ─────────────────────────────────────────────────────────────
@@ -2312,13 +2324,13 @@ async def show_ranked() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Ranked: 7 programming languages with popularity scores and trend indicators."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Ranked: 7 programming languages with popularity scores and trend indicators."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 26. Poll ───────────────────────────────────────────────────────────────
@@ -2363,13 +2375,13 @@ async def show_poll() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Poll: Developer Survey with 2 questions on editor and language preferences."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Poll: Developer Survey with 2 questions on editor and language preferences."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 27. Quiz ───────────────────────────────────────────────────────────────
@@ -2430,13 +2442,13 @@ async def show_quiz() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Quiz: Heritage History — 3 questions, 30 points total."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Quiz: Heritage History — 3 questions, 30 points total."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 28. Chat ───────────────────────────────────────────────────────────────
@@ -2462,13 +2474,13 @@ async def show_chat() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Chat: Heritage Assistant with 3 messages and suggested prompts."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Chat: Heritage Assistant with 3 messages and suggested prompts."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 29. Image ──────────────────────────────────────────────────────────────
@@ -2500,13 +2512,13 @@ async def show_image() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Image: 2 heritage images with captions."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Image: 2 heritage images with captions."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 30. Log ────────────────────────────────────────────────────────────────
@@ -2539,13 +2551,13 @@ async def show_log() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Log: 10 application log entries across info, debug, warning, and error levels."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Log: 10 application log entries across info, debug, warning, and error levels."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 31. Alert ──────────────────────────────────────────────────────────────
@@ -2570,13 +2582,13 @@ async def show_alert() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Alerts: 4 system alerts — 1 error, 1 warning, 1 info, 1 success."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Alerts: 4 system alerts — 1 error, 1 warning, 1 info, 1 success."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 32. Diff ───────────────────────────────────────────────────────────────
@@ -2613,13 +2625,13 @@ async def show_diff() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Diff: schema.ts — viewUrl made optional, viewType and selectionField added."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Diff: schema.ts — viewUrl made optional, viewType and selectionField added."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 33. Embed ──────────────────────────────────────────────────────────────
@@ -2640,13 +2652,13 @@ async def show_embed() -> dict:
         "fallbackText": "Visit https://spec.modelcontextprotocol.io to view the MCP specification.",
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Embed: MCP specification website."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Embed: MCP specification website."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 34. Filter ─────────────────────────────────────────────────────────────
@@ -2682,13 +2694,13 @@ async def show_filter() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Filter: Monument search with text, select, multi-select, and range controls."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Filter: Monument search with text, select, multi-select, and range controls."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 35. Settings ───────────────────────────────────────────────────────────
@@ -2750,13 +2762,13 @@ async def show_settings() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Settings: 3 sections — Appearance, Data & Privacy, Notifications."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Settings: 3 sections — Appearance, Data & Privacy, Notifications."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 36. Stepper ────────────────────────────────────────────────────────────
@@ -2782,13 +2794,13 @@ async def show_stepper() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Stepper: Data Import Wizard — 5 steps, currently validating (step 2 of 5)."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Stepper: Data Import Wizard — 5 steps, currently validating (step 2 of 5)."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 37. Heatmap ────────────────────────────────────────────────────────────
@@ -2823,13 +2835,13 @@ async def show_heatmap() -> dict:
         "colorScale": {"min": "#f0fdf4", "max": "#166534"},
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Heatmap: commit activity by day of week and hour. Peak on Tuesday afternoons."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Heatmap: commit activity by day of week and hour. Peak on Tuesday afternoons."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 38. Crosstab ───────────────────────────────────────────────────────────
@@ -2857,13 +2869,13 @@ async def show_crosstab() -> dict:
         "showTotals": True,
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Crosstab: monument counts by period vs type. Medieval castles dominate with 47."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Crosstab: monument counts by period vs type. Medieval castles dominate with 47."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 39. Scatter ────────────────────────────────────────────────────────────
@@ -2916,13 +2928,13 @@ async def show_scatter() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Scatter: 13 cities across 3 regions. Tokyo leads in GDP; Shanghai in population."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Scatter: 13 cities across 3 regions. Tokyo leads in GDP; Shanghai in population."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 40. Boxplot ────────────────────────────────────────────────────────────
@@ -2948,13 +2960,13 @@ async def show_boxplot() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Boxplot: API response times across 5 services. CDN fastest (15ms median), Search slowest (195ms)."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Boxplot: API response times across 5 services. CDN fastest (15ms median), Search slowest (195ms)."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 41. Timeseries ────────────────────────────────────────────────────────
@@ -2990,13 +3002,13 @@ async def show_timeseries() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Timeseries: CPU and memory over 24h (48 points each). CPU peaks ~65% at 14:00."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Timeseries: CPU and memory over 24h (48 points each). CPU peaks ~65% at 14:00."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 42. Treemap ────────────────────────────────────────────────────────────
@@ -3037,13 +3049,13 @@ async def show_treemap() -> dict:
         },
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Treemap: disk usage (128 GB). Media largest at 52 GB, then Documents 35 GB."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Treemap: disk usage (128 GB). Media largest at 52 GB, then Documents 35 GB."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 43. Sunburst ───────────────────────────────────────────────────────────
@@ -3090,13 +3102,13 @@ async def show_sunburst() -> dict:
         },
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Sunburst: monuments by period > type. Medieval dominates (112), castles largest (47)."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Sunburst: monuments by period > type. Medieval dominates (112), castles largest (47)."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 44. Pivot ──────────────────────────────────────────────────────────────
@@ -3135,13 +3147,13 @@ async def show_pivot() -> dict:
         "showTotals": True,
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Pivot: quarterly sales by region. West leads with $527K revenue."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Pivot: quarterly sales by region. West leads with $527K revenue."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 45. Profile ────────────────────────────────────────────────────────────
@@ -3173,13 +3185,13 @@ async def show_profile() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Profile: Snowdon, 12 km round trip. Elevation gain 622m, summit 1042m."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Profile: Snowdon, 12 km round trip. Elevation gain 622m, summit 1042m."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 46. Audio ──────────────────────────────────────────────────────────────
@@ -3200,13 +3212,13 @@ async def show_audio() -> dict:
         "loop": False,
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Audio: Bach Cello Suite No. 1 — Prelude. Public domain recording."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Audio: Bach Cello Suite No. 1 — Prelude. Public domain recording."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 47. Carousel ───────────────────────────────────────────────────────────
@@ -3250,13 +3262,13 @@ async def show_carousel() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Carousel: 4 heritage sites — Stonehenge, Hadrian's Wall, Roman Baths, Caernarfon Castle."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Carousel: 4 heritage sites — Stonehenge, Hadrian's Wall, Roman Baths, Caernarfon Castle."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 48. Terminal ───────────────────────────────────────────────────────────
@@ -3294,13 +3306,13 @@ async def show_terminal() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Terminal: deployment script — Docker build, push, scale to 3 instances."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Terminal: deployment script — Docker build, push, scale to 3 instances."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 49. GIS Legend ─────────────────────────────────────────────────────────
@@ -3354,13 +3366,13 @@ async def show_gis_legend() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="GIS Legend: 4 sections — monument types, linear features, areas, and risk gradient."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "GIS Legend: 4 sections — monument types, linear features, areas, and risk gradient."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 50. Layers ─────────────────────────────────────────────────────────────
@@ -3429,13 +3441,13 @@ async def show_layers() -> dict:
         ],
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Layers: 3 toggleable layers — Monuments (4 points), Conservation Areas (1 polygon), Historic Paths (1 line, hidden)."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Layers: 3 toggleable layers — Monuments (4 points), Conservation Areas (1 polygon), Historic Paths (1 line, hidden)."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 51. Minimap ────────────────────────────────────────────────────────────
@@ -3477,13 +3489,13 @@ async def show_minimap() -> dict:
         },
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text="Minimap: overview (5 sites) with detail view focused on Stonehenge area."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": "Minimap: overview (5 sites) with detail view focused on Stonehenge area."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── 52. Spectrogram ───────────────────────────────────────────────────────
@@ -3527,13 +3539,13 @@ async def show_spectrogram() -> dict:
         },
     }
 
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text=f"Spectrogram: A major chord, {num_frames} frames x {num_bins} bins, {sample_rate} Hz sample rate."),
-            TextContent(type="text", text=json.dumps(structured)),
+    return {
+        "content": [
+            {"type": "text", "text": f"Spectrogram: A major chord, {num_frames} frames x {num_bins} bins, {sample_rate} Hz sample rate."},
+            {"type": "text", "text": json.dumps(structured)},
         ],
-        structuredContent=structured,
-    )
+        "structuredContent": structured,
+    }
 
 
 # ── Handler tools (receive form submissions and row actions) ─────────────
@@ -3541,23 +3553,23 @@ async def show_spectrogram() -> dict:
 # Handler tools for poll, quiz, chat, settings submissions
 
 @mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, idempotentHint=False))
-async def handle_poll_vote(question_id: str, selected: str) -> CallToolResult:
+async def handle_poll_vote(question_id: str, selected: str) -> dict:
     """Handle a poll vote submission."""
-    return CallToolResult(content=[TextContent(type="text", text=f"Vote recorded: {selected} for question {question_id}.")])
+    return {"content": [{"type": "text", "text": f"Vote recorded: {selected} for question {question_id}."}]}
 
 
 @mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, idempotentHint=False))
-async def handle_quiz_answer(question_id: str, answer: str) -> CallToolResult:
+async def handle_quiz_answer(question_id: str, answer: str) -> dict:
     """Validate a quiz answer."""
     correct = {"q1": "b", "q2": "b", "q3": "b"}
     is_correct = correct.get(question_id) == answer
-    return CallToolResult(content=[TextContent(type="text", text=f"{'Correct!' if is_correct else 'Incorrect.'} (Question {question_id})")])
+    return {"content": [{"type": "text", "text": f"{'Correct!' if is_correct else 'Incorrect.'} (Question {question_id})"}]}
 
 
 @mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, idempotentHint=False))
-async def handle_chat_message(message: str) -> CallToolResult:
+async def handle_chat_message(message: str) -> dict:
     """Handle a chat message (demo echo response)."""
-    return CallToolResult(content=[TextContent(type="text", text=f"You said: {message}\n\n(This is a demo — in production this would call the LLM.)")])
+    return {"content": [{"type": "text", "text": f"You said: {message}\n\n(This is a demo — in production this would call the LLM.)"}]}
 
 
 @mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, idempotentHint=False))
@@ -3577,13 +3589,13 @@ async def handle_save_settings(
         "analytics": analytics, "cache_ttl": cache_ttl, "export_format": export_format,
         "email_alerts": email_alerts, "alert_threshold": alert_threshold,
     }
-    return CallToolResult(content=[TextContent(type="text", text=f"Settings saved: {json.dumps(settings, indent=2)}")])
+    return {"content": [{"type": "text", "text": f"Settings saved: {json.dumps(settings, indent=2)}"}]}
 
 
 @mcp.tool(annotations=ToolAnnotations(readOnlyHint=False, idempotentHint=False))
-async def delete_dataset(dataset_id: str) -> CallToolResult:
+async def delete_dataset(dataset_id: str) -> dict:
     """Delete a dataset (demo — no actual deletion)."""
-    return CallToolResult(content=[TextContent(type="text", text=f"Dataset '{dataset_id}' deleted (demo only).")])
+    return {"content": [{"type": "text", "text": f"Dataset '{dataset_id}' deleted (demo only)."}]}
 
 
 @mcp.tool(
@@ -3603,11 +3615,11 @@ async def handle_registration(
     referral_code: str = "",
 ) -> dict:
     """Handle event registration form submission."""
-    return CallToolResult(
-        content=[
-            TextContent(
-                type="text",
-                text=(
+    return {
+        "content": [
+            {
+                "type": "text",
+                "text": (
                     f"Registration confirmed for {name}!\n"
                     f"Email: {email}\n"
                     f"Ticket: {ticket_type}\n"
@@ -3617,9 +3629,9 @@ async def handle_registration(
                     f"Newsletter: {'Yes' if newsletter else 'No'}\n"
                     f"Referral: {referral_code or 'None'}"
                 ),
-            )
+            }
         ]
-    )
+    }
 
 
 @mcp.tool(
@@ -3629,20 +3641,20 @@ async def handle_feedback(
     name: str, message: str, city: str = "", visited: bool = False, rating: int = 0
 ) -> dict:
     """Handle feedback form submission."""
-    return CallToolResult(
-        content=[
-            TextContent(
-                type="text",
-                text=(
+    return {
+        "content": [
+            {
+                "type": "text",
+                "text": (
                     f"Feedback received from {name}.\n"
                     f"City: {city or 'Not specified'}\n"
                     f"Visited: {'Yes' if visited else 'No'}\n"
                     f"Rating: {rating}/10\n"
                     f"Comments: {message}"
                 ),
-            )
+            }
         ]
-    )
+    }
 
 
 @mcp.tool(annotations=READ_ONLY)
@@ -3659,9 +3671,9 @@ async def show_country_detail(country: str) -> dict:
         "France": "France is a Western European country known for its art, fashion, cuisine, and the Eiffel Tower.",
     }
     desc = details.get(country, f"{country} — no additional details available.")
-    return CallToolResult(
-        content=[TextContent(type="text", text=f"{country}: {desc}")]
-    )
+    return {
+        "content": [{"type": "text", "text": f"{country}: {desc}"}]
+    }
 
 
 @mcp.tool(
@@ -3669,11 +3681,14 @@ async def show_country_detail(country: str) -> dict:
 )
 async def remove_country(country: str) -> dict:
     """Remove a country from the table (demo — no actual deletion)."""
-    return CallToolResult(
-        content=[
-            TextContent(type="text", text=f"{country} has been removed from the display (demo only — data is static).")
+    return {
+        "content": [
+            {
+                "type": "text",
+                "text": f"{country} has been removed from the display (demo only — data is static).",
+            }
         ]
-    )
+    }
 
 
 if __name__ == "__main__":

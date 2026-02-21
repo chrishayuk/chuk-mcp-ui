@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView, Fallback, useViewEvents } from "@chuk/view-shared";
 import { motion } from "framer-motion";
 import { fadeIn } from "@chuk/view-ui/animations";
 import {
@@ -35,6 +35,7 @@ export interface DynamicFormProps {
 }
 
 export function DynamicForm({ data, onCallTool }: DynamicFormProps) {
+  const { emitSubmit } = useViewEvents();
   const { schema, uiSchema, initialValues, submitTool, submitLabel, title, description } = data;
   const [values, setValues] = useState<Record<string, unknown>>(
     () => initialValues ?? buildDefaults(schema)
@@ -61,6 +62,7 @@ export function DynamicForm({ data, onCallTool }: DynamicFormProps) {
       }
       setSubmitting(true);
       try {
+        emitSubmit(values, submitTool);
         await onCallTool(submitTool, values);
       } finally {
         setSubmitting(false);

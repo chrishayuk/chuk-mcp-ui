@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView, Fallback, useViewEvents } from "@chuk/view-shared";
 import {
   Card,
   CardContent,
@@ -27,15 +27,17 @@ export interface DetailRendererProps {
 }
 
 export function DetailRenderer({ data, onCallTool }: DetailRendererProps) {
+  const { emitAction } = useViewEvents();
   const { title, subtitle, image, fields, actions, sections } = data;
 
   const handleAction = useCallback(
     async (action: DetailAction) => {
+      emitAction(action.tool, action.args ?? {});
       if (onCallTool) {
         await onCallTool(action.tool, action.args ?? {});
       }
     },
-    [onCallTool]
+    [onCallTool, emitAction]
   );
 
   return (
