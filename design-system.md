@@ -470,23 +470,57 @@ Use this to verify a View works correctly in both themes. Toggle the Storybook t
 
 | View | Bundle Size | Uses Framer Motion |
 |------|------------|-------------------|
-| datatable | 810 KB | Yes |
-| form | 809 KB | Yes |
-| map | 754 KB | No |
-| chart | 745 KB | No |
-| pdf | 692 KB | No |
-| dashboard | 692 KB | Yes |
-| tabs | 691 KB | Yes |
-| split | 691 KB | No |
-| markdown | 583 KB | No |
-| video | 542 KB | No |
-| detail | 806 KB | Yes |
-| counter | 806 KB | Yes |
-| code | 9,933 KB | No |
-| progress | 807 KB | Yes |
-| confirm | 807 KB | Yes |
-| json | 808 KB | Yes |
-| status | 809 KB | Yes |
+| code | 2,808 KB | No |
+| timeseries | 905 KB | No |
+| layers | 879 KB | No |
+| profile | 839 KB | No |
+| minimap | 832 KB | No |
+| scatter | 828 KB | No |
+| settings | 803 KB | Yes |
+| form | 787 KB | Yes |
+| filter | 782 KB | Yes |
+| gallery | 780 KB | Yes |
+| map | 757 KB | No |
+| chart | 748 KB | No |
+| heatmap | 743 KB | No |
+| timeline | 716 KB | Yes |
+| tree | 715 KB | Yes |
+| alert | 713 KB | Yes |
+| kanban | 711 KB | Yes |
+| datatable | 710 KB | Yes |
+| chat | 707 KB | Yes |
+| quiz | 706 KB | Yes |
+| log | 706 KB | Yes |
+| diff | 705 KB | Yes |
+| ranked | 705 KB | Yes |
+| json | 703 KB | Yes |
+| crosstab | 702 KB | Yes |
+| audio | 701 KB | No |
+| pivot | 701 KB | Yes |
+| dashboard | 701 KB | Yes |
+| poll | 701 KB | Yes |
+| terminal | 700 KB | No |
+| gis-legend | 697 KB | No |
+| treemap | 690 KB | No |
+| image | 687 KB | No |
+| detail | 687 KB | Yes |
+| stepper | 687 KB | Yes |
+| compare | 687 KB | No |
+| status | 686 KB | Yes |
+| confirm | 686 KB | Yes |
+| carousel | 686 KB | No |
+| spectrogram | 683 KB | No |
+| sunburst | 683 KB | No |
+| embed | 683 KB | No |
+| boxplot | 681 KB | No |
+| progress | 680 KB | Yes |
+| counter | 680 KB | Yes |
+| gauge | 678 KB | No |
+| markdown | 584 KB | No |
+| pdf | 570 KB | No |
+| tabs | 565 KB | Yes |
+| split | 565 KB | No |
+| video | 543 KB | No |
 
 All sizes are for the single-file `mcp-app.html` with CSS, JS, and assets inlined.
 
@@ -494,7 +528,7 @@ All sizes are for the single-file `mcp-app.html` with CSS, JS, and assets inline
 
 ## Storybook
 
-The design system is documented with 231 interactive stories across 77 groups, browsable at `localhost:6006`.
+The design system is documented with 253 interactive stories across 78 groups, browsable at `localhost:6006`.
 
 ### Running
 
@@ -508,8 +542,8 @@ The design system is documented with 231 interactive stories across 77 groups, b
 | Tier | Location | Count | Description |
 |------|----------|-------|-------------|
 | Component | `packages/ui/src/components/*.stories.tsx` | 48 stories (15 groups) | shadcn/ui primitives: variants, sizes, states |
-| View | `apps/*/src/*.stories.tsx` | 44 stories (17 groups) | Full View rendering with mock data |
-| Hook | `packages/shared/src/hooks/*.stories.tsx` | 18 stories (6 groups) | Interactive hook demos: resize, undo, stream, selection, filter, export |
+| View | `apps/*/src/*.stories.tsx` | 187 stories (51 groups) | Full View rendering with mock data |
+| Hook | `packages/shared/src/hooks/*.stories.tsx` | 18 stories (12 groups) | Interactive hook demos: resize, undo, stream, selection, filter, export, toast, navigation, auth, live-data, drag, events |
 
 ### Theme Toggle
 

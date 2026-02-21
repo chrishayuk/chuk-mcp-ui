@@ -90,7 +90,7 @@ have no View. Ordered by how frequently MCP servers produce this shape.
 - [x] `view-markdown` — rich markdown with code blocks, tables, links
 - [x] Design system — Tailwind CSS v4, shadcn/ui (15 components), Framer Motion animations
 - [x] `packages/ui` — shared component library with theme bridge
-- [x] Storybook — 101 stories (15 component + 17 View + 6 hook), theme toggle, static build
+- [x] Storybook — 253 stories (15 component + 51 View + 12 hook groups), theme toggle, static build
 - [x] `view-timeline` — events on a timeline with groups and severity
 - [x] `view-tree` — hierarchical explorer with lazy loading and search
 - [x] `view-diff` — unified and split diff rendering
@@ -378,7 +378,7 @@ novel experiences.
   region on the map, everything else auto-populates from multiple MCP
   server calls. The Discovery Channel demo, the YouTube viral clip,
   the thing that makes people understand what composition actually means.
-- [ ] `view-chat` — Lightweight embedded chat within a View. The MCP
+- [x] `view-chat` — Lightweight embedded chat within a View. The MCP
   server handles AI responses via `callServerTool`. Turns any View into
   a conversational interface — "ask questions about this data" right in
   the dashboard.
@@ -567,21 +567,21 @@ community-contributed Views.
 
 | Milestone | Phase | Status |
 |-----------|-------|--------|
-| First View on Fly.io | 1 | ✓ Done — 51 Views at `chuk-mcp-ui-views.fly.dev` |
+| First View on Fly.io | 1 | ✓ Done — 52 Views at `chuk-mcp-ui-views.fly.dev` |
 | TS server using npm inline | 1 | ✓ Done — `examples/ts-inline` |
 | Python server using hosted Views | 1 | ✓ Done — `examples/python-heritage` |
 | Demo MCP server (streamable HTTP) | 1-2 | ✓ Done — `mcp-view-demo.fly.dev/mcp` |
 | Composed dashboard | 2 | ✓ Done — dashboard, split, tabs Views |
 | Cross-View interaction | 2 | ✓ Done — click marker -> highlight row |
 | GitHub Actions CI | — | ✓ Done — build, test, type-check |
-| Zod schemas + tests | — | ✓ Done — 51 schemas, 1000+ total tests |
-| Design system (Tailwind + shadcn + Framer Motion) | 3 | ✓ Done — packages/ui, all 17 Views migrated, dark mode compliant |
-| Storybook (101 stories, theme toggle) | 3 | ✓ Done — component + View + hook stories, static build |
+| Zod schemas + tests | — | ✓ Done — 52 schemas, 385 tests |
+| Design system (Tailwind + shadcn + Framer Motion) | 3 | ✓ Done — packages/ui, all 52 Views migrated, dark mode compliant |
+| Storybook (253 stories, theme toggle) | 3 | ✓ Done — component + View + hook stories, static build |
 | First View on npm | 1 | Pending |
 | PyPI publish | 1 | Pending |
 | Full MCP coverage (10 → 17 Views) | 3 | ✓ Done — Sprint 1 |
 | Full MCP coverage (17 → 27 Views) | 3-4 | ✅ Done — Sprint 3 |
-| Full catalogue (27 → 51 Views) | 3-4 | ✅ Done — Sprint 4 |
+| Full catalogue (27 → 52 Views) | 3-4 | ✅ Done — Sprint 4 |
 | `create-chuk-view` CLI | 5 | ✅ Done — Sprint 2 |
 | Live playground MVP | 5 | ✅ Done — Sprint 2 |
 | Hook family (`useViewStream`, etc.) | 5 | ✅ Done — Sprint 2 |
@@ -593,7 +593,7 @@ community-contributed Views.
 | AppRenderer compatibility | 7 | Not started |
 | SSR runtime | 8 | Not started |
 | View catalogue | 9 | Not started |
-| 67 Views in catalogue | 3-6 | Not started |
+| 67 Views in catalogue | 3-6 | 52 shipped, 15 planned |
 | Discovery Channel demo | 4-6 | Pending |
 | YouTube video | 1-2 | Pending |
 
@@ -617,7 +617,7 @@ Two tracks running in parallel: **MCP-essential Views** that cover every
 common tool output pattern, and **infrastructure** that drives adoption.
 The goal is "whatever your MCP tool returns, there's a View for it."
 
-### Completed (51 Views)
+### Completed (52 Views)
 
 1. ~~**view-datatable**~~ ✓ — returns a list
 2. ~~**view-map**~~ ✓ — returns spatial data
@@ -784,13 +784,13 @@ The pitch: "Whatever your MCP tool returns, there's a View for it."
 
 Sprint 1 shipped, taking the catalogue from **10 → 17 Views**. Sprint 3 reached
 **27 Views** with 10 new Views and 5 new hooks (11 total). Sprint 4 completed
-Phases 3 and 4, reaching **51 Views** with 24 new Views and 563 new tests.
+Phases 3 and 4, reaching **52 Views** with 25 new Views and 385 tests.
 
 ---
 
 ## View Catalogue Summary
 
-Total Views: **67** (51 shipped, 16 planned)
+Total Views: **67** (52 shipped, 15 planned)
 
 | Category | Views | Phase | Status |
 |----------|-------|-------|--------|
@@ -802,7 +802,7 @@ Total Views: **67** (51 shipped, 16 planned)
 | **Data-Dense** (8) | heatmap, gauge, treemap, sunburst, scatter, boxplot, pivot, crosstab | 4 | ✅ Shipped |
 | **Geo-Specialist** (5) | layers, timeseries, profile, minimap, gis-legend | 4 | ✅ Shipped |
 | **Specialist** (2) | terminal, spectrogram | 4 | ✅ Shipped |
-| **Novel Compound** (3) | notebook, investigation, annotation | 6 | Planned |
+| **Novel Compound** (2) | notebook, investigation | 6 | Planned |
 | **Flow & Process** (5) | sankey, funnel, gantt, swimlane, flowchart | 6 | Planned |
 | **Content & Narrative** (3) | geostory, slides, neural | 6 | Planned |
 | **Advanced** (5) | globe, 3d, graph, calendar, wizard | 6 | Planned |

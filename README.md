@@ -95,6 +95,88 @@ The dashboard view is a composable layout engine with three capability tiers:
 ### Specialist (7)
 `audio` `carousel` `terminal` `gis-legend` `layers` `minimap` `spectrogram`
 
+## Demo MCP Server
+
+A fully working 52-tool MCP server is included at `examples/demo-server/`. It registers all views as tools and serves them over streamable-HTTP.
+
+```bash
+cd examples/demo-server
+uv run server.py
+```
+
+Deployed at `mcp-view-demo.fly.dev/mcp`. See [examples/demo-server/FINDINGS.md](examples/demo-server/FINDINGS.md) for lessons learned shipping ext-apps views over MCP.
+
+### Key Patterns for MCP Server Authors
+
+1. **Return `CallToolResult`**, not a plain dict — FastMCP silently drops `structuredContent` from dicts
+2. **Hide resources from `list_resources()`** — hosts pre-fetch all resources at connect time, hitting size limits
+3. **Use `resourceUri`** in tool metadata — `viewUrl` is not in the ext-apps spec
+
+```python
+from mcp.types import CallToolResult, TextContent
+
+@mcp.tool(meta={"ui": {"resourceUri": "ui://my-server/chart"}})
+async def show_chart(chart_type: str = "bar") -> CallToolResult:
+    structured = {"type": "chart", "version": "1.0", "chartType": chart_type, ...}
+    return CallToolResult(
+        content=[TextContent(type="text", text="Chart data.")],
+        structuredContent=structured,
+    )
+```
+
+## Server-Side Helpers
+
+### Python (FastMCP Decorators)
+
+The `chuk-view-schemas` package provides 17 per-view decorators:
+
+```python
+from chuk_view_schemas.fastmcp import map_tool
+
+@map_tool(mcp, "show_sites")
+async def show_sites() -> MapContent:
+    return MapContent(center={"lat": 51.5, "lon": -0.1}, layers=[...])
+```
+
+### TypeScript
+
+```typescript
+import { getViewUrl, buildViewMeta, wrapViewResult } from "@chuk/view-shared/server";
+
+const url = getViewUrl("map");           // https://chuk-mcp-ui-views.fly.dev/map/v1
+const meta = buildViewMeta("map");       // { ui: { resourceUri: "..." } }
+const result = wrapViewResult("map", { structuredContent: mapData });
+```
+
+## CDN URLs
+
+All views are deployed to Fly.io at versioned URLs:
+
+```
+https://chuk-mcp-ui-views.fly.dev/{view-name}/v1
+```
+
+Examples: `.../map/v1`, `.../chart/v1`, `.../dashboard/v1`
+
+## Hooks
+
+`@chuk/view-shared` provides 12 purpose-built hooks beyond the core `useView`:
+
+| Hook | Purpose |
+|------|---------|
+| `useViewStream` | Progressive rendering from `ontoolinputpartial` |
+| `useViewSelection` | Shared selection state across composed views |
+| `useViewFilter` | Cross-view filtering with predicate composition |
+| `useViewUndo` | Undo/redo state management with history stack |
+| `useViewExport` | CSV generation and clipboard export |
+| `useViewResize` | Responsive breakpoint detection inside iframes |
+| `useViewToast` | Toast notification queue with auto-dismiss |
+| `useViewNavigation` | Navigation breadcrumb state for hierarchical views |
+| `useViewAuth` | Auth credential handling for protected resources |
+| `useViewLiveData` | Polling and SSE live data subscriptions |
+| `useViewDrag` | Cross-view drag and drop via ViewBus |
+| `useViewEvents` | Typed event emission (`select`, `filter-change`, `submit`, `action`, `draw`) |
+
 ## Development
 
 ```bash

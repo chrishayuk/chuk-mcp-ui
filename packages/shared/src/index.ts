@@ -1,6 +1,16 @@
 export { useView } from "./use-view";
 export { resolveTemplates } from "./actions";
-export { applyTheme, CSS_VARS, LIGHT_DEFAULTS, DARK_DEFAULTS } from "./theme";
+export {
+  applyTheme,
+  applyPreset,
+  registerPreset,
+  getPresetNames,
+  CSS_VARS,
+  LIGHT_DEFAULTS,
+  DARK_DEFAULTS,
+} from "./theme";
+export type { ThemePreset } from "./presets";
+export { BUILT_IN_PRESETS } from "./presets";
 export { Fallback } from "./fallback";
 
 // Cross-View message bus

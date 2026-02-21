@@ -312,3 +312,80 @@ A shared `tsconfig.base.json` at the root provides common compiler options. Indi
 ### Serving and Deployment
 
 A `server.mjs` at the root serves built view HTML files. Deployment is configured for Fly.io (`fly.toml`, `Dockerfile`). Views are accessible at `https://chuk-mcp-ui-views.fly.dev/{view-name}/v{major}`.
+
+---
+
+## 8. Python Server Integration
+
+Source: `chuk-view-schemas/chuk_view_schemas/fastmcp.py`
+
+### FastMCP Decorators
+
+17 per-view decorators wrap the `meta={"ui": {"resourceUri": ...}}` boilerplate:
+
+| Decorator | View Type |
+|-----------|-----------|
+| `@map_tool` | map |
+| `@chart_tool` | chart |
+| `@datatable_tool` | datatable |
+| `@form_tool` | form |
+| `@dashboard_tool` | dashboard |
+| `@detail_tool` | detail |
+| `@counter_tool` | counter |
+| `@code_tool` | code |
+| `@progress_tool` | progress |
+| `@confirm_tool` | confirm |
+| `@json_tool` | json |
+| `@status_tool` | status |
+| `@gallery_tool` | gallery |
+| `@timeline_tool` | timeline |
+| `@markdown_tool` | markdown |
+| `@video_tool` | video |
+| `@view_tool(type)` | any (generic) |
+
+Each decorator registers the MCP tool with correct `resourceUri` metadata and returns a `CallToolResult` with both `content` (text fallback) and `structuredContent` (typed data for the UI).
+
+### `_QuietFastMCP` Pattern
+
+When a server has many resources, Claude pre-fetches **all** resources at connect time via `resources/list` → `resources/read`. With 52 views at ~730KB each, this exceeds the 5MB aggregate limit.
+
+The fix: subclass `FastMCP` and override `list_resources()` to return an empty list. Resources remain registered and fetchable via `resources/read` on-demand during tool calls.
+
+```python
+class _QuietFastMCP(FastMCP):
+    async def list_resources(self):
+        return []
+```
+
+**Why a subclass?** FastMCP captures handler references at `__init__` time. Setting `mcp.list_resources = lambda: []` after construction has no effect.
+
+See [examples/demo-server/FINDINGS.md](examples/demo-server/FINDINGS.md) for the full debugging story.
+
+---
+
+## 9. ext-apps Integration Details
+
+### `CallToolResult` Requirement
+
+FastMCP's result pipeline serializes plain dict returns as `TextContent`, silently discarding `structuredContent`. Tools using ext-apps **must** return `CallToolResult` instances directly:
+
+```python
+from mcp.types import CallToolResult, TextContent
+
+return CallToolResult(
+    content=[TextContent(type="text", text="Description.")],
+    structuredContent={"type": "chart", "version": "1.0", ...},
+)
+```
+
+### Resource MIME Type
+
+Resources must use `text/html;profile=mcp-app` (not plain `text/html`):
+
+```python
+@mcp.resource(uri, mime_type="text/html;profile=mcp-app")
+```
+
+### Tool Metadata
+
+Tools link to their UI resource via `meta.ui.resourceUri`. The `viewUrl` field is **not** part of the ext-apps spec and is ignored by hosts.

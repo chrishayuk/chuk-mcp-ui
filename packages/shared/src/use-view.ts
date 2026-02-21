@@ -5,7 +5,7 @@ import {
   useDocumentTheme,
 } from "@modelcontextprotocol/ext-apps/react";
 import type { App } from "@modelcontextprotocol/ext-apps";
-import { applyTheme } from "./theme";
+import { applyTheme, applyPreset } from "./theme";
 
 interface ViewState<T> {
   app: App | null;
@@ -122,6 +122,15 @@ export function useView<T>(
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, [expectedType]);
+
+  // Apply ?theme= query param on mount (one-time, before host context arrives)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const presetName = params.get("theme");
+    if (presetName) {
+      applyPreset(presetName);
+    }
+  }, []);
 
   useHostStyles(app, app?.getHostContext());
   const themeStr = useDocumentTheme();

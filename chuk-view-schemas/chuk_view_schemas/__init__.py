@@ -1,5 +1,6 @@
 """Pydantic v2 schemas for chuk-mcp-ui Views."""
 
+from .infer import infer_view, infer_views, ViewSuggestion
 from .chart import ChartContent, ChartDataset
 from .dashboard import DashboardContent, Panel
 from .datatable import DataTableContent, Column, RowAction
@@ -12,6 +13,7 @@ from .tabs import TabsContent, Tab
 from .video import VideoContent
 
 __all__ = [
+    "infer_view", "infer_views", "ViewSuggestion",
     "ChartContent", "ChartDataset",
     "DashboardContent", "Panel",
     "DataTableContent", "Column", "RowAction",
