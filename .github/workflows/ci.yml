@@ -27,7 +27,7 @@ jobs:
       - run: pnpm type-check
 
       - name: Install Playwright browsers
-        run: pnpm --filter @chuk/compat-harness exec playwright install --with-deps chromium
+        run: pnpm --filter @chuk/compat-harness exec playwright install --with-deps
 
       - name: Run compatibility tests
         run: pnpm test:compat
