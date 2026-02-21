@@ -13,7 +13,8 @@
     "build-storybook": "storybook build -o storybook-static",
     "test-storybook": "test-storybook",
     "snapshot": "test-storybook --url http://localhost:6006",
-    "snapshot:update": "test-storybook --url http://localhost:6006 --updateSnapshot"
+    "snapshot:update": "test-storybook --url http://localhost:6006 --updateSnapshot",
+    "test:compat": "pnpm --filter @chuk/compat-harness test"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^8.5.0",

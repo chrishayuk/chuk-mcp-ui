@@ -26,3 +26,13 @@ jobs:
       - run: pnpm build
       - run: pnpm test
       - run: pnpm type-check
+
+      - name: Install Playwright browsers
+        run: pnpm --filter @chuk/compat-harness exec playwright install --with-deps chromium
+
+      - name: Run compatibility tests
+        run: pnpm test:compat
+
+      - name: Generate compatibility matrix
+        if: always()
+        run: pnpm --filter @chuk/compat-harness generate:matrix

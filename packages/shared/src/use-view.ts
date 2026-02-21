@@ -32,14 +32,28 @@ export function useView<T>(
   // Reserved for future schema version negotiation; part of the public API surface.
   _expectedVersion: string
 ): ViewState<T> {
-  const [data, setData] = useState<T | null>(null);
+  // Check URL hash for initial data (playground embeds data in hash).
+  // This is synchronous — no timing issues with postMessage.
+  const hashData = (() => {
+    try {
+      const hash = window.location.hash;
+      if (!hash || hash.length < 2) return null;
+      const raw = JSON.parse(decodeURIComponent(hash.slice(1)));
+      if (raw && typeof raw === "object" && raw.type === expectedType) {
+        return raw as T;
+      }
+    } catch { /* not hash-encoded data */ }
+    return null;
+  })();
+
+  const [data, setData] = useState<T | null>(hashData);
   const [content, setContent] = useState<Array<{
     type: string;
     text?: string;
   }> | null>(null);
   const [callToolError, setCallToolError] = useState<string | null>(null);
-  // Track whether data arrived via dashboard postMessage (bypasses ext-apps)
-  const [dashboardConnected, setDashboardConnected] = useState(false);
+  // Track whether data arrived via dashboard postMessage or hash (bypasses ext-apps)
+  const [dashboardConnected, setDashboardConnected] = useState(hashData !== null);
 
   const { app, isConnected: extAppsConnected, error } = useApp({
     appInfo: {
@@ -120,6 +134,16 @@ export function useView<T>(
     }
 
     window.addEventListener("message", handleMessage);
+
+    // Signal to parent (playground / dashboard) that our listener is ready.
+    // Heavy views may finish mounting after the parent's onLoad has already
+    // sent data, so the parent can re-send when it receives this signal.
+    try {
+      window.parent?.postMessage({ type: "mcp-app:view-ready" }, "*");
+    } catch {
+      // Silently ignore if cross-origin parent blocks postMessage
+    }
+
     return () => window.removeEventListener("message", handleMessage);
   }, [expectedType]);
 

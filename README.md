@@ -1,6 +1,6 @@
 # chuk-mcp-ui
 
-A monorepo of **52 standalone MCP (Model Context Protocol) UI views**, each built as a single-file HTML app with Vite + vite-plugin-singlefile. Views communicate with LLMs through the MCP ext-apps protocol and with each other through the ViewBus cross-view message bus.
+A monorepo of **66 standalone MCP (Model Context Protocol) UI views**, each built as a single-file HTML app with Vite + vite-plugin-singlefile. Views communicate with LLMs through the MCP ext-apps protocol and with each other through the ViewBus cross-view message bus.
 
 ## Getting Started
 
@@ -33,7 +33,7 @@ chuk-mcp-ui/
 │   ├── datatable/     # Data table view
 │   ├── chart/         # Chart.js chart view
 │   ├── form/          # Dynamic form view
-│   ├── ...            # 47 more view apps
+│   ├── ...            # 61 more view apps
 │   └── playground/    # Dev playground
 ├── packages/
 │   ├── shared/        # @chuk/view-shared — hooks, ViewBus, theme
@@ -95,9 +95,12 @@ The dashboard view is a composable layout engine with three capability tiers:
 ### Specialist (7)
 `audio` `carousel` `terminal` `gis-legend` `layers` `minimap` `spectrogram`
 
+### Compound (15)
+`annotation` `calendar` `flowchart` `funnel` `gantt` `geostory` `globe` `graph` `investigation` `neural` `notebook` `sankey` `slides` `swimlane` `threed`
+
 ## Demo MCP Server
 
-A fully working 52-tool MCP server is included at `examples/demo-server/`. It registers all views as tools and serves them over streamable-HTTP.
+A fully working 88-tool MCP server is included at `examples/demo-server/`. It registers all views as tools and serves them over streamable-HTTP.
 
 ```bash
 cd examples/demo-server
@@ -176,6 +179,27 @@ Examples: `.../map/v1`, `.../chart/v1`, `.../dashboard/v1`
 | `useViewLiveData` | Polling and SSE live data subscriptions |
 | `useViewDrag` | Cross-view drag and drop via ViewBus |
 | `useViewEvents` | Typed event emission (`select`, `filter-change`, `submit`, `action`, `draw`) |
+
+## Compatibility Testing
+
+The `@chuk/compat-harness` package (`packages/compat/`) verifies all 66 views work correctly when loaded by MCP hosts via the `@modelcontextprotocol/ext-apps` protocol. 166 Playwright tests cover:
+
+- **Smoke** (132 tests) — every view loads via both ext-apps and postMessage protocols
+- **Theme** (24 tests) — light/dark theme bridging across 12 representative views
+- **callTool** (3 tests) — interactive views dispatch tool calls to the host
+- **Resize** (3 tests) — views adapt to container size changes
+- **Handshake** (2 tests) — slow handshake timing
+- **Update** (2 tests) — incremental data updates via `update-structured-content`
+
+```bash
+# Run compat tests
+pnpm test:compat
+
+# Generate compatibility matrix
+pnpm --filter @chuk/compat-harness generate:matrix
+```
+
+Results are published to `docs/compat-matrix.md`.
 
 ## Development
 

@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "layers"],
+  "properties": {
+    "type": { "const": "neural" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "layers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "units"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "enum": ["input", "dense", "conv", "pooling", "dropout", "output"] },
+          "units": { "type": "number" },
+          "activation": { "type": "string" },
+          "color": { "type": "string" }
+        }
+      }
+    },
+    "showWeights": { "type": "boolean" }
+  }
+}

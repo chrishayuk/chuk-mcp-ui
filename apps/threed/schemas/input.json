@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "objects"],
+  "properties": {
+    "type": { "const": "threed" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "geometry", "position"],
+        "properties": {
+          "id": { "type": "string" },
+          "geometry": { "enum": ["box", "sphere", "cylinder", "cone", "torus"] },
+          "position": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "scale": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "color": { "type": "string" },
+          "label": { "type": "string" },
+          "wireframe": { "type": "boolean" }
+        }
+      }
+    },
+    "camera": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "target": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 3,
+          "maxItems": 3
+        }
+      }
+    },
+    "background": { "type": "string" }
+  }
+}

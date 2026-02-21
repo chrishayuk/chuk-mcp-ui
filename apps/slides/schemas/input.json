@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "slides"],
+  "properties": {
+    "type": { "const": "slides" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "transition": { "enum": ["fade", "slide", "none"] },
+    "slides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["content"],
+        "properties": {
+          "title": { "type": "string" },
+          "content": { "type": "string" },
+          "notes": { "type": "string" },
+          "background": { "type": "string" },
+          "layout": { "enum": ["default", "center", "split", "image"] },
+          "image": { "type": "string" }
+        }
+      }
+    }
+  }
+}

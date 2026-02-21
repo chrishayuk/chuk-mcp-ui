@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "nodes", "links"],
+  "properties": {
+    "type": { "const": "sankey" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "color": { "type": "string" }
+        }
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source", "target", "value"],
+        "properties": {
+          "source": { "type": "string" },
+          "target": { "type": "string" },
+          "value": { "type": "number" },
+          "color": { "type": "string" }
+        }
+      }
+    }
+  }
+}

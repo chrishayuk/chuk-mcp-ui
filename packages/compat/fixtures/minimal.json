@@ -1,0 +1,421 @@
+{
+  "alert": {
+    "type": "alert",
+    "version": "1.0",
+    "alerts": []
+  },
+  "annotation": {
+    "type": "annotation",
+    "version": "1.0",
+    "imageUrl": "test",
+    "annotations": []
+  },
+  "audio": {
+    "type": "audio",
+    "version": "1.0",
+    "url": "test"
+  },
+  "boxplot": {
+    "type": "boxplot",
+    "version": "1.0",
+    "groups": [
+      {
+        "label": "test",
+        "stats": {
+          "min": 0,
+          "q1": 0,
+          "median": 0,
+          "q3": 0,
+          "max": 0
+        }
+      }
+    ]
+  },
+  "calendar": {
+    "type": "calendar",
+    "version": "1.0",
+    "events": []
+  },
+  "carousel": {
+    "type": "carousel",
+    "version": "1.0",
+    "items": []
+  },
+  "chart": {
+    "type": "chart",
+    "version": "1.0",
+    "chartType": "bar",
+    "data": []
+  },
+  "chat": {
+    "type": "chat",
+    "version": "1.0",
+    "messages": [],
+    "respondTool": "test"
+  },
+  "code": {
+    "type": "code",
+    "version": "1.0",
+    "code": "test"
+  },
+  "compare": {
+    "type": "compare",
+    "version": "1.0",
+    "before": {
+      "url": "test"
+    },
+    "after": {
+      "url": "test"
+    }
+  },
+  "confirm": {
+    "type": "confirm",
+    "version": "1.0",
+    "title": "test",
+    "message": "test"
+  },
+  "counter": {
+    "type": "counter",
+    "version": "1.0",
+    "value": 0,
+    "label": "test"
+  },
+  "crosstab": {
+    "type": "crosstab",
+    "version": "1.0",
+    "rowHeaders": [],
+    "columnHeaders": [],
+    "values": []
+  },
+  "dashboard": {
+    "type": "dashboard",
+    "version": "1.0",
+    "layout": "split-horizontal",
+    "panels": []
+  },
+  "datatable": {
+    "type": "datatable",
+    "version": "1.0",
+    "columns": [],
+    "rows": []
+  },
+  "detail": {
+    "type": "detail",
+    "version": "1.0",
+    "title": "test",
+    "fields": []
+  },
+  "diff": {
+    "type": "diff",
+    "version": "1.0",
+    "hunks": []
+  },
+  "embed": {
+    "type": "embed",
+    "version": "1.0",
+    "url": "test"
+  },
+  "filter": {
+    "type": "filter",
+    "version": "1.0",
+    "filters": []
+  },
+  "flowchart": {
+    "type": "flowchart",
+    "version": "1.0",
+    "nodes": [],
+    "edges": []
+  },
+  "form": {
+    "type": "form",
+    "version": "1.0",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name"
+        }
+      }
+    },
+    "submitTool": "test"
+  },
+  "funnel": {
+    "type": "funnel",
+    "version": "1.0",
+    "stages": []
+  },
+  "gallery": {
+    "type": "gallery",
+    "version": "1.0",
+    "items": []
+  },
+  "gantt": {
+    "type": "gantt",
+    "version": "1.0",
+    "tasks": []
+  },
+  "gauge": {
+    "type": "gauge",
+    "version": "1.0",
+    "value": 0
+  },
+  "geostory": {
+    "type": "geostory",
+    "version": "1.0",
+    "steps": []
+  },
+  "gis-legend": {
+    "type": "gis-legend",
+    "version": "1.0",
+    "sections": []
+  },
+  "globe": {
+    "type": "globe",
+    "version": "1.0",
+    "points": []
+  },
+  "graph": {
+    "type": "graph",
+    "version": "1.0",
+    "nodes": [],
+    "edges": []
+  },
+  "heatmap": {
+    "type": "heatmap",
+    "version": "1.0",
+    "rows": [],
+    "columns": [],
+    "values": []
+  },
+  "image": {
+    "type": "image",
+    "version": "1.0",
+    "images": []
+  },
+  "investigation": {
+    "type": "investigation",
+    "version": "1.0",
+    "evidence": []
+  },
+  "json": {
+    "type": "json",
+    "version": "1.0",
+    "data": null
+  },
+  "kanban": {
+    "type": "kanban",
+    "version": "1.0",
+    "columns": []
+  },
+  "layers": {
+    "type": "layers",
+    "version": "1.0",
+    "layers": []
+  },
+  "log": {
+    "type": "log",
+    "version": "1.0",
+    "entries": []
+  },
+  "map": {
+    "type": "map",
+    "version": "1.0",
+    "layers": []
+  },
+  "markdown": {
+    "type": "markdown",
+    "version": "1.0",
+    "content": "test"
+  },
+  "minimap": {
+    "type": "minimap",
+    "version": "1.0",
+    "overview": {
+      "layers": []
+    },
+    "detail": {
+      "layers": []
+    }
+  },
+  "neural": {
+    "type": "neural",
+    "version": "1.0",
+    "layers": []
+  },
+  "notebook": {
+    "type": "notebook",
+    "version": "1.0",
+    "cells": []
+  },
+  "pdf": {
+    "type": "pdf",
+    "version": "1.0",
+    "url": "test"
+  },
+  "pivot": {
+    "type": "pivot",
+    "version": "1.0",
+    "data": [],
+    "rows": [],
+    "columns": [],
+    "values": []
+  },
+  "poll": {
+    "type": "poll",
+    "version": "1.0",
+    "title": "test",
+    "questions": [
+      {
+        "id": "q1",
+        "type": "single-choice",
+        "prompt": "Test question",
+        "options": [
+          {
+            "id": "a",
+            "label": "Option A"
+          },
+          {
+            "id": "b",
+            "label": "Option B"
+          }
+        ]
+      }
+    ],
+    "voteTool": "test"
+  },
+  "profile": {
+    "type": "profile",
+    "version": "1.0",
+    "points": []
+  },
+  "progress": {
+    "type": "progress",
+    "version": "1.0",
+    "tracks": []
+  },
+  "quiz": {
+    "type": "quiz",
+    "version": "1.0",
+    "title": "test",
+    "questions": [],
+    "validateTool": "test"
+  },
+  "ranked": {
+    "type": "ranked",
+    "version": "1.0",
+    "items": []
+  },
+  "sankey": {
+    "type": "sankey",
+    "version": "1.0",
+    "nodes": [],
+    "links": []
+  },
+  "scatter": {
+    "type": "scatter",
+    "version": "1.0",
+    "datasets": []
+  },
+  "settings": {
+    "type": "settings",
+    "version": "1.0",
+    "sections": []
+  },
+  "slides": {
+    "type": "slides",
+    "version": "1.0",
+    "slides": []
+  },
+  "spectrogram": {
+    "type": "spectrogram",
+    "version": "1.0",
+    "data": {
+      "sampleRate": 0,
+      "fftSize": 0,
+      "hopSize": 0,
+      "magnitudes": []
+    }
+  },
+  "split": {
+    "type": "split",
+    "version": "1.0",
+    "left": {
+      "viewUrl": "test",
+      "structuredContent": null
+    },
+    "right": {
+      "viewUrl": "test",
+      "structuredContent": null
+    }
+  },
+  "status": {
+    "type": "status",
+    "version": "1.0",
+    "items": []
+  },
+  "stepper": {
+    "type": "stepper",
+    "version": "1.0",
+    "steps": [],
+    "activeStep": 0
+  },
+  "sunburst": {
+    "type": "sunburst",
+    "version": "1.0",
+    "root": {
+      "id": "test",
+      "label": "test"
+    }
+  },
+  "swimlane": {
+    "type": "swimlane",
+    "version": "1.0",
+    "lanes": [],
+    "columns": [],
+    "activities": []
+  },
+  "tabs": {
+    "type": "tabs",
+    "version": "1.0",
+    "tabs": []
+  },
+  "terminal": {
+    "type": "terminal",
+    "version": "1.0",
+    "lines": []
+  },
+  "threed": {
+    "type": "threed",
+    "version": "1.0",
+    "objects": []
+  },
+  "timeline": {
+    "type": "timeline",
+    "version": "1.0",
+    "events": []
+  },
+  "timeseries": {
+    "type": "timeseries",
+    "version": "1.0",
+    "series": []
+  },
+  "tree": {
+    "type": "tree",
+    "version": "1.0",
+    "roots": []
+  },
+  "treemap": {
+    "type": "treemap",
+    "version": "1.0",
+    "root": {
+      "id": "test",
+      "label": "test"
+    }
+  },
+  "video": {
+    "type": "video",
+    "version": "1.0",
+    "url": "test"
+  }
+}

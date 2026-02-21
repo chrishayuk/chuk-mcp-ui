@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "lanes", "columns", "activities"],
+  "properties": {
+    "type": { "const": "swimlane" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "lanes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "color": { "type": "string" }
+        }
+      }
+    },
+    "columns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" }
+        }
+      }
+    },
+    "activities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "laneId", "columnId", "label"],
+        "properties": {
+          "id": { "type": "string" },
+          "laneId": { "type": "string" },
+          "columnId": { "type": "string" },
+          "label": { "type": "string" },
+          "description": { "type": "string" },
+          "color": { "type": "string" },
+          "status": { "enum": ["pending", "active", "completed", "blocked"] }
+        }
+      }
+    }
+  }
+}

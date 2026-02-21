@@ -11,7 +11,23 @@ interface PreviewPaneProps {
 
 export function PreviewPane({ viewType, data }: PreviewPaneProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const src = `${BASE_URL}/${viewType}/v1`;
+
+  // Track initial data per viewType so we embed it in the hash.
+  // Re-computes during render only when viewType changes — data edits
+  // do NOT change the src (updates go via postMessage instead).
+  const snapshotRef = useRef<{ viewType: string; src: string } | null>(null);
+  if (!snapshotRef.current || snapshotRef.current.viewType !== viewType) {
+    const base = `${BASE_URL}/${viewType}/v1`;
+    let src = base;
+    if (data) {
+      try {
+        src = `${base}#${encodeURIComponent(JSON.stringify(data))}`;
+      } catch { /* fallback to base */ }
+    }
+    snapshotRef.current = { viewType, src };
+  }
+
+  const iframeSrc = snapshotRef.current.src;
 
   const sendData = useCallback(() => {
     if (!iframeRef.current?.contentWindow || !data) return;
@@ -25,23 +41,34 @@ export function PreviewPane({ viewType, data }: PreviewPaneProps) {
     );
   }, [data]);
 
-  // Send data when iframe loads
+  // Also send via postMessage on load + retry
   const handleLoad = useCallback(() => {
     sendData();
+    setTimeout(sendData, 200);
   }, [sendData]);
 
-  // Re-send when data changes (iframe already loaded)
+  // Listen for "view-ready" signal from the iframe's useView hook
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      if (event.data?.type === "mcp-app:view-ready") {
+        sendData();
+      }
+    }
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [sendData]);
+
+  // Re-send when data changes (user edits JSON)
   useEffect(() => {
     sendData();
   }, [sendData]);
 
   return (
     <iframe
-      key={src}
+      key={`${BASE_URL}/${viewType}/v1`}
       ref={iframeRef}
-      src={src}
+      src={iframeSrc}
       onLoad={handleLoad}
-      sandbox="allow-scripts allow-same-origin"
       className="flex-1 w-full border-none bg-background"
       title={`Preview: ${viewType}`}
     />

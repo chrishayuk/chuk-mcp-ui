@@ -12,7 +12,7 @@ Extend the existing `applyTheme("light" | "dark")` system with named presets tha
 
 The theme system defines 8 CSS custom properties (`--chuk-*`) with `LIGHT_DEFAULTS` and `DARK_DEFAULTS` records. `applyTheme(mode)` sets these on `document.documentElement`.
 
-All 52 views consume these variables via the Tailwind theme bridge in `packages/ui/src/styles/theme.css`.
+All 66 views consume these variables via the Tailwind theme bridge in `packages/ui/src/styles/theme.css`.
 
 ---
 

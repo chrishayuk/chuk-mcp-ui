@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "cells"],
+  "properties": {
+    "type": { "const": "notebook" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "cells": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["cellType", "source"],
+            "properties": {
+              "cellType": { "const": "markdown" },
+              "source": { "type": "string" },
+              "collapsed": { "type": "boolean" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["cellType", "source"],
+            "properties": {
+              "cellType": { "const": "code" },
+              "source": { "type": "string" },
+              "language": { "type": "string" },
+              "output": { "type": "string" },
+              "collapsed": { "type": "boolean" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["cellType", "columns", "rows"],
+            "properties": {
+              "cellType": { "const": "table" },
+              "columns": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "rows": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              },
+              "caption": { "type": "string" },
+              "collapsed": { "type": "boolean" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["cellType", "url"],
+            "properties": {
+              "cellType": { "const": "image" },
+              "url": { "type": "string" },
+              "alt": { "type": "string" },
+              "caption": { "type": "string" },
+              "collapsed": { "type": "boolean" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["cellType", "value"],
+            "properties": {
+              "cellType": { "const": "counter" },
+              "value": { "type": "number" },
+              "label": { "type": "string" },
+              "collapsed": { "type": "boolean" }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  }
+}

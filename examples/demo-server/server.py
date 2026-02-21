@@ -1,5 +1,5 @@
 """
-Demo MCP server showcasing all 51 chuk-mcp-ui Views.
+Demo MCP server showcasing all 67 chuk-mcp-ui Views.
 
 Spec-compliant: registers ui:// resources, proxies View HTML from CDN,
 uses ToolAnnotations, and returns structuredContent + content fallback.
@@ -32,7 +32,7 @@ class _QuietFastMCP(FastMCP):
 
     Resources are still registered (so resources/read works), but
     list_resources returns empty. This stops hosts like Claude from
-    pre-fetching all 51 views on connect (~38 MB combined > 5 MB limit).
+    pre-fetching all 67 views on connect (~50 MB combined > 5 MB limit).
     """
 
     async def list_resources(self):
@@ -75,6 +75,12 @@ VIEWS = {
     "audio": "/audio/v1", "carousel": "/carousel/v1", "terminal": "/terminal/v1",
     "gis-legend": "/gis-legend/v1", "layers": "/layers/v1", "minimap": "/minimap/v1",
     "spectrogram": "/spectrogram/v1",
+    # Phase 6 — Novel Compound (15)
+    "notebook": "/notebook/v1", "funnel": "/funnel/v1", "swimlane": "/swimlane/v1",
+    "slides": "/slides/v1", "annotation": "/annotation/v1", "neural": "/neural/v1",
+    "sankey": "/sankey/v1", "geostory": "/geostory/v1", "investigation": "/investigation/v1",
+    "gantt": "/gantt/v1", "calendar": "/calendar/v1", "graph": "/graph/v1",
+    "flowchart": "/flowchart/v1", "globe": "/globe/v1", "threed": "/threed/v1",
 }
 
 # ui:// URIs for tool metadata (host fetches HTML via resources/read)
@@ -3532,6 +3538,487 @@ async def show_spectrogram() -> CallToolResult:
             TextContent(type="text", text=f"Spectrogram: A major chord, {num_frames} frames x {num_bins} bins, {sample_rate} Hz sample rate."),
             TextContent(type="text", text=json.dumps(structured)),
         ],
+        structuredContent=structured,
+    )
+
+
+# ── 53. Notebook ─────────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["notebook"], "viewUrl": CDN_URL["notebook"]}},
+    annotations=READ_ONLY,
+)
+async def show_notebook() -> CallToolResult:
+    """Show a compound notebook with markdown, code, table, and counter cells."""
+    structured = {
+        "type": "notebook",
+        "version": "1.0",
+        "title": "Sales Analysis Q4 2024",
+        "cells": [
+            {"cellType": "markdown", "source": "# Sales Analysis Q4 2024\nThis notebook summarises quarterly sales data across regions."},
+            {"cellType": "table", "columns": ["Region", "Q3 Revenue", "Q4 Revenue", "Growth"], "rows": [
+                ["North", "$2.1M", "$2.6M", "+23%"], ["South", "$1.8M", "$1.7M", "-5%"],
+                ["East", "$1.5M", "$1.7M", "+13%"], ["West", "$2.0M", "$2.3M", "+15%"],
+            ]},
+            {"cellType": "markdown", "source": "## Key Findings\n- North region grew by **23%** — strongest quarter yet\n- South region declined slightly, needs attention"},
+            {"cellType": "counter", "value": 8300000, "label": "Total Q4 Revenue (USD)"},
+            {"cellType": "code", "language": "python", "source": "import pandas as pd\ndf = pd.read_csv('sales_q4.csv')\ndf.groupby('region')['revenue'].sum()", "output": "Region\nEast     1700000\nNorth    2600000\nSouth    1700000\nWest     2300000"},
+        ],
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing sales analysis notebook with 5 cells."), TextContent(type="text", text=json.dumps(structured))],
+        structuredContent=structured,
+    )
+
+
+# ── 54. Funnel ───────────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["funnel"], "viewUrl": CDN_URL["funnel"]}},
+    annotations=READ_ONLY,
+)
+async def show_funnel() -> CallToolResult:
+    """Show a conversion funnel chart."""
+    structured = {
+        "type": "funnel",
+        "version": "1.0",
+        "title": "Marketing Conversion Funnel",
+        "showConversion": True,
+        "stages": [
+            {"label": "Website Visitors", "value": 12000},
+            {"label": "Leads", "value": 5200},
+            {"label": "Qualified Leads", "value": 2100},
+            {"label": "Proposals Sent", "value": 870},
+            {"label": "Closed Deals", "value": 340},
+        ],
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing 5-stage marketing conversion funnel."), TextContent(type="text", text=json.dumps(structured))],
+        structuredContent=structured,
+    )
+
+
+# ── 55. Swimlane ─────────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["swimlane"], "viewUrl": CDN_URL["swimlane"]}},
+    annotations=READ_ONLY,
+)
+async def show_swimlane() -> CallToolResult:
+    """Show a swimlane process diagram."""
+    structured = {
+        "type": "swimlane",
+        "version": "1.0",
+        "title": "Software Delivery Process",
+        "lanes": [
+            {"id": "design", "label": "Design", "color": "#8b5cf6"},
+            {"id": "dev", "label": "Development", "color": "#3b82f6"},
+            {"id": "qa", "label": "QA", "color": "#22c55e"},
+        ],
+        "columns": [
+            {"id": "backlog", "label": "Backlog"},
+            {"id": "active", "label": "In Progress"},
+            {"id": "review", "label": "Review"},
+            {"id": "done", "label": "Done"},
+        ],
+        "activities": [
+            {"id": "a1", "laneId": "design", "columnId": "done", "label": "Wireframes", "status": "completed"},
+            {"id": "a2", "laneId": "design", "columnId": "active", "label": "High-fi Mockups", "status": "active"},
+            {"id": "a3", "laneId": "dev", "columnId": "active", "label": "API Endpoints", "status": "active"},
+            {"id": "a4", "laneId": "dev", "columnId": "backlog", "label": "Frontend Integration", "status": "pending"},
+            {"id": "a5", "laneId": "qa", "columnId": "backlog", "label": "Test Plan", "status": "pending"},
+            {"id": "a6", "laneId": "qa", "columnId": "review", "label": "Unit Tests", "status": "active"},
+        ],
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing software delivery swimlane with 3 lanes and 6 activities."), TextContent(type="text", text=json.dumps(structured))],
+        structuredContent=structured,
+    )
+
+
+# ── 56. Slides ───────────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["slides"], "viewUrl": CDN_URL["slides"]}},
+    annotations=READ_ONLY,
+)
+async def show_slides() -> CallToolResult:
+    """Show a slide presentation."""
+    structured = {
+        "type": "slides",
+        "version": "1.0",
+        "title": "Quarterly Review",
+        "transition": "fade",
+        "slides": [
+            {"title": "Q4 2024 Review", "content": "<h2>Team Performance</h2><p>Revenue up 18% year-over-year.</p>", "layout": "center"},
+            {"title": "Key Metrics", "content": "<ul><li>Revenue: $8.3M (+18%)</li><li>New Customers: 340</li><li>Retention: 94%</li><li>NPS: 72</li></ul>"},
+            {"title": "Challenges", "content": "<p>Supply chain delays impacted Q4 deliveries. South region declined 5%.</p>"},
+            {"title": "2025 Roadmap", "content": "<ol><li>Expand to 3 new markets</li><li>Launch self-service portal</li><li>Achieve $40M ARR</li></ol>"},
+        ],
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing 4-slide quarterly review presentation."), TextContent(type="text", text=json.dumps(structured))],
+        structuredContent=structured,
+    )
+
+
+# ── 57. Annotation ───────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["annotation"], "viewUrl": CDN_URL["annotation"]}},
+    annotations=READ_ONLY,
+)
+async def show_annotation() -> CallToolResult:
+    """Show an annotated image with overlays."""
+    structured = {
+        "type": "annotation",
+        "version": "1.0",
+        "title": "Site Survey — Region 4B",
+        "imageUrl": "https://picsum.photos/seed/survey/800/600",
+        "imageWidth": 800,
+        "imageHeight": 600,
+        "annotations": [
+            {"kind": "circle", "id": "a1", "cx": 200, "cy": 180, "r": 40, "color": "#ef4444", "label": "Structure A"},
+            {"kind": "rect", "id": "a2", "x": 450, "y": 300, "width": 120, "height": 80, "color": "#3b82f6", "label": "Excavation Zone"},
+            {"kind": "arrow", "id": "a3", "x1": 240, "y1": 180, "x2": 450, "y2": 340, "color": "#22c55e", "label": "Access Path"},
+            {"kind": "text", "id": "a4", "x": 650, "y": 50, "text": "N ↑", "fontSize": 18},
+        ],
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing annotated site survey image with 4 annotations."), TextContent(type="text", text=json.dumps(structured))],
+        structuredContent=structured,
+    )
+
+
+# ── 58. Neural ───────────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["neural"], "viewUrl": CDN_URL["neural"]}},
+    annotations=READ_ONLY,
+)
+async def show_neural() -> CallToolResult:
+    """Show a neural network architecture diagram."""
+    structured = {
+        "type": "neural",
+        "version": "1.0",
+        "title": "Image Classifier",
+        "layers": [
+            {"name": "Input", "type": "input", "units": 784},
+            {"name": "Conv1", "type": "conv", "units": 32, "activation": "relu"},
+            {"name": "Pool1", "type": "pooling", "units": 16},
+            {"name": "Dense1", "type": "dense", "units": 128, "activation": "relu"},
+            {"name": "Dropout", "type": "dropout", "units": 128},
+            {"name": "Output", "type": "output", "units": 10, "activation": "softmax"},
+        ],
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing 6-layer image classifier neural network architecture."), TextContent(type="text", text=json.dumps(structured))],
+        structuredContent=structured,
+    )
+
+
+# ── 59. Sankey ───────────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["sankey"], "viewUrl": CDN_URL["sankey"]}},
+    annotations=READ_ONLY,
+)
+async def show_sankey() -> CallToolResult:
+    """Show a Sankey flow diagram."""
+    structured = {
+        "type": "sankey",
+        "version": "1.0",
+        "title": "Energy Flow",
+        "nodes": [
+            {"id": "solar", "label": "Solar", "color": "#f59e0b"},
+            {"id": "wind", "label": "Wind", "color": "#06b6d4"},
+            {"id": "gas", "label": "Natural Gas", "color": "#ef4444"},
+            {"id": "elec", "label": "Electricity", "color": "#3b82f6"},
+            {"id": "heat", "label": "Heat", "color": "#f97316"},
+            {"id": "res", "label": "Residential", "color": "#22c55e"},
+            {"id": "com", "label": "Commercial", "color": "#8b5cf6"},
+            {"id": "ind", "label": "Industrial", "color": "#64748b"},
+        ],
+        "links": [
+            {"source": "solar", "target": "elec", "value": 120},
+            {"source": "wind", "target": "elec", "value": 80},
+            {"source": "gas", "target": "elec", "value": 200},
+            {"source": "gas", "target": "heat", "value": 150},
+            {"source": "elec", "target": "res", "value": 180},
+            {"source": "elec", "target": "com", "value": 120},
+            {"source": "elec", "target": "ind", "value": 100},
+            {"source": "heat", "target": "res", "value": 80},
+            {"source": "heat", "target": "ind", "value": 70},
+        ],
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing energy flow Sankey diagram with 8 nodes and 9 links."), TextContent(type="text", text=json.dumps(structured))],
+        structuredContent=structured,
+    )
+
+
+# ── 60. Geostory ─────────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["geostory"], "viewUrl": CDN_URL["geostory"]}},
+    annotations=READ_ONLY,
+)
+async def show_geostory() -> CallToolResult:
+    """Show a scrollytelling geographic narrative."""
+    structured = {
+        "type": "geostory",
+        "version": "1.0",
+        "title": "The Silk Road",
+        "steps": [
+            {"id": "s1", "title": "Xi'an, China", "text": "The eastern terminus of the Silk Road, Xi'an served as the capital of multiple Chinese dynasties.", "location": {"lat": 34.26, "lon": 108.94}},
+            {"id": "s2", "title": "Samarkand, Uzbekistan", "text": "A key trading hub where Chinese silk met Persian carpets and Indian spices.", "location": {"lat": 39.65, "lon": 66.96}},
+            {"id": "s3", "title": "Baghdad, Iraq", "text": "The Abbasid capital was a centre of learning and trade during the Islamic Golden Age.", "location": {"lat": 33.31, "lon": 44.37}},
+            {"id": "s4", "title": "Constantinople", "text": "The gateway between East and West, controlling trade between Asia and Europe.", "location": {"lat": 41.01, "lon": 28.98}},
+            {"id": "s5", "title": "Venice, Italy", "text": "The western end of the Silk Road, where Eastern goods entered European markets.", "location": {"lat": 45.44, "lon": 12.32}},
+        ],
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing Silk Road geostory with 5 steps."), TextContent(type="text", text=json.dumps(structured))],
+        structuredContent=structured,
+    )
+
+
+# ── 61. Investigation ────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["investigation"], "viewUrl": CDN_URL["investigation"]}},
+    annotations=READ_ONLY,
+)
+async def show_investigation() -> CallToolResult:
+    """Show an investigation pinboard with evidence and connections."""
+    structured = {
+        "type": "investigation",
+        "version": "1.0",
+        "title": "Security Incident Analysis",
+        "evidence": [
+            {"id": "e1", "label": "Anomalous Login", "type": "event", "description": "Login from unknown IP at 03:14 UTC", "tags": ["critical"]},
+            {"id": "e2", "label": "Server Log", "type": "document", "description": "Apache access log showing 500 errors", "tags": ["evidence"]},
+            {"id": "e3", "label": "Admin Account", "type": "person", "description": "Compromised admin credentials used"},
+            {"id": "e4", "label": "Data Centre", "type": "location", "description": "EU-West-1 region, Frankfurt"},
+            {"id": "e5", "label": "USB Drive", "type": "object", "description": "Recovered from workstation B-14", "tags": ["physical"]},
+        ],
+        "connections": [
+            {"from": "e1", "to": "e3", "label": "used credentials of", "strength": "strong"},
+            {"from": "e1", "to": "e2", "label": "triggered", "strength": "strong"},
+            {"from": "e3", "to": "e4", "label": "accessed from", "strength": "medium"},
+            {"from": "e5", "to": "e3", "label": "contained backup of", "strength": "weak"},
+        ],
+        "notes": "Timeline suggests insider threat. USB drive contents under forensic analysis.",
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing security investigation with 5 evidence items and 4 connections."), TextContent(type="text", text=json.dumps(structured))],
+        structuredContent=structured,
+    )
+
+
+# ── 62. Gantt ────────────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["gantt"], "viewUrl": CDN_URL["gantt"]}},
+    annotations=READ_ONLY,
+)
+async def show_gantt() -> CallToolResult:
+    """Show a Gantt chart project timeline."""
+    structured = {
+        "type": "gantt",
+        "version": "1.0",
+        "title": "Product Launch Plan",
+        "tasks": [
+            {"id": "t1", "label": "Requirements", "start": "2025-01-06", "end": "2025-01-17", "progress": 100, "group": "Planning"},
+            {"id": "t2", "label": "Design", "start": "2025-01-20", "end": "2025-02-07", "progress": 100, "dependencies": ["t1"], "group": "Planning"},
+            {"id": "t3", "label": "Backend API", "start": "2025-02-10", "end": "2025-03-14", "progress": 60, "dependencies": ["t2"], "group": "Development"},
+            {"id": "t4", "label": "Frontend UI", "start": "2025-02-17", "end": "2025-03-21", "progress": 45, "dependencies": ["t2"], "group": "Development"},
+            {"id": "t5", "label": "Integration Testing", "start": "2025-03-24", "end": "2025-04-04", "progress": 0, "dependencies": ["t3", "t4"], "group": "Testing"},
+            {"id": "t6", "label": "Launch", "start": "2025-04-07", "end": "2025-04-11", "progress": 0, "dependencies": ["t5"], "group": "Release"},
+        ],
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing product launch Gantt chart with 6 tasks."), TextContent(type="text", text=json.dumps(structured))],
+        structuredContent=structured,
+    )
+
+
+# ── 63. Calendar ─────────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["calendar"], "viewUrl": CDN_URL["calendar"]}},
+    annotations=READ_ONLY,
+)
+async def show_calendar() -> CallToolResult:
+    """Show a monthly calendar with events."""
+    structured = {
+        "type": "calendar",
+        "version": "1.0",
+        "title": "Team Calendar — February 2025",
+        "defaultDate": "2025-02-01",
+        "events": [
+            {"id": "ev1", "title": "Sprint Planning", "start": "2025-02-03", "color": "#3b82f6"},
+            {"id": "ev2", "title": "Design Review", "start": "2025-02-05", "end": "2025-02-05", "color": "#8b5cf6"},
+            {"id": "ev3", "title": "Team Offsite", "start": "2025-02-10", "end": "2025-02-12", "allDay": True, "color": "#22c55e"},
+            {"id": "ev4", "title": "Release v2.1", "start": "2025-02-14", "color": "#ef4444"},
+            {"id": "ev5", "title": "Retro", "start": "2025-02-14", "color": "#f59e0b"},
+            {"id": "ev6", "title": "All-Hands", "start": "2025-02-19", "color": "#06b6d4"},
+            {"id": "ev7", "title": "Sprint Planning", "start": "2025-02-17", "color": "#3b82f6"},
+            {"id": "ev8", "title": "Board Meeting", "start": "2025-02-25", "color": "#ec4899", "description": "Q4 results presentation"},
+        ],
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing February 2025 team calendar with 8 events."), TextContent(type="text", text=json.dumps(structured))],
+        structuredContent=structured,
+    )
+
+
+# ── 64. Graph ────────────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["graph"], "viewUrl": CDN_URL["graph"]}},
+    annotations=READ_ONLY,
+)
+async def show_graph() -> CallToolResult:
+    """Show a force-directed network graph."""
+    structured = {
+        "type": "graph",
+        "version": "1.0",
+        "title": "Package Dependencies",
+        "directed": True,
+        "nodes": [
+            {"id": "app", "label": "app", "color": "#ef4444", "size": 8, "group": "core"},
+            {"id": "react", "label": "react", "color": "#3b82f6", "group": "framework"},
+            {"id": "react-dom", "label": "react-dom", "color": "#3b82f6", "group": "framework"},
+            {"id": "vite", "label": "vite", "color": "#8b5cf6", "group": "tooling"},
+            {"id": "ts", "label": "typescript", "color": "#8b5cf6", "group": "tooling"},
+            {"id": "zod", "label": "zod", "color": "#22c55e", "group": "validation"},
+            {"id": "tailwind", "label": "tailwindcss", "color": "#06b6d4", "group": "styling"},
+        ],
+        "edges": [
+            {"source": "app", "target": "react"}, {"source": "app", "target": "react-dom"},
+            {"source": "app", "target": "vite"}, {"source": "app", "target": "ts"},
+            {"source": "app", "target": "zod"}, {"source": "app", "target": "tailwind"},
+            {"source": "react-dom", "target": "react"},
+        ],
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing package dependency graph with 7 nodes."), TextContent(type="text", text=json.dumps(structured))],
+        structuredContent=structured,
+    )
+
+
+# ── 65. Flowchart ────────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["flowchart"], "viewUrl": CDN_URL["flowchart"]}},
+    annotations=READ_ONLY,
+)
+async def show_flowchart() -> CallToolResult:
+    """Show a flowchart diagram."""
+    structured = {
+        "type": "flowchart",
+        "version": "1.0",
+        "title": "User Login Flow",
+        "direction": "TB",
+        "nodes": [
+            {"id": "start", "label": "Start", "shape": "ellipse"},
+            {"id": "input", "label": "Enter Credentials", "shape": "parallelogram"},
+            {"id": "validate", "label": "Valid?", "shape": "diamond"},
+            {"id": "mfa", "label": "MFA Check", "shape": "rect"},
+            {"id": "mfa_ok", "label": "MFA Valid?", "shape": "diamond"},
+            {"id": "grant", "label": "Grant Access", "shape": "rect", "color": "#22c55e"},
+            {"id": "deny", "label": "Deny Access", "shape": "rect", "color": "#ef4444"},
+        ],
+        "edges": [
+            {"source": "start", "target": "input"},
+            {"source": "input", "target": "validate"},
+            {"source": "validate", "target": "mfa", "label": "Yes"},
+            {"source": "validate", "target": "deny", "label": "No", "style": "dashed"},
+            {"source": "mfa", "target": "mfa_ok"},
+            {"source": "mfa_ok", "target": "grant", "label": "Yes"},
+            {"source": "mfa_ok", "target": "deny", "label": "No", "style": "dashed"},
+        ],
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing user login flowchart with 7 nodes."), TextContent(type="text", text=json.dumps(structured))],
+        structuredContent=structured,
+    )
+
+
+# ── 66. Globe ────────────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["globe"], "viewUrl": CDN_URL["globe"]}},
+    annotations=READ_ONLY,
+)
+async def show_globe() -> CallToolResult:
+    """Show points and arcs on a 3D globe."""
+    structured = {
+        "type": "globe",
+        "version": "1.0",
+        "title": "Global Office Locations",
+        "rotation": {"lat": 30, "lon": -20},
+        "points": [
+            {"id": "nyc", "lat": 40.71, "lon": -74.01, "label": "New York", "color": "#ef4444", "size": 6},
+            {"id": "ldn", "lat": 51.51, "lon": -0.13, "label": "London", "color": "#3b82f6", "size": 6},
+            {"id": "tky", "lat": 35.68, "lon": 139.69, "label": "Tokyo", "color": "#22c55e", "size": 5},
+            {"id": "syd", "lat": -33.87, "lon": 151.21, "label": "Sydney", "color": "#f59e0b", "size": 4},
+            {"id": "sfo", "lat": 37.77, "lon": -122.42, "label": "San Francisco", "color": "#8b5cf6", "size": 5},
+        ],
+        "arcs": [
+            {"from": "nyc", "to": "ldn", "color": "#94a3b8"},
+            {"from": "ldn", "to": "tky", "color": "#94a3b8"},
+            {"from": "tky", "to": "syd", "color": "#94a3b8"},
+            {"from": "sfo", "to": "nyc", "color": "#94a3b8"},
+            {"from": "sfo", "to": "tky", "color": "#94a3b8"},
+        ],
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing 5 global offices on a 3D globe with flight arcs."), TextContent(type="text", text=json.dumps(structured))],
+        structuredContent=structured,
+    )
+
+
+# ── 67. 3D Scene ─────────────────────────────────────────────────────────
+
+
+@mcp.tool(
+    meta={"ui": {"resourceUri": UI_URI["threed"], "viewUrl": CDN_URL["threed"]}},
+    annotations=READ_ONLY,
+)
+async def show_3d() -> CallToolResult:
+    """Show a 3D scene with geometric objects."""
+    structured = {
+        "type": "threed",
+        "version": "1.0",
+        "title": "Geometric Scene",
+        "background": "#1a1a2e",
+        "objects": [
+            {"id": "floor", "geometry": "box", "position": [0, -1, 0], "scale": [8, 0.2, 8], "color": "#334155"},
+            {"id": "cube", "geometry": "box", "position": [-2, 0.5, 0], "color": "#3b82f6", "label": "Cube"},
+            {"id": "sphere", "geometry": "sphere", "position": [0, 1, 1], "color": "#ef4444", "label": "Sphere"},
+            {"id": "cylinder", "geometry": "cylinder", "position": [2, 0.5, -1], "color": "#22c55e", "label": "Cylinder"},
+            {"id": "cone", "geometry": "cone", "position": [-1, 0.5, 2], "scale": [1, 1.5, 1], "color": "#f59e0b", "label": "Cone"},
+            {"id": "torus", "geometry": "torus", "position": [1.5, 1.2, 2], "color": "#8b5cf6", "label": "Torus"},
+        ],
+    }
+    return CallToolResult(
+        content=[TextContent(type="text", text="Showing 3D scene with 6 geometric objects."), TextContent(type="text", text=json.dumps(structured))],
         structuredContent=structured,
     )
 

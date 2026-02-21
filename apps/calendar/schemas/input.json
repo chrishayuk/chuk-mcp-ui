@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "events"],
+  "properties": {
+    "type": { "const": "calendar" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "start"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "start": { "type": "string" },
+          "end": { "type": "string" },
+          "allDay": { "type": "boolean" },
+          "color": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "defaultView": { "enum": ["month", "week", "agenda"] },
+    "defaultDate": { "type": "string" }
+  }
+}

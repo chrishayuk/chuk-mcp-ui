@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "points"],
+  "properties": {
+    "type": { "const": "globe" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "lat", "lon", "label"],
+        "properties": {
+          "id": { "type": "string" },
+          "lat": { "type": "number" },
+          "lon": { "type": "number" },
+          "label": { "type": "string" },
+          "color": { "type": "string" },
+          "size": { "type": "number" }
+        }
+      }
+    },
+    "arcs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to"],
+        "properties": {
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "color": { "type": "string" },
+          "label": { "type": "string" }
+        }
+      }
+    },
+    "rotation": {
+      "type": "object",
+      "properties": {
+        "lat": { "type": "number" },
+        "lon": { "type": "number" }
+      }
+    }
+  }
+}

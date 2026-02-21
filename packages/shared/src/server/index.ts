@@ -59,6 +59,22 @@ const VIEW_PATHS: Record<string, string> = {
   tree: "/tree/v1",
   treemap: "/treemap/v1",
   video: "/video/v1",
+  // Phase 6 — Novel Compound (15)
+  annotation: "/annotation/v1",
+  calendar: "/calendar/v1",
+  flowchart: "/flowchart/v1",
+  funnel: "/funnel/v1",
+  gantt: "/gantt/v1",
+  geostory: "/geostory/v1",
+  globe: "/globe/v1",
+  graph: "/graph/v1",
+  investigation: "/investigation/v1",
+  neural: "/neural/v1",
+  notebook: "/notebook/v1",
+  sankey: "/sankey/v1",
+  slides: "/slides/v1",
+  swimlane: "/swimlane/v1",
+  threed: "/threed/v1",
 };
 
 export interface ViewToolResult {

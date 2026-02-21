@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "imageUrl", "annotations"],
+  "properties": {
+    "type": { "const": "annotation" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "imageUrl": { "type": "string" },
+    "imageWidth": { "type": "number" },
+    "imageHeight": { "type": "number" },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["kind", "id", "cx", "cy", "r"],
+            "properties": {
+              "kind": { "const": "circle" },
+              "id": { "type": "string" },
+              "cx": { "type": "number" },
+              "cy": { "type": "number" },
+              "r": { "type": "number" },
+              "color": { "type": "string" },
+              "label": { "type": "string" },
+              "strokeWidth": { "type": "number" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["kind", "id", "x", "y", "width", "height"],
+            "properties": {
+              "kind": { "const": "rect" },
+              "id": { "type": "string" },
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "width": { "type": "number" },
+              "height": { "type": "number" },
+              "color": { "type": "string" },
+              "label": { "type": "string" },
+              "strokeWidth": { "type": "number" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["kind", "id", "x1", "y1", "x2", "y2"],
+            "properties": {
+              "kind": { "const": "arrow" },
+              "id": { "type": "string" },
+              "x1": { "type": "number" },
+              "y1": { "type": "number" },
+              "x2": { "type": "number" },
+              "y2": { "type": "number" },
+              "color": { "type": "string" },
+              "label": { "type": "string" },
+              "strokeWidth": { "type": "number" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["kind", "id", "x", "y", "text"],
+            "properties": {
+              "kind": { "const": "text" },
+              "id": { "type": "string" },
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "text": { "type": "string" },
+              "color": { "type": "string" },
+              "fontSize": { "type": "number" }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  }
+}

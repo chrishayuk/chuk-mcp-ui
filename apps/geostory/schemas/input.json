@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "steps"],
+  "properties": {
+    "type": { "const": "geostory" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "text", "location"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "text": { "type": "string" },
+          "location": {
+            "type": "object",
+            "required": ["lat", "lon"],
+            "properties": {
+              "lat": { "type": "number" },
+              "lon": { "type": "number" }
+            }
+          },
+          "zoom": { "type": "number" },
+          "image": { "type": "string" },
+          "marker": { "type": "string" }
+        }
+      }
+    },
+    "basemap": { "enum": ["terrain", "satellite", "simple"] }
+  }
+}

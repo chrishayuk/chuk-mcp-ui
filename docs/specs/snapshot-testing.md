@@ -159,7 +159,7 @@ PRs that intentionally change visuals include updated `__snapshots__/*.png` file
 ### Console (pass)
 
 ```
-Snapshot Testing — 52 views, 253 stories
+Snapshot Testing — 66 views, 253+ stories
 
   chart/Default .......................... PASS
   chart/BarChart ......................... PASS

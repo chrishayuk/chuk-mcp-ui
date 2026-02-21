@@ -151,4 +151,4 @@ The function accepts several input shapes:
 
 - No external dependencies (pure Python stdlib)
 - Uses existing `chuk-view-schemas` package structure
-- References the 52 `schemas/input.json` files as the source of truth for field patterns
+- References the 66 `schemas/input.json` files as the source of truth for field patterns

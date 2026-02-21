@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "stages"],
+  "properties": {
+    "type": { "const": "funnel" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "stages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "value"],
+        "properties": {
+          "label": { "type": "string" },
+          "value": { "type": "number" },
+          "color": { "type": "string" },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        }
+      }
+    },
+    "showConversion": { "type": "boolean" },
+    "orientation": { "enum": ["vertical", "horizontal"] }
+  }
+}

@@ -5,7 +5,7 @@ WORKDIR /app
 # Copy only the server and built dist files — no npm install needed
 COPY server.mjs .
 
-# 51 View apps (single-file HTML each)
+# 66 View apps (single-file HTML each)
 # Phase 1-2 (original 27)
 COPY apps/chart/dist/mcp-app.html      apps/chart/dist/mcp-app.html
 COPY apps/chat/dist/mcp-app.html       apps/chat/dist/mcp-app.html
@@ -60,9 +60,28 @@ COPY apps/sunburst/dist/mcp-app.html    apps/sunburst/dist/mcp-app.html
 COPY apps/terminal/dist/mcp-app.html    apps/terminal/dist/mcp-app.html
 COPY apps/timeseries/dist/mcp-app.html  apps/timeseries/dist/mcp-app.html
 COPY apps/treemap/dist/mcp-app.html     apps/treemap/dist/mcp-app.html
+# Phase 6 Compound (15 new)
+COPY apps/annotation/dist/mcp-app.html    apps/annotation/dist/mcp-app.html
+COPY apps/calendar/dist/mcp-app.html      apps/calendar/dist/mcp-app.html
+COPY apps/flowchart/dist/mcp-app.html     apps/flowchart/dist/mcp-app.html
+COPY apps/funnel/dist/mcp-app.html        apps/funnel/dist/mcp-app.html
+COPY apps/gantt/dist/mcp-app.html         apps/gantt/dist/mcp-app.html
+COPY apps/geostory/dist/mcp-app.html      apps/geostory/dist/mcp-app.html
+COPY apps/globe/dist/mcp-app.html         apps/globe/dist/mcp-app.html
+COPY apps/graph/dist/mcp-app.html         apps/graph/dist/mcp-app.html
+COPY apps/investigation/dist/mcp-app.html apps/investigation/dist/mcp-app.html
+COPY apps/neural/dist/mcp-app.html        apps/neural/dist/mcp-app.html
+COPY apps/notebook/dist/mcp-app.html      apps/notebook/dist/mcp-app.html
+COPY apps/sankey/dist/mcp-app.html        apps/sankey/dist/mcp-app.html
+COPY apps/slides/dist/mcp-app.html        apps/slides/dist/mcp-app.html
+COPY apps/swimlane/dist/mcp-app.html      apps/swimlane/dist/mcp-app.html
+COPY apps/threed/dist/mcp-app.html        apps/threed/dist/mcp-app.html
 
 # Playground (multi-file SPA)
 COPY apps/playground/dist              apps/playground/dist
+
+# Storybook (static build)
+COPY storybook-static                  storybook-static
 
 EXPOSE 8000
 

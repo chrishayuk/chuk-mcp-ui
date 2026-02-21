@@ -2,7 +2,7 @@
 
 ## Overview
 
-Verify that all 52 views render correctly in the `@mcp-ui/client` `AppRenderer` component used by MCP hosts. The goal is zero host-specific code in any view — if a host supports MCP Apps at all, chuk views just work.
+Verify that all 66 views render correctly in the `@mcp-ui/client` `AppRenderer` component used by MCP hosts. The goal is zero host-specific code in any view — if a host supports MCP Apps at all, chuk views just work.
 
 ---
 
@@ -38,7 +38,7 @@ Different hosts may wrap `AppRenderer` differently or implement their own render
 
 ### Per-View Tests
 
-For each of the 52 views, verify:
+For each of the 66 views, verify:
 
 | Check | Description |
 |-------|-------------|
@@ -67,32 +67,24 @@ For each of the 52 views, verify:
 
 A standalone HTML page that loads `AppRenderer` and renders a single view with mock data. Used for automated testing outside any specific host.
 
-**File:** `packages/shared/src/compat/test-harness.html`
+**Package:** `packages/compat/` (`@chuk/compat-harness`)
 
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <script type="module">
-    import { AppRenderer } from "@mcp-ui/client";
-    // Load view, deliver structuredContent, verify render
-  </script>
-</head>
-<body>
-  <div id="app-container"></div>
-</body>
-</html>
+The harness uses `AppBridge` + `PostMessageTransport` from `@modelcontextprotocol/ext-apps` (the official MCP Apps SDK) to simulate a real host. It creates an iframe, performs the ext-apps handshake, and delivers `structuredContent` via `bridge.sendToolResult()`.
+
 ```
-
-### Harness API
-
-```typescript
-interface TestHarnessConfig {
-  viewUrl: string;              // URL of the view HTML
-  structuredContent: unknown;   // Data to deliver
-  theme?: "light" | "dark";    // Theme context
-  viewport?: { width: number; height: number };
-}
+packages/compat/
+  src/harness.html          # Host page Playwright loads
+  src/harness.ts            # AppBridge setup, iframe management
+  src/view-manifest.ts      # Auto-generated: all 66 views + metadata
+  fixtures/minimal.json     # Auto-generated: minimal valid data per view
+  fixtures/curated.ts       # Hand-picked full data for 12 representative views
+  tests/
+    smoke.spec.ts           # 66 views x 2 protocols = 132 tests
+    theme.spec.ts           # Light/dark (12 views x 2 = 24 tests)
+    calltool.spec.ts        # Interactive dispatch (3 tests)
+    resize.spec.ts          # Viewport adaptation (3 tests)
+    handshake.spec.ts       # Slow handshake (2 tests)
+    update.spec.ts          # Incremental updates (2 tests)
 ```
 
 The harness is driven by Playwright for automated testing.
@@ -126,7 +118,7 @@ This function is **not** called by views directly. It's used by the test harness
 
 | # | Criterion |
 |---|-----------|
-| 1 | All 52 views render in `@mcp-ui/client` AppRenderer with zero console errors |
+| 1 | All 66 views render in `@mcp-ui/client` AppRenderer with zero console errors |
 | 2 | Theme bridging works (light and dark) across all views |
 | 3 | `callServerTool` dispatches correctly from all interactive views |
 | 4 | No view contains host-specific branching code |

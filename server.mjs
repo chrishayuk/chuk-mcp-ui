@@ -17,6 +17,10 @@ const VIEWS = [
   "audio", "boxplot", "carousel", "crosstab", "gauge", "gis-legend",
   "heatmap", "layers", "minimap", "pivot", "profile", "scatter",
   "spectrogram", "sunburst", "terminal", "timeseries", "treemap",
+  // Phase 6 Compound (15 new)
+  "annotation", "calendar", "flowchart", "funnel", "gantt", "geostory",
+  "globe", "graph", "investigation", "neural", "notebook", "sankey",
+  "slides", "swimlane", "threed",
 ];
 
 // Pre-load all HTML into memory at startup
@@ -80,26 +84,47 @@ const server = createServer((req, res) => {
     return;
   }
 
-  // Playground: serve static files from apps/playground/dist
-  if (path === "/playground" || path.startsWith("/playground/")) {
-    const MIME = { ".html": "text/html", ".js": "application/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml" };
-    const subPath = path === "/playground" || path === "/playground/"
-      ? "/index.html"
-      : path.replace("/playground", "");
-    const filePath = resolve(__dirname, "apps", "playground", "dist", subPath.slice(1));
-    if (existsSync(filePath)) {
-      try {
-        const content = readFileSync(filePath);
-        const ext = extname(filePath);
-        res.writeHead(200, {
-          "Content-Type": MIME[ext] || "application/octet-stream",
-          "Cache-Control": "public, max-age=3600",
-        });
-        res.end(content);
-        return;
-      } catch { /* fall through to 404 */ }
+  // Static app helper: serve files from a directory at a URL prefix
+  const MIME = {
+    ".html": "text/html", ".js": "application/javascript", ".css": "text/css",
+    ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png",
+    ".ico": "image/x-icon", ".woff": "font/woff", ".woff2": "font/woff2",
+    ".ttf": "font/ttf", ".map": "application/json", ".txt": "text/plain",
+  };
+
+  function serveStatic(prefix, dir) {
+    // Redirect /prefix to /prefix/ so relative paths resolve correctly
+    if (path === prefix) {
+      res.writeHead(301, { Location: prefix + "/" });
+      res.end();
+      return true;
     }
+    if (path.startsWith(prefix + "/")) {
+      const subPath = path === prefix + "/"
+        ? "/index.html"
+        : path.replace(prefix, "");
+      const filePath = resolve(__dirname, dir, subPath.slice(1));
+      if (existsSync(filePath)) {
+        try {
+          const content = readFileSync(filePath);
+          const ext = extname(filePath);
+          res.writeHead(200, {
+            "Content-Type": MIME[ext] || "application/octet-stream",
+            "Cache-Control": "public, max-age=3600",
+          });
+          res.end(content);
+          return true;
+        } catch { /* fall through */ }
+      }
+    }
+    return false;
   }
+
+  // Playground: serve SPA from apps/playground/dist
+  if (serveStatic("/playground", "apps/playground/dist")) return;
+
+  // Storybook: serve static build from storybook-static
+  if (serveStatic("/storybook", "storybook-static")) return;
 
   // 404
   res.writeHead(404, { "Content-Type": "application/json" });
