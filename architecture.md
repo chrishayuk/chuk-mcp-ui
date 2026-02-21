@@ -6,11 +6,11 @@ Technical architecture reference for **chuk-mcp-ui**.
 
 ## 1. Overview
 
-A monorepo of 52+ MCP (Model Context Protocol) ext-apps views. Each view is a standalone HTML app that renders structured data from LLM tool calls via the `@modelcontextprotocol/ext-apps` SDK.
+A monorepo of 66 MCP (Model Context Protocol) ext-apps views. Each view is a standalone HTML app that renders structured data from LLM tool calls via the `@modelcontextprotocol/ext-apps` SDK.
 
 ```
 chuk-mcp-ui/
-  apps/              # 52 view apps (alert, chart, dashboard, map, ...)
+  apps/              # 66 view apps (alert, chart, dashboard, map, ...)
   packages/
     shared/          # @chuk/view-shared  -- hooks, bus, theme, actions
     ui/              # @chuk/view-ui      -- Tailwind CSS v4 component library
@@ -47,6 +47,7 @@ Wraps the ext-apps `useApp` hook. Responsibilities:
 - Applies the host theme via `applyTheme()` on `onhostcontextchanged`.
 - Returns typed `data: T` and a `callTool()` function for invoking server-side MCP tools.
 - Handles `update-structured-content` `postMessage` events for in-place panel updates without a full tool-result cycle.
+- Supports URL hash data injection for synchronous initial data delivery (used by the playground to avoid postMessage timing issues with heavy views).
 
 #### Auxiliary Hooks
 
@@ -302,7 +303,7 @@ Each view app uses **Vite** with `vite-plugin-singlefile` to produce a single se
 
 ### Monorepo Orchestration
 
-- **Turborepo** (`turbo.json`) orchestrates builds across all 52+ apps and shared packages with dependency-aware caching and parallel execution.
+- **Turborepo** (`turbo.json`) orchestrates builds across all 66+ apps and shared packages with dependency-aware caching and parallel execution.
 - **pnpm workspaces** (`pnpm-workspace.yaml`) manage package resolution across the monorepo.
 
 ### TypeScript
@@ -312,6 +313,10 @@ A shared `tsconfig.base.json` at the root provides common compiler options. Indi
 ### Serving and Deployment
 
 A `server.mjs` at the root serves built view HTML files. Deployment is configured for Fly.io (`fly.toml`, `Dockerfile`). Views are accessible at `https://chuk-mcp-ui-views.fly.dev/{view-name}/v{major}`.
+
+The server also hosts:
+- **Playground** at `/playground/` — live JSON editor + iframe preview for all 66 views
+- **Storybook** at `/storybook/` — static build of all component, view, and hook stories
 
 ---
 
@@ -347,7 +352,7 @@ Each decorator registers the MCP tool with correct `resourceUri` metadata and re
 
 ### `_QuietFastMCP` Pattern
 
-When a server has many resources, Claude pre-fetches **all** resources at connect time via `resources/list` → `resources/read`. With 52 views at ~730KB each, this exceeds the 5MB aggregate limit.
+When a server has many resources, Claude pre-fetches **all** resources at connect time via `resources/list` → `resources/read`. With 66 views at ~730KB each, this exceeds the 5MB aggregate limit.
 
 The fix: subclass `FastMCP` and override `list_resources()` to return an empty list. Resources remain registered and fetchable via `resources/read` on-demand during tool calls.
 

@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { motion } from "framer-motion";
+import { fadeIn } from "@chuk/view-ui/animations";
 import { useView, Fallback } from "@chuk/view-shared";
 import { Button, ScrollArea, cn } from "@chuk/view-ui";
 import { highlight } from "./highlighter";
@@ -55,7 +57,12 @@ export function CodeRenderer({ data }: CodeRendererProps) {
   const lineCount = useMemo(() => code.split("\n").length, [code]);
 
   return (
-    <div className="h-full flex flex-col font-sans text-foreground bg-background">
+    <motion.div
+      variants={fadeIn}
+      initial="hidden"
+      animate="visible"
+      className="h-full flex flex-col font-sans text-foreground bg-background"
+    >
       {/* Header */}
       {(title || true) && (
         <div className="flex items-center justify-between px-4 py-2 border-b">
@@ -97,6 +104,6 @@ export function CodeRenderer({ data }: CodeRendererProps) {
           </div>
         </div>
       </ScrollArea>
-    </div>
+    </motion.div>
   );
 }

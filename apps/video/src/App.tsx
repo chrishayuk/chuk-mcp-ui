@@ -1,4 +1,6 @@
 import { useRef, useEffect } from "react";
+import { motion } from "framer-motion";
+import { fadeIn } from "@chuk/view-ui/animations";
 import { useView, Fallback } from "@chuk/view-shared";
 import type { VideoContent } from "./schema";
 
@@ -65,7 +67,12 @@ export function VideoPlayer({ data }: { data: VideoContent }) {
   }, [data.volume]);
 
   return (
-    <div className="flex flex-col h-full font-sans bg-background text-foreground">
+    <motion.div
+      variants={fadeIn}
+      initial="hidden"
+      animate="visible"
+      className="flex flex-col h-full font-sans bg-background text-foreground"
+    >
       {data.title && (
         <div className="px-3 py-2 text-[15px] font-semibold border-b">
           {data.title}
@@ -83,6 +90,6 @@ export function VideoPlayer({ data }: { data: VideoContent }) {
           className="max-w-full max-h-full rounded-md"
         />
       </div>
-    </div>
+    </motion.div>
   );
 }

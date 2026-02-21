@@ -33,7 +33,7 @@ chuk-mcp-ui/
 │   ├── datatable/     # Data table view
 │   ├── chart/         # Chart.js chart view
 │   ├── form/          # Dynamic form view
-│   ├── ...            # 61 more view apps
+│   ├── ...            # 65 more view apps
 │   └── playground/    # Dev playground
 ├── packages/
 │   ├── shared/        # @chuk/view-shared — hooks, ViewBus, theme
@@ -160,6 +160,13 @@ https://chuk-mcp-ui-views.fly.dev/{view-name}/v1
 ```
 
 Examples: `.../map/v1`, `.../chart/v1`, `.../dashboard/v1`
+
+The playground and Storybook are also hosted:
+
+```
+https://chuk-mcp-ui-views.fly.dev/playground/    # Live JSON editor + preview
+https://chuk-mcp-ui-views.fly.dev/storybook/     # Component & view stories
+```
 
 ## Hooks
 

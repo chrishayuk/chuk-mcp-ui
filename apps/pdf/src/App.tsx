@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { motion } from "framer-motion";
+import { fadeIn } from "@chuk/view-ui/animations";
 import { useView, Fallback } from "@chuk/view-shared";
 import { Button } from "@chuk/view-ui";
 import type { PdfContent } from "./schema";
@@ -126,7 +128,12 @@ export function PdfViewer({ data }: { data: PdfContent }) {
   if (error) return <Fallback message={error} />;
 
   return (
-    <div className="flex flex-col h-full font-sans bg-background text-foreground">
+    <motion.div
+      variants={fadeIn}
+      initial="hidden"
+      animate="visible"
+      className="flex flex-col h-full font-sans bg-background text-foreground"
+    >
       {data.title && (
         <div className="px-3 py-2 text-[15px] font-semibold border-b">
           {data.title}
@@ -156,6 +163,6 @@ export function PdfViewer({ data }: { data: PdfContent }) {
       <div className="flex-1 overflow-auto flex justify-center p-4">
         <canvas ref={canvasRef} />
       </div>
-    </div>
+    </motion.div>
   );
 }

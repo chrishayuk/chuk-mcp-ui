@@ -22,6 +22,7 @@
   "dependencies": {
     "@chuk/view-shared": "workspace:*",
     "@chuk/view-ui": "workspace:*",
+    "framer-motion": "^11.0.0",
     "@shikijs/core": "^3.0.0",
     "@shikijs/engine-javascript": "^3.0.0",
     "@shikijs/langs": "^3.0.0",

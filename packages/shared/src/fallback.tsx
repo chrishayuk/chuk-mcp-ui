@@ -6,6 +6,9 @@ interface FallbackProps {
 /**
  * Fallback component rendered when structuredContent is missing,
  * has the wrong type, or has an incompatible version.
+ *
+ * Uses inline styles instead of Tailwind so it renders correctly
+ * even before the theme CSS has loaded.
  */
 export function Fallback({ message, content }: FallbackProps) {
   const text =
@@ -17,7 +20,20 @@ export function Fallback({ message, content }: FallbackProps) {
     "No data to display.";
 
   return (
-    <div className="flex items-center justify-center h-full p-8 font-sans text-muted-foreground bg-background text-center whitespace-pre-wrap">
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100%",
+        padding: "2rem",
+        fontFamily: "var(--chuk-font-family, system-ui, sans-serif)",
+        color: "var(--chuk-color-text-secondary, #666)",
+        backgroundColor: "var(--chuk-color-background, #fff)",
+        textAlign: "center",
+        whiteSpace: "pre-wrap",
+      }}
+    >
       {text}
     </div>
   );

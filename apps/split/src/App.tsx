@@ -1,4 +1,6 @@
 import { useRef, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
+import { fadeIn } from "@chuk/view-ui/animations";
 import { useView, Fallback, ViewBusProvider, useViewBusContainer } from "@chuk/view-shared";
 import { cn } from "@chuk/view-ui";
 import type { SplitContent, SplitPanel } from "./schema";
@@ -23,7 +25,10 @@ export function Split({ data }: { data: SplitContent }) {
   const isHorizontal = direction === "horizontal";
 
   return (
-    <div
+    <motion.div
+      variants={fadeIn}
+      initial="hidden"
+      animate="visible"
       className={cn(
         "flex w-full h-full gap-1 p-1 bg-background",
         isHorizontal ? "flex-row" : "flex-col"
@@ -31,7 +36,7 @@ export function Split({ data }: { data: SplitContent }) {
     >
       <ChildPanel panel={left} panelId="left" flex={leftRatio} />
       <ChildPanel panel={right} panelId="right" flex={rightRatio} />
-    </div>
+    </motion.div>
   );
 }
 

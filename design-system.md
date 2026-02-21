@@ -470,7 +470,7 @@ Use this to verify a View works correctly in both themes. Toggle the Storybook t
 
 | View | Bundle Size | Uses Framer Motion |
 |------|------------|-------------------|
-| code | 2,808 KB | No |
+| code | 1,560 KB | Yes |
 | timeseries | 905 KB | No |
 | layers | 879 KB | No |
 | profile | 839 KB | No |
@@ -481,7 +481,7 @@ Use this to verify a View works correctly in both themes. Toggle the Storybook t
 | filter | 782 KB | Yes |
 | gallery | 780 KB | Yes |
 | map | 757 KB | No |
-| chart | 748 KB | No |
+| chart | 861 KB | Yes |
 | heatmap | 743 KB | No |
 | timeline | 716 KB | Yes |
 | tree | 715 KB | Yes |
@@ -516,11 +516,11 @@ Use this to verify a View works correctly in both themes. Toggle the Storybook t
 | progress | 680 KB | Yes |
 | counter | 680 KB | Yes |
 | gauge | 678 KB | No |
-| markdown | 584 KB | No |
-| pdf | 570 KB | No |
-| tabs | 565 KB | Yes |
-| split | 565 KB | No |
-| video | 543 KB | No |
+| markdown | ~697 KB | Yes |
+| pdf | ~683 KB | Yes |
+| tabs | ~565 KB | No |
+| split | ~678 KB | Yes |
+| video | ~656 KB | Yes |
 
 All sizes are for the single-file `mcp-app.html` with CSS, JS, and assets inlined.
 
@@ -528,7 +528,7 @@ All sizes are for the single-file `mcp-app.html` with CSS, JS, and assets inline
 
 ## Storybook
 
-The design system is documented with 253 interactive stories across 78 groups, browsable at `localhost:6006`.
+The design system is documented with 253+ interactive stories across 78+ groups, browsable at `localhost:6006` or the deployed build at `chuk-mcp-ui-views.fly.dev/storybook/`.
 
 ### Running
 
@@ -591,4 +591,4 @@ View stories render the inner component directly (e.g. `DataTable`, `DynamicForm
 | `packages/ui` | shadcn components, Tailwind theme bridge, animation variants, `cn()` | Protocol, data fetching, business logic |
 | `packages/create-chuk-view` | CLI scaffolder — generates all boilerplate files for a new View | Runtime code, components |
 | `apps/*` | View-specific rendering, schema types, Zod validation | Shared components, theme infrastructure |
-| `apps/playground` | Interactive sandbox for testing Views with live theme/data controls (dev-only, not shipped as a View) | Production Views, shared infrastructure |
+| `apps/playground` | Interactive sandbox for testing Views with live theme/data controls. Deployed at `chuk-mcp-ui-views.fly.dev/playground/` | Production Views, shared infrastructure |

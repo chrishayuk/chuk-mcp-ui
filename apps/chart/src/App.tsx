@@ -1,4 +1,6 @@
 import { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { fadeIn } from "@chuk/view-ui/animations";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -204,9 +206,14 @@ export function ChartRenderer({ data }: { data: ChartContent }) {
   }, [data]);
 
   return (
-    <div className="w-full h-full p-4 font-sans bg-background flex items-center justify-center">
+    <motion.div
+      variants={fadeIn}
+      initial="hidden"
+      animate="visible"
+      className="w-full h-full p-4 font-sans bg-background flex items-center justify-center"
+    >
       <canvas ref={canvasRef} />
-    </div>
+    </motion.div>
   );
 }
 

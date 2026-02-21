@@ -70,7 +70,7 @@ have no View. Ordered by how frequently MCP servers produce this shape.
   but the most used dashboard widget on earth.
 - [x] `view-code` — syntax-highlighted, copyable code/config. Every
   code-generating MCP tool (codegen, SQL, config) needs this.
-  Quick build: highlight.js or Shiki.
+  Powered by Shiki with 9 core language grammars and alias mapping.
 - [x] `view-progress` — progress bars, single or multi-track with labels.
   Long-running MCP tools need to show progress. Pairs with
   `ontoolinputpartial` streaming.
@@ -300,10 +300,13 @@ Presets: `default`, `dark`, `discovery` (Discovery Channel branding),
 
 ### 5.6 Live Playground MVP ✓
 
-**Sprint 2: shipped.** Implemented at `apps/playground/`.
+**Sprint 2: shipped.** Implemented at `apps/playground/`. Deployed at
+`chuk-mcp-ui-views.fly.dev/playground/`. Storybook deployed at
+`chuk-mcp-ui-views.fly.dev/storybook/`.
 
-A stripped-down early version of the Phase 9 catalogue: dropdown of Views
-+ JSON editor + live iframe preview. Ship this before more Views.
+A stripped-down early version of the Phase 9 catalogue: dropdown of all 66 Views
++ JSON editor + live iframe preview. Uses URL hash for synchronous initial
+data delivery to iframes, with postMessage for subsequent updates.
 The JSON editor where a Python developer pastes their data and sees it
 render instantly — that's the conversion moment.
 
@@ -362,19 +365,22 @@ users.
 
 ---
 
-## Phase 6 — Compound & Novel Views
+## Phase 6 — Compound & Novel Views ✓
 
 **Goal:** Views that no one else in the MCP ecosystem will build.
 These demonstrate what composition actually means and create genuinely
 novel experiences.
 
+**Status: Complete.** All 15 compound views shipped and deployed to Fly.io.
+Total catalogue now at 66 views.
+
 ### Novel Compound Views
 
-- [ ] `view-notebook` — Markdown cells + chart cells + map cells + table
+- [x] `view-notebook` — Markdown cells + chart cells + map cells + table
   cells, inline and scrollable. Every MCP server becomes a rich
   interactive report generator. Genuinely novel — nobody in the MCP
   ecosystem has anything like it.
-- [ ] `view-investigation` — Spatial investigation workspace. Draw a
+- [x] `view-investigation` — Spatial investigation workspace. Draw a
   region on the map, everything else auto-populates from multiple MCP
   server calls. The Discovery Channel demo, the YouTube viral clip,
   the thing that makes people understand what composition actually means.
@@ -382,47 +388,47 @@ novel experiences.
   server handles AI responses via `callServerTool`. Turns any View into
   a conversational interface — "ask questions about this data" right in
   the dashboard.
-- [ ] `view-annotation` — Overlay annotations on any child View (map,
+- [x] `view-annotation` — Overlay annotations on any child View (map,
   image, PDF, video). Draw circles, arrows, text labels. Annotations sent
   back via `callServerTool`. Heritage: circle an area on aerial imagery
   and write "possible enclosure." Code review: highlight and comment.
 
 ### Flow & Process Visualisation
 
-- [ ] `view-sankey` — flow diagrams showing quantities moving between
+- [x] `view-sankey` — flow diagrams showing quantities moving between
   stages. User journeys, energy flows, budget allocation, expert routing
   in MoE models. Visually stunning, huge breadth of use cases, nobody
   has this in MCP.
-- [ ] `view-funnel` — progressive reduction through stages with
+- [x] `view-funnel` — progressive reduction through stages with
   conversion rates. Sales pipelines, data processing pipelines, tool
   execution chains.
-- [ ] `view-gantt` — task bars on a time axis with dependencies. Project
+- [x] `view-gantt` — task bars on a time axis with dependencies. Project
   timelines, excavation schedules, video production pipeline.
-- [ ] `view-swimlane` — horizontal lanes with activities per actor/system.
+- [x] `view-swimlane` — horizontal lanes with activities per actor/system.
   Multi-agent workflows, MCP server orchestration, process mapping.
   Extremely timely given MCP's multi-server model.
-- [ ] `view-flowchart` — node-and-edge process diagrams with decision
+- [x] `view-flowchart` — node-and-edge process diagrams with decision
   points. Decision trees, approval workflows, diagnostic paths.
 
 ### Content & Narrative
 
-- [ ] `view-geostory` — scrollytelling map. Scroll through narrative and
+- [x] `view-geostory` — scrollytelling map. Scroll through narrative and
   map animates between locations. Heritage investigations as a narrative,
   maritime voyage stories, YouTube content companion. Scrollytelling maps
   are viral content.
-- [ ] `view-slides` — presentation mode, full-screen sequential content.
+- [x] `view-slides` — presentation mode, full-screen sequential content.
   Conference demos, Discovery Channel presentations, YouTube content.
-- [ ] `view-neural` — neural network layer visualisation. Activations,
+- [x] `view-neural` — neural network layer visualisation. Activations,
   weights, attention patterns. Interpretability work rendered live —
   attention heads, expert routing, layer activations. Personal showcase,
   nobody else has the data or expertise.
 
 ### Advanced Views
 
-- [ ] `view-globe` — CesiumJS 3D globe
-- [ ] `view-3d` — Three.js scene renderer (orbit, bloom, streaming)
-- [ ] `view-graph` — force-directed network graph
-- [ ] `view-calendar` — date-grid with event density
+- [x] `view-globe` — CesiumJS 3D globe
+- [x] `view-3d` — Three.js scene renderer (orbit, bloom, streaming)
+- [x] `view-graph` — force-directed network graph
+- [x] `view-calendar` — date-grid with event density
 - [ ] `view-wizard` — multi-step conditional forms
 - [ ] `view-transcript` — timestamped speaker-labelled text
 - [ ] `view-shader` — GLSL playground
@@ -436,17 +442,21 @@ flagship — a rich interactive report from pure JSON.
 
 ---
 
-## Phase 7 — AppRenderer Compatibility
+## Phase 7 — AppRenderer Compatibility ✓
 
 **Goal:** Ensure every View works seamlessly with the `@mcp-ui/client`
 AppRenderer used by hosts like ChatGPT and Goose.
 
+**Status: Complete.** 166 Playwright tests verify all 66 views across
+ext-apps protocol, postMessage, theme bridging, callTool, resize, and
+incremental updates. Compatibility matrix published at `docs/compat-matrix.md`.
+
 ### Deliverables
 
-- [ ] Test all Views against `@mcp-ui/client` AppRenderer
-- [ ] Document any quirks or required workarounds
+- [x] Test all Views against `@mcp-ui/client` AppRenderer
+- [x] Document any quirks or required workarounds
+- [x] Compatibility matrix (View × Host) published in docs
 - [ ] Adapter layer if needed for host-specific differences
-- [ ] Compatibility matrix (View × Host) published in docs
 
 ### Success Criteria
 
@@ -567,33 +577,34 @@ community-contributed Views.
 
 | Milestone | Phase | Status |
 |-----------|-------|--------|
-| First View on Fly.io | 1 | ✓ Done — 52 Views at `chuk-mcp-ui-views.fly.dev` |
+| First View on Fly.io | 1 | ✓ Done — 66 Views at `chuk-mcp-ui-views.fly.dev` |
 | TS server using npm inline | 1 | ✓ Done — `examples/ts-inline` |
 | Python server using hosted Views | 1 | ✓ Done — `examples/python-heritage` |
 | Demo MCP server (streamable HTTP) | 1-2 | ✓ Done — `mcp-view-demo.fly.dev/mcp` |
 | Composed dashboard | 2 | ✓ Done — dashboard, split, tabs Views |
 | Cross-View interaction | 2 | ✓ Done — click marker -> highlight row |
 | GitHub Actions CI | — | ✓ Done — build, test, type-check |
-| Zod schemas + tests | — | ✓ Done — 52 schemas, 385 tests |
-| Design system (Tailwind + shadcn + Framer Motion) | 3 | ✓ Done — packages/ui, all 52 Views migrated, dark mode compliant |
-| Storybook (253 stories, theme toggle) | 3 | ✓ Done — component + View + hook stories, static build |
+| Zod schemas + tests | — | ✓ Done — 66 schemas, 385+ tests |
+| Design system (Tailwind + shadcn + Framer Motion) | 3 | ✓ Done — packages/ui, all 66 Views migrated, dark mode compliant |
+| Storybook (253+ stories, theme toggle) | 3 | ✓ Done — component + View + hook stories, deployed at `/storybook` |
 | First View on npm | 1 | Pending |
 | PyPI publish | 1 | Pending |
 | Full MCP coverage (10 → 17 Views) | 3 | ✓ Done — Sprint 1 |
 | Full MCP coverage (17 → 27 Views) | 3-4 | ✅ Done — Sprint 3 |
 | Full catalogue (27 → 52 Views) | 3-4 | ✅ Done — Sprint 4 |
+| Compound views (52 → 66 Views) | 6 | ✅ Done — Phase 6 |
 | `create-chuk-view` CLI | 5 | ✅ Done — Sprint 2 |
-| Live playground MVP | 5 | ✅ Done — Sprint 2 |
+| Live playground MVP | 5 | ✅ Done — deployed at `/playground` |
 | Hook family (`useViewStream`, etc.) | 5 | ✅ Done — Sprint 2 |
 | Cross-View message bus | 5 | ✅ Done — Sprint 2 |
 | Server-side decorators (Python + TS) | 5 | ✅ Done — Sprint 2 |
-| `view-notebook` | 6 | Not started — Sprint 4 |
-| `view-sankey` | 6 | Not started — Sprint 4 |
-| `view-geostory` | 6 | Not started — Sprint 4 |
-| AppRenderer compatibility | 7 | Not started |
+| `view-notebook` | 6 | ✅ Done |
+| `view-sankey` | 6 | ✅ Done |
+| `view-geostory` | 6 | ✅ Done |
+| AppRenderer compatibility | 7 | ✅ Done — 166 Playwright tests |
 | SSR runtime | 8 | Not started |
 | View catalogue | 9 | Not started |
-| 67 Views in catalogue | 3-6 | 52 shipped, 15 planned |
+| 66 Views in catalogue | 3-6 | ✅ Done — all 66 shipped |
 | Discovery Channel demo | 4-6 | Pending |
 | YouTube video | 1-2 | Pending |
 
@@ -617,7 +628,7 @@ Two tracks running in parallel: **MCP-essential Views** that cover every
 common tool output pattern, and **infrastructure** that drives adoption.
 The goal is "whatever your MCP tool returns, there's a View for it."
 
-### Completed (52 Views)
+### Completed (66 Views)
 
 1. ~~**view-datatable**~~ ✓ — returns a list
 2. ~~**view-map**~~ ✓ — returns spatial data
@@ -670,6 +681,21 @@ The goal is "whatever your MCP tool returns, there's a View for it."
 49. ~~**view-minimap**~~ ✓ — overview + detail map
 50. ~~**view-pivot**~~ ✓ — pivot table with aggregation
 51. ~~**view-spectrogram**~~ ✓ — audio frequency visualization
+52. ~~**view-annotation**~~ ✓ — overlay annotations on child views
+53. ~~**view-calendar**~~ ✓ — date-grid with event density
+54. ~~**view-flowchart**~~ ✓ — node-and-edge process diagrams
+55. ~~**view-funnel**~~ ✓ — progressive reduction through stages
+56. ~~**view-gantt**~~ ✓ — task bars on a time axis with dependencies
+57. ~~**view-geostory**~~ ✓ — scrollytelling map
+58. ~~**view-globe**~~ ✓ — CesiumJS 3D globe
+59. ~~**view-graph**~~ ✓ — force-directed network graph
+60. ~~**view-investigation**~~ ✓ — spatial investigation workspace
+61. ~~**view-neural**~~ ✓ — neural network layer visualisation
+62. ~~**view-notebook**~~ ✓ — rich interactive report from JSON
+63. ~~**view-sankey**~~ ✓ — flow diagrams
+64. ~~**view-slides**~~ ✓ — presentation mode
+65. ~~**view-swimlane**~~ ✓ — horizontal lanes with activities
+66. ~~**view-threed**~~ ✓ — Three.js scene renderer
 
 ### Sprint 1 — MCP Coverage Essentials (10 → 17 Views) ✓
 
@@ -705,26 +731,27 @@ to 17 Views. Every common MCP tool output pattern is now covered.
 31. ~~**view-quiz**~~ ✓ — interactive quiz with timer and server validation
 32. ~~**view-poll**~~ ✓ — live polling/voting with results visualization
 
-### Sprint 4 — Wow Factor & Differentiation
+### Sprint 4 — Wow Factor & Differentiation ✓
 
-31. **view-notebook** — the genuinely novel thing nobody else has
-32. **view-sankey** — visually stunning, nobody has this in MCP
-33. **view-geostory** — scrollytelling maps, viral content
-34. **view-swimlane** — agent orchestration, timely with MCP multi-server
-35. **view-treemap** — universal demand, every dashboard tool has one
-36. **view-neural** — personal showcase, nobody else has the data
+31. ~~**view-notebook**~~ ✓ — the genuinely novel thing nobody else has
+32. ~~**view-sankey**~~ ✓ — visually stunning, nobody has this in MCP
+33. ~~**view-geostory**~~ ✓ — scrollytelling maps, viral content
+34. ~~**view-swimlane**~~ ✓ — agent orchestration, timely with MCP multi-server
+35. ~~**view-treemap**~~ ✓ — universal demand, every dashboard tool has one
+36. ~~**view-neural**~~ ✓ — personal showcase, nobody else has the data
 
-### Views — By Demand
+### Phase 6 Compound Views ✓
 
-37. **view-layers** — Discovery Channel killer demo
-38. **view-investigation** — spatial investigation workspace
-39. **view-annotation** — collaborative investigation tool
-40. **view-scatter** — embedding spaces, feature correlations
-41. **view-pivot** — spreadsheet power-user's View
-42. **view-funnel** — conversion rates through stages
-43. **view-gantt** — task bars with dependencies
-44. **view-flowchart** — node-and-edge process diagrams
-45. Everything else by demand
+37. ~~**view-annotation**~~ ✓ — collaborative investigation tool
+38. ~~**view-investigation**~~ ✓ — spatial investigation workspace
+39. ~~**view-funnel**~~ ✓ — conversion rates through stages
+40. ~~**view-gantt**~~ ✓ — task bars with dependencies
+41. ~~**view-flowchart**~~ ✓ — node-and-edge process diagrams
+42. ~~**view-slides**~~ ✓ — presentation mode
+43. ~~**view-globe**~~ ✓ — CesiumJS 3D globe
+44. ~~**view-threed**~~ ✓ — Three.js scene renderer
+45. ~~**view-graph**~~ ✓ — force-directed network graph
+46. ~~**view-calendar**~~ ✓ — date-grid with event density
 
 ---
 
@@ -780,17 +807,32 @@ The pitch: "Whatever your MCP tool returns, there's a View for it."
 | Returns filter controls | `view-filter` | ✅ Shipped |
 | Returns configuration | `view-settings` | ✅ Shipped |
 | Returns external content | `view-embed` | ✅ Shipped |
-| Returns flow data | `view-sankey` | Phase 6 |
+| Returns flow data | `view-sankey` | ✅ Shipped |
+| Returns funnel/pipeline | `view-funnel` | ✅ Shipped |
+| Returns project timeline | `view-gantt` | ✅ Shipped |
+| Returns process lanes | `view-swimlane` | ✅ Shipped |
+| Returns process diagram | `view-flowchart` | ✅ Shipped |
+| Returns scrolly narrative | `view-geostory` | ✅ Shipped |
+| Returns presentation | `view-slides` | ✅ Shipped |
+| Returns neural network viz | `view-neural` | ✅ Shipped |
+| Returns notebook/report | `view-notebook` | ✅ Shipped |
+| Returns investigation workspace | `view-investigation` | ✅ Shipped |
+| Returns annotation overlay | `view-annotation` | ✅ Shipped |
+| Returns network graph | `view-graph` | ✅ Shipped |
+| Returns calendar events | `view-calendar` | ✅ Shipped |
+| Returns 3D globe | `view-globe` | ✅ Shipped |
+| Returns 3D scene | `view-threed` | ✅ Shipped |
 
 Sprint 1 shipped, taking the catalogue from **10 → 17 Views**. Sprint 3 reached
 **27 Views** with 10 new Views and 5 new hooks (11 total). Sprint 4 completed
-Phases 3 and 4, reaching **52 Views** with 25 new Views and 385 tests.
+Phases 3 and 4, reaching **52 Views** with 25 new Views and 385 tests. Phase 6
+added 15 compound views, bringing the total to **66 Views**.
 
 ---
 
 ## View Catalogue Summary
 
-Total Views: **67** (52 shipped, 15 planned)
+Total Views: **66 shipped** (+ 3 planned: wizard, transcript, shader)
 
 | Category | Views | Phase | Status |
 |----------|-------|-------|--------|
@@ -802,10 +844,10 @@ Total Views: **67** (52 shipped, 15 planned)
 | **Data-Dense** (8) | heatmap, gauge, treemap, sunburst, scatter, boxplot, pivot, crosstab | 4 | ✅ Shipped |
 | **Geo-Specialist** (5) | layers, timeseries, profile, minimap, gis-legend | 4 | ✅ Shipped |
 | **Specialist** (2) | terminal, spectrogram | 4 | ✅ Shipped |
-| **Novel Compound** (2) | notebook, investigation | 6 | Planned |
-| **Flow & Process** (5) | sankey, funnel, gantt, swimlane, flowchart | 6 | Planned |
-| **Content & Narrative** (3) | geostory, slides, neural | 6 | Planned |
-| **Advanced** (5) | globe, 3d, graph, calendar, wizard | 6 | Planned |
+| **Novel Compound** (4) | notebook, investigation, annotation, chat | 6 | ✅ Shipped |
+| **Flow & Process** (5) | sankey, funnel, gantt, swimlane, flowchart | 6 | ✅ Shipped |
+| **Content & Narrative** (3) | geostory, slides, neural | 6 | ✅ Shipped |
+| **Advanced** (4) | globe, threed, graph, calendar | 6 | ✅ Shipped |
 
 ---
 
@@ -824,5 +866,5 @@ Total Views: **67** (52 shipped, 15 planned)
 | CDN domain | `chuk-mcp-ui-views.fly.dev` | Fly.io, versioned URL paths |
 | Schema validation | Ajv + Zod (JS) / Pydantic (Py) | Triple schema: JSON Schema, Zod, Pydantic |
 | Styling | Tailwind CSS v4 + shadcn/ui | Utility-first CSS, accessible Radix primitives, theme bridge to --chuk-* vars |
-| Animation | Framer Motion (opt-in) | Declarative enter/exit, zero cost for Views that skip it |
-| Component development | Storybook 8 | 101 stories, theme toggle, colocated with source |
+| Animation | Framer Motion (opt-in) | Declarative enter/exit, all views use fadeIn; map is the only exception (interactive canvas) |
+| Component development | Storybook 8 | 253+ stories, theme toggle, colocated with source |

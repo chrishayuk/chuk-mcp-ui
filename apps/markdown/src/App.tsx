@@ -1,4 +1,6 @@
 import { useMemo } from "react";
+import { motion } from "framer-motion";
+import { fadeIn } from "@chuk/view-ui/animations";
 import { marked } from "marked";
 import { useView, Fallback } from "@chuk/view-shared";
 import type { MarkdownContent } from "./schema";
@@ -30,7 +32,12 @@ export function MarkdownRenderer({ data }: { data: MarkdownContent }) {
   );
 
   return (
-    <div className="h-full overflow-auto font-sans text-foreground bg-background">
+    <motion.div
+      variants={fadeIn}
+      initial="hidden"
+      animate="visible"
+      className="h-full overflow-auto font-sans text-foreground bg-background"
+    >
       {data.title && (
         <div className="px-3 py-2 text-[15px] font-semibold border-b">
           {data.title}
@@ -41,7 +48,7 @@ export function MarkdownRenderer({ data }: { data: MarkdownContent }) {
         className="md-body px-6 py-4 max-w-[800px]"
         dangerouslySetInnerHTML={{ __html: html }}
       />
-    </div>
+    </motion.div>
   );
 }
 

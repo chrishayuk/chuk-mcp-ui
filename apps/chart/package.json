@@ -24,6 +24,7 @@
     "@chuk/view-ui": "workspace:*",
     "@modelcontextprotocol/ext-apps": "^1.0.0",
     "chart.js": "^4.4.0",
+    "framer-motion": "^11.0.0",
     "react": "^18.3.0",
     "zod": "^4.0.0",
     "react-dom": "^18.3.0"
