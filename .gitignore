@@ -48,3 +48,6 @@ __snapshots__/
 
 # cache
 __pycache__/
+
+# claude
+.claude/
