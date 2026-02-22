@@ -5,8 +5,6 @@ from chuk_view_schemas.chuk_mcp import (
     map_tool,
     chart_tool,
     view_tool,
-    CDN_BASE,
-    VIEW_PATHS,
 )
 from chuk_view_schemas import MapContent, MapLayer, ChartContent, ChartDataset
 
@@ -87,7 +85,8 @@ class TestMetaRegistration:
         assert "meta" in tool["kwargs"]
         assert "ui" in tool["kwargs"]["meta"]
         assert "resourceUri" in tool["kwargs"]["meta"]["ui"]
-        assert "/map/v1" in tool["kwargs"]["meta"]["ui"]["resourceUri"]
+        assert tool["kwargs"]["meta"]["ui"]["resourceUri"] == "ui://mcp-server/map"
+        assert "/map/v1" in tool["kwargs"]["meta"]["ui"]["viewUrl"]
 
 
 class TestHintKwargs:
@@ -211,7 +210,8 @@ class TestCustomCdnBase:
             return {"type": "map", "version": "1.0"}
 
         tool = mcp._tools["show_map"]
-        assert "custom.example.com" in tool["kwargs"]["meta"]["ui"]["resourceUri"]
+        assert tool["kwargs"]["meta"]["ui"]["resourceUri"] == "ui://mcp-server/map"
+        assert "custom.example.com" in tool["kwargs"]["meta"]["ui"]["viewUrl"]
 
 
 class TestGenericViewTool:

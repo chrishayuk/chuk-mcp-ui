@@ -56,7 +56,8 @@ class TestMapTool:
         assert "meta" in tool["kwargs"]
         assert "ui" in tool["kwargs"]["meta"]
         assert "resourceUri" in tool["kwargs"]["meta"]["ui"]
-        assert "/map/v1" in tool["kwargs"]["meta"]["ui"]["resourceUri"]
+        assert tool["kwargs"]["meta"]["ui"]["resourceUri"] == "ui://test-server/map"
+        assert "/map/v1" in tool["kwargs"]["meta"]["ui"]["viewUrl"]
 
     def test_wraps_pydantic_model(self):
         mcp = MockMCP()
@@ -148,7 +149,8 @@ class TestCustomCdnBase:
             return {"type": "map", "version": "1.0"}
 
         tool = list(mcp._tools.values())[0]
-        assert "custom.example.com" in tool["kwargs"]["meta"]["ui"]["resourceUri"]
+        assert tool["kwargs"]["meta"]["ui"]["resourceUri"] == "ui://test-server/map"
+        assert "custom.example.com" in tool["kwargs"]["meta"]["ui"]["viewUrl"]
 
 
 class TestGenericViewTool:
