@@ -62,9 +62,17 @@ def _view_tool(
       ChukMCPServer's API instead of a monolithic ``annotations`` dict.
     """
     effective_cdn = cdn_base or CDN_BASE
-    resource_uri = f"{effective_cdn}{VIEW_PATHS.get(view_type, f'/{view_type}/v1')}"
+    view_path = VIEW_PATHS.get(view_type, f"/{view_type}/v1")
+    view_url = f"{effective_cdn}{view_path}"
 
-    meta = {"ui": {"resourceUri": resource_uri}}
+    # Use ui:// scheme for resourceUri; actual URL goes in viewUrl
+    server_name = (
+        getattr(getattr(mcp_server, "protocol", None), "server_info", None)
+        and mcp_server.protocol.server_info.name
+    ) or getattr(mcp_server, "name", "mcp-server")
+    resource_uri = f"ui://{server_name}/{view_type}"
+
+    meta = {"ui": {"resourceUri": resource_uri, "viewUrl": view_url}}
 
     # Build kwargs for ChukMCPServer.tool()
     decorator_kwargs: dict[str, Any] = {"name": tool_name, "meta": meta}
