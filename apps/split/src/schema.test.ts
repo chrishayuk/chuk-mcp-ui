@@ -11,11 +11,11 @@ describe("split schema validation", () => {
       type: "split",
       version: "1.0",
       left: {
-        viewUrl: "https://chuk-mcp-ui-views.fly.dev/map/v1",
+        viewUrl: "https://mcp-views.chukai.io/map/v1",
         structuredContent: { type: "map", version: "1.0", layers: [] },
       },
       right: {
-        viewUrl: "https://chuk-mcp-ui-views.fly.dev/datatable/v1",
+        viewUrl: "https://mcp-views.chukai.io/datatable/v1",
         structuredContent: { type: "datatable", version: "1.0", columns: [], rows: [] },
       },
     };
@@ -30,12 +30,12 @@ describe("split schema validation", () => {
       ratio: "60:40",
       left: {
         label: "Map",
-        viewUrl: "https://chuk-mcp-ui-views.fly.dev/map/v1",
+        viewUrl: "https://mcp-views.chukai.io/map/v1",
         structuredContent: { type: "map", version: "1.0", layers: [] },
       },
       right: {
         label: "Data",
-        viewUrl: "https://chuk-mcp-ui-views.fly.dev/datatable/v1",
+        viewUrl: "https://mcp-views.chukai.io/datatable/v1",
         structuredContent: { type: "datatable", version: "1.0", columns: [], rows: [] },
       },
     };

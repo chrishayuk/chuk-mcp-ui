@@ -191,4 +191,4 @@ class TestViewPaths:
             assert view in VIEW_PATHS, f"Missing path for {view}"
 
     def test_cdn_base(self):
-        assert CDN_BASE == "https://chuk-mcp-ui-views.fly.dev"
+        assert CDN_BASE == "https://mcp-views.chukai.io"

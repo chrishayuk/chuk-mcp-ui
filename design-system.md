@@ -528,7 +528,7 @@ All sizes are for the single-file `mcp-app.html` with CSS, JS, and assets inline
 
 ## Storybook
 
-The design system is documented with 253+ interactive stories across 78+ groups, browsable at `localhost:6006` or the deployed build at `chuk-mcp-ui-views.fly.dev/storybook/`.
+The design system is documented with 253+ interactive stories across 78+ groups, browsable at `localhost:6006` or the deployed build at `mcp-views.chukai.io/storybook/`.
 
 ### Running
 
@@ -591,4 +591,4 @@ View stories render the inner component directly (e.g. `DataTable`, `DynamicForm
 | `packages/ui` | shadcn components, Tailwind theme bridge, animation variants, `cn()` | Protocol, data fetching, business logic |
 | `packages/create-chuk-view` | CLI scaffolder — generates all boilerplate files for a new View | Runtime code, components |
 | `apps/*` | View-specific rendering, schema types, Zod validation | Shared components, theme infrastructure |
-| `apps/playground` | Interactive sandbox for testing Views with live theme/data controls. Deployed at `chuk-mcp-ui-views.fly.dev/playground/` | Production Views, shared infrastructure |
+| `apps/playground` | Interactive sandbox for testing Views with live theme/data controls. Deployed at `mcp-views.chukai.io/playground/` | Production Views, shared infrastructure |

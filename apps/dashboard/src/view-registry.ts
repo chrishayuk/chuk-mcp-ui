@@ -1,4 +1,4 @@
-const CDN_BASE = "https://chuk-mcp-ui-views.fly.dev";
+const CDN_BASE = "https://mcp-views.chukai.io";
 
 /**
  * Built-in registry mapping viewType to CDN URL.

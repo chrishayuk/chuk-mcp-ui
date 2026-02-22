@@ -312,7 +312,7 @@ A shared `tsconfig.base.json` at the root provides common compiler options. Indi
 
 ### Serving and Deployment
 
-A `server.mjs` at the root serves built view HTML files. Deployment is configured for Fly.io (`fly.toml`, `Dockerfile`). Views are accessible at `https://chuk-mcp-ui-views.fly.dev/{view-name}/v{major}`.
+A `server.mjs` at the root serves built view HTML files. Deployment is configured for Fly.io (`fly.toml`, `Dockerfile`). Views are accessible at `https://mcp-views.chukai.io/{view-name}/v{major}`.
 
 The server also hosts:
 - **Playground** at `/playground/` — live JSON editor + iframe preview for all 66 views

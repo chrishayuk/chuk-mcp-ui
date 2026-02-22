@@ -2,7 +2,7 @@ import { useRef, useCallback, useEffect } from "react";
 
 const BASE_URL = import.meta.env.DEV
   ? "http://localhost:8000"
-  : "https://chuk-mcp-ui-views.fly.dev";
+  : "https://mcp-views.chukai.io";
 
 interface PreviewPaneProps {
   viewType: string;

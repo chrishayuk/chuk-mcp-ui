@@ -47,7 +47,7 @@ mcp = _QuietFastMCP(
 
 # ── CDN + resource URI constants ──────────────────────────────────────────
 
-CDN_BASE = "https://chuk-mcp-ui-views.fly.dev"
+CDN_BASE = "https://mcp-views.chukai.io"
 
 VIEWS = {
     # Core (17)
@@ -2234,7 +2234,7 @@ async def show_json() -> CallToolResult:
         "deployment": {
             "provider": "fly.io",
             "region": "lhr",
-            "url": "https://chuk-mcp-ui-views.fly.dev",
+            "url": "https://mcp-views.chukai.io",
             "status": "healthy",
         },
     }

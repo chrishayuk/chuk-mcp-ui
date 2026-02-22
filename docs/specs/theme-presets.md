@@ -52,7 +52,7 @@ Returns all registered preset names (built-in + custom).
 Views check `?theme=<name>` on load:
 
 ```
-https://chuk-mcp-ui-views.fly.dev/chart/v1?theme=ocean
+https://mcp-views.chukai.io/chart/v1?theme=ocean
 ```
 
 This is read once at initialization and passed to `applyPreset()`. The host's `onhostcontextchanged` callback takes precedence if it fires after load.

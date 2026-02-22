@@ -10,7 +10,7 @@ describe("dashboard zod schema validation", () => {
       panels: [
         {
           id: "left",
-          viewUrl: "https://chuk-mcp-ui-views.fly.dev/datatable/v1",
+          viewUrl: "https://mcp-views.chukai.io/datatable/v1",
           structuredContent: { type: "datatable", version: "1.0", columns: [], rows: [] },
         },
       ],
@@ -29,7 +29,7 @@ describe("dashboard zod schema validation", () => {
         {
           id: "map",
           label: "Map",
-          viewUrl: "https://chuk-mcp-ui-views.fly.dev/map/v1",
+          viewUrl: "https://mcp-views.chukai.io/map/v1",
           structuredContent: { type: "map", version: "1.0", layers: [] },
           width: "60%",
           height: "400px",
@@ -39,7 +39,7 @@ describe("dashboard zod schema validation", () => {
         {
           id: "table",
           label: "Results",
-          viewUrl: "https://chuk-mcp-ui-views.fly.dev/datatable/v1",
+          viewUrl: "https://mcp-views.chukai.io/datatable/v1",
           structuredContent: { type: "datatable", version: "1.0", columns: [], rows: [] },
           width: "40%",
         },

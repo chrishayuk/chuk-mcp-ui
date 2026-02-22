@@ -8,7 +8,7 @@
 npm inline for Node/TS servers, CDN hosted for Python servers.
 
 **Status: Complete.** All deliverables shipped. Hosted on Fly.io at
-`chuk-mcp-ui-views.fly.dev` (npm publish pending).
+`mcp-views.chukai.io` (npm publish pending).
 
 ### Deliverables
 
@@ -20,8 +20,8 @@ npm inline for Node/TS servers, CDN hosted for Python servers.
 - [x] `view-datatable` — sortable, filterable, badges, CSV export
 - [x] `view-map` — Leaflet, GeoJSON layers, clustering, popups, actions
 - [x] Deploy to Fly.io
-  - `chuk-mcp-ui-views.fly.dev/datatable/v1`
-  - `chuk-mcp-ui-views.fly.dev/map/v1`
+  - `mcp-views.chukai.io/datatable/v1`
+  - `mcp-views.chukai.io/map/v1`
 - [x] TypeScript example: MCP server using npm inline path
 - [x] Python example: heritage exploration using hosted path
 - [x] Python schema package: `chuk-view-schemas` (Pydantic v2)
@@ -292,7 +292,7 @@ and text fallback. One decorator (Python) or three helper calls (TypeScript), do
 Named theme presets beyond light/dark:
 
 ```python
-MAP_VIEW = "https://chuk-mcp-ui-views.fly.dev/map/v1?theme=discovery"
+MAP_VIEW = "https://mcp-views.chukai.io/map/v1?theme=discovery"
 ```
 
 Presets: `default`, `dark`, `discovery` (Discovery Channel branding),
@@ -302,8 +302,8 @@ Presets: `default`, `dark`, `discovery` (Discovery Channel branding),
 ### 5.6 Live Playground MVP ✓
 
 **Sprint 2: shipped.** Implemented at `apps/playground/`. Deployed at
-`chuk-mcp-ui-views.fly.dev/playground/`. Storybook deployed at
-`chuk-mcp-ui-views.fly.dev/storybook/`.
+`mcp-views.chukai.io/playground/`. Storybook deployed at
+`mcp-views.chukai.io/storybook/`.
 
 A stripped-down early version of the Phase 9 catalogue: dropdown of all 66 Views
 + JSON editor + live iframe preview. Uses URL hash for synchronous initial
@@ -492,17 +492,17 @@ and returns a single rendered page. Zero UI decisions in the MCP server.
 ## Phase 9 — View Catalogue & Viewer
 
 **Goal:** A purpose-built Storybook for MCP Views. The landing page at
-`chuk-mcp-ui-views.fly.dev`, the development tool, the demo platform,
+`mcp-views.chukai.io`, the development tool, the demo platform,
 and the test harness — all in one. Evolves from the Phase 5 live
 playground MVP.
 
 ### URL Structure
 
 ```
-chuk-mcp-ui-views.fly.dev/                 -> Catalogue / viewer
-chuk-mcp-ui-views.fly.dev/map/v1           -> The actual View (served to hosts)
-chuk-mcp-ui-views.fly.dev/datatable/v1     -> The actual View
-chuk-mcp-ui-views.fly.dev/chart/v1         -> The actual View
+mcp-views.chukai.io/                 -> Catalogue / viewer
+mcp-views.chukai.io/map/v1           -> The actual View (served to hosts)
+mcp-views.chukai.io/datatable/v1     -> The actual View
+mcp-views.chukai.io/chart/v1         -> The actual View
 ```
 
 The root is the viewer. Each View's versioned path serves the raw
@@ -510,7 +510,7 @@ The root is the viewer. Each View's versioned path serves the raw
 
 ### Deliverables
 
-- [ ] Catalogue app at `chuk-mcp-ui-views.fly.dev/`
+- [ ] Catalogue app at `mcp-views.chukai.io/`
   - Lists all Views with live preview thumbnails
   - Each View rendered in an iframe exactly as a host would
   - Feeds sample `structuredContent` from COMPONENT.md test cases
@@ -541,7 +541,7 @@ The viewer serves four roles from a single app:
 
 ### The Killer DX Feature
 
-A Python developer visits `chuk-mcp-ui-views.fly.dev`, picks `view-map`, sees it
+A Python developer visits `mcp-views.chukai.io`, picks `view-map`, sees it
 rendered with sample heritage data, pastes in their own GeoJSON in the
 live editor, sees it work, copies the Python snippet, done. They never
 cloned a repo. They never ran `npm install`. They went from "I have data"
@@ -549,7 +549,7 @@ to "I have a working MCP App" in minutes.
 
 ### Success Criteria
 
-The root of `chuk-mcp-ui-views.fly.dev` is a polished catalogue showing every
+The root of `mcp-views.chukai.io` is a polished catalogue showing every
 published View. A developer can browse, try, and integrate any View
 without installing anything locally.
 
@@ -579,7 +579,7 @@ community-contributed Views.
 
 | Milestone | Phase | Status |
 |-----------|-------|--------|
-| First View on Fly.io | 1 | ✓ Done — 66 Views at `chuk-mcp-ui-views.fly.dev` |
+| First View on Fly.io | 1 | ✓ Done — 66 Views at `mcp-views.chukai.io` |
 | TS server using npm inline | 1 | ✓ Done — `examples/ts-inline` |
 | Python server using hosted Views | 1 | ✓ Done — `examples/python-heritage` |
 | Demo MCP server (streamable HTTP) | 1-2 | ✓ Done — `mcp-view-demo.fly.dev/mcp` |
@@ -865,7 +865,7 @@ Total Views: **66 shipped** (+ 3 planned: wizard, transcript, shader)
 | Chart library | Chart.js | Lightweight, covers all common chart types |
 | CDN hosting | Fly.io | Docker-based, auto-stop/start, Node.js static server |
 | npm scope | `@chuk/view-*` | Clean namespace, discoverable |
-| CDN domain | `chuk-mcp-ui-views.fly.dev` | Fly.io, versioned URL paths |
+| CDN domain | `mcp-views.chukai.io` | Fly.io, versioned URL paths |
 | Schema validation | Ajv + Zod (JS) / Pydantic (Py) | Triple schema: JSON Schema, Zod, Pydantic |
 | Styling | Tailwind CSS v4 + shadcn/ui | Utility-first CSS, accessible Radix primitives, theme bridge to --chuk-* vars |
 | Animation | Framer Motion (opt-in) | Declarative enter/exit, all views use fadeIn; map is the only exception (interactive canvas) |

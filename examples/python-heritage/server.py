@@ -1,5 +1,5 @@
 """
-Example: Python MCP server using a hosted View from chuk-mcp-ui-views.fly.dev.
+Example: Python MCP server using a hosted View from mcp-views.chukai.io.
 
 This server has zero frontend code. It references a map View by URL
 and sends GeoJSON data as structuredContent. That's it.
@@ -10,10 +10,10 @@ from mcp.server.fastmcp import FastMCP
 mcp = FastMCP("heritage-explorer")
 
 # The Views live on Fly.io. No npm, no Vite, no HTML.
-MAP_VIEW = "https://chuk-mcp-ui-views.fly.dev/map/v1"
-TABLE_VIEW = "https://chuk-mcp-ui-views.fly.dev/datatable/v1"
-CHART_VIEW = "https://chuk-mcp-ui-views.fly.dev/chart/v1"
-DASHBOARD_VIEW = "https://chuk-mcp-ui-views.fly.dev/dashboard/v1"
+MAP_VIEW = "https://mcp-views.chukai.io/map/v1"
+TABLE_VIEW = "https://mcp-views.chukai.io/datatable/v1"
+CHART_VIEW = "https://mcp-views.chukai.io/chart/v1"
+DASHBOARD_VIEW = "https://mcp-views.chukai.io/dashboard/v1"
 
 # Sample heritage data (replace with real API calls)
 SAMPLE_SITES = [

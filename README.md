@@ -168,7 +168,7 @@ async def show_popularity(chart_type: str = "bar") -> ChartContent:
 ```typescript
 import { getViewUrl, buildViewMeta, wrapViewResult } from "@chuk/view-shared/server";
 
-const url = getViewUrl("map");           // https://chuk-mcp-ui-views.fly.dev/map/v1
+const url = getViewUrl("map");           // https://mcp-views.chukai.io/map/v1
 const meta = buildViewMeta("map");       // { ui: { resourceUri: "..." } }
 const result = wrapViewResult("map", { structuredContent: mapData });
 ```
@@ -178,7 +178,7 @@ const result = wrapViewResult("map", { structuredContent: mapData });
 All views are deployed to Fly.io at versioned URLs:
 
 ```
-https://chuk-mcp-ui-views.fly.dev/{view-name}/v1
+https://mcp-views.chukai.io/{view-name}/v1
 ```
 
 Examples: `.../map/v1`, `.../chart/v1`, `.../dashboard/v1`
@@ -186,8 +186,8 @@ Examples: `.../map/v1`, `.../chart/v1`, `.../dashboard/v1`
 The playground and Storybook are also hosted:
 
 ```
-https://chuk-mcp-ui-views.fly.dev/playground/    # Live JSON editor + preview
-https://chuk-mcp-ui-views.fly.dev/storybook/     # Component & view stories
+https://mcp-views.chukai.io/playground/    # Live JSON editor + preview
+https://mcp-views.chukai.io/storybook/     # Component & view stories
 ```
 
 ## Hooks

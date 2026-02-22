@@ -14,7 +14,7 @@ describe("tabs schema validation", () => {
         {
           id: "tab1",
           label: "Map",
-          viewUrl: "https://chuk-mcp-ui-views.fly.dev/map/v1",
+          viewUrl: "https://mcp-views.chukai.io/map/v1",
           structuredContent: { type: "map", version: "1.0", layers: [] },
         },
       ],
@@ -32,14 +32,14 @@ describe("tabs schema validation", () => {
           id: "tab1",
           label: "Map",
           icon: "map",
-          viewUrl: "https://chuk-mcp-ui-views.fly.dev/map/v1",
+          viewUrl: "https://mcp-views.chukai.io/map/v1",
           structuredContent: { type: "map", version: "1.0", layers: [] },
         },
         {
           id: "tab2",
           label: "Data",
           icon: "table",
-          viewUrl: "https://chuk-mcp-ui-views.fly.dev/datatable/v1",
+          viewUrl: "https://mcp-views.chukai.io/datatable/v1",
           structuredContent: { type: "datatable", version: "1.0", columns: [], rows: [] },
         },
       ],
@@ -62,7 +62,7 @@ describe("tabs schema validation", () => {
       tabs: [
         {
           label: "Map",
-          viewUrl: "https://chuk-mcp-ui-views.fly.dev/map/v1",
+          viewUrl: "https://mcp-views.chukai.io/map/v1",
           structuredContent: {},
         },
       ],
@@ -77,7 +77,7 @@ describe("tabs schema validation", () => {
       tabs: [
         {
           id: "tab1",
-          viewUrl: "https://chuk-mcp-ui-views.fly.dev/map/v1",
+          viewUrl: "https://mcp-views.chukai.io/map/v1",
           structuredContent: {},
         },
       ],

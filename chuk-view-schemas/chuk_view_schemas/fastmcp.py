@@ -28,7 +28,7 @@ from .tabs import TabsContent
 from .video import VideoContent
 
 # CDN URL registry
-CDN_BASE = "https://chuk-mcp-ui-views.fly.dev"
+CDN_BASE = "https://mcp-views.chukai.io"
 
 VIEW_PATHS: dict[str, str] = {
     "map": "/map/v1",

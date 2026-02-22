@@ -107,9 +107,9 @@ suggestion = infer_view([{"lat": 51.5, "lon": -0.1, "name": "London"}])
 All views are pre-built and hosted at versioned URLs on Fly.io:
 
 ```
-https://chuk-mcp-ui-views.fly.dev/chart/v1
-https://chuk-mcp-ui-views.fly.dev/map/v1
-https://chuk-mcp-ui-views.fly.dev/datatable/v1
+https://mcp-views.chukai.io/chart/v1
+https://mcp-views.chukai.io/map/v1
+https://mcp-views.chukai.io/datatable/v1
 ...
 ```
 
@@ -119,5 +119,5 @@ The decorators point at these URLs automatically. Your Python server never serve
 
 - [chuk-mcp-ui repo](https://github.com/chrishayuk/chuk-mcp-ui) — 66 pre-built views
 - [Demo server](https://mcp-view-demo.fly.dev/mcp) — 88-tool live demo
-- [Storybook](https://chuk-mcp-ui-views.fly.dev/storybook/) — Browse all views
-- [Playground](https://chuk-mcp-ui-views.fly.dev/playground/) — Try views with your data
+- [Storybook](https://mcp-views.chukai.io/storybook/) — Browse all views
+- [Playground](https://mcp-views.chukai.io/playground/) — Try views with your data

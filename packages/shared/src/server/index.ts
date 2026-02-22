@@ -5,7 +5,7 @@
  * point that does NOT get bundled into client-side View code.
  */
 
-const CDN_BASE = "https://chuk-mcp-ui-views.fly.dev";
+const CDN_BASE = "https://mcp-views.chukai.io";
 
 const VIEW_PATHS: Record<string, string> = {
   alert: "/alert/v1",
