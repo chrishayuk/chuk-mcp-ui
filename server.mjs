@@ -131,7 +131,7 @@ const server = createServer((req, res) => {
   res.end(JSON.stringify({ error: "Not found" }));
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`chuk-mcp-ui-views listening on port ${PORT}`);
   console.log(`Views: ${Object.keys(viewHtml).join(", ")}`);
 });
