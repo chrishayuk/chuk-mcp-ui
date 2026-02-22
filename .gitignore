@@ -1,6 +1,50 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
-.turbo/
-*.tsbuildinfo
-.DS_Store
 storybook-static/
+
+# Turbo
+.turbo/
+
+# TypeScript
+*.tsbuildinfo
+
+# Vite
+*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Testing
+coverage/
+__snapshots__/
+
+# Misc
+*.tgz
+
+# cache
+__pycache__/
