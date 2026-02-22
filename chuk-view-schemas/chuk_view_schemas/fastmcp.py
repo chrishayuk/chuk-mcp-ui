@@ -3,7 +3,7 @@ FastMCP decorators for chuk View tools.
 
 Usage:
     from chuk_view_schemas.fastmcp import map_tool, chart_tool, view_tool
-    
+
     @map_tool(mcp, "show_sites")
     async def show_sites() -> MapContent:
         return MapContent(center={"lat": 51.5, "lon": -0.1}, layers=[...])
@@ -11,7 +11,6 @@ Usage:
 
 from __future__ import annotations
 
-import json
 from functools import wraps
 from typing import Any, Callable, Optional, TypeVar
 
@@ -59,8 +58,13 @@ def _get_cdn_url(view_type: str) -> str:
 
 # Text fallback generators
 def _map_fallback(data: MapContent) -> str:
-    n = sum(len(l.features.get("features", [])) if isinstance(l.features, dict) else 0 for l in data.layers)
-    names = ", ".join(l.label for l in data.layers)
+    n = sum(
+        len(layer.features.get("features", []))
+        if isinstance(layer.features, dict)
+        else 0
+        for layer in data.layers
+    )
+    names = ", ".join(layer.label for layer in data.layers)
     return f"Map with {n} features across {len(data.layers)} layers ({names})."
 
 
@@ -104,7 +108,9 @@ def _tabs_fallback(data: TabsContent) -> str:
 
 
 def _generic_fallback(data: Any) -> str:
-    view_type = getattr(data, "type", "unknown") if isinstance(data, BaseModel) else "unknown"
+    view_type = (
+        getattr(data, "type", "unknown") if isinstance(data, BaseModel) else "unknown"
+    )
     return f"Showing {view_type} view."
 
 
@@ -177,6 +183,7 @@ def _view_tool(
 
 
 # Per-View convenience decorators
+
 
 def map_tool(mcp: Any, name: str, **kwargs: Any) -> Callable[[F], F]:
     """Register an MCP tool that returns a map View."""

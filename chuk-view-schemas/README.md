@@ -1,32 +1,3 @@
-Metadata-Version: 2.4
-Name: chuk-view-schemas
-Version: 0.1.0
-Summary: Pydantic v2 schemas and FastMCP decorators for chuk-mcp-ui Views
-Author-email: Chris Hay <chrishayuk@somejunkmailbox.com>
-License-Expression: MIT
-Project-URL: Homepage, https://github.com/chrishayuk/chuk-mcp-ui
-Project-URL: Repository, https://github.com/chrishayuk/chuk-mcp-ui
-Project-URL: Issues, https://github.com/chrishayuk/chuk-mcp-ui/issues
-Keywords: mcp,mcp-apps,ui,views,pydantic,schemas,fastmcp
-Classifier: Development Status :: 4 - Beta
-Classifier: Intended Audience :: Developers
-Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.10
-Classifier: Programming Language :: Python :: 3.11
-Classifier: Programming Language :: Python :: 3.12
-Classifier: Programming Language :: Python :: 3.13
-Classifier: Topic :: Software Development :: Libraries :: Python Modules
-Requires-Python: >=3.10
-Description-Content-Type: text/markdown
-Requires-Dist: pydantic>=2.0
-Provides-Extra: dev
-Requires-Dist: pytest>=7; extra == "dev"
-Requires-Dist: pytest-asyncio>=0.25; extra == "dev"
-Requires-Dist: pytest-cov>=6.0; extra == "dev"
-Requires-Dist: ruff>=0.8; extra == "dev"
-Provides-Extra: fastmcp
-Requires-Dist: mcp>=1.0; extra == "fastmcp"
-
 # chuk-view-schemas
 
 Pydantic v2 schemas and FastMCP decorators for [chuk-mcp-ui](https://github.com/chrishayuk/chuk-mcp-ui) Views.

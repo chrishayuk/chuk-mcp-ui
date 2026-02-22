@@ -1,10 +1,12 @@
 """Tests for FastMCP decorator helpers."""
 
 import asyncio
-import pytest
 from chuk_view_schemas.fastmcp import (
-    map_tool, chart_tool, datatable_tool, view_tool,
-    CDN_BASE, VIEW_PATHS, _generic_fallback,
+    map_tool,
+    chart_tool,
+    view_tool,
+    CDN_BASE,
+    VIEW_PATHS,
 )
 from chuk_view_schemas import MapContent, MapLayer, ChartContent, ChartDataset
 
@@ -22,6 +24,7 @@ class MockMCP:
             name = kwargs.get("name", func.__name__)
             self._tools[name] = {"func": func, "kwargs": kwargs}
             return func
+
         return decorator
 
 
@@ -166,10 +169,23 @@ class TestGenericViewTool:
 class TestViewPaths:
     def test_all_17_views_have_paths(self):
         expected = [
-            "map", "chart", "datatable", "form", "markdown",
-            "video", "pdf", "dashboard", "split", "tabs",
-            "detail", "counter", "code", "progress", "confirm",
-            "json", "status",
+            "map",
+            "chart",
+            "datatable",
+            "form",
+            "markdown",
+            "video",
+            "pdf",
+            "dashboard",
+            "split",
+            "tabs",
+            "detail",
+            "counter",
+            "code",
+            "progress",
+            "confirm",
+            "json",
+            "status",
         ]
         for view in expected:
             assert view in VIEW_PATHS, f"Missing path for {view}"

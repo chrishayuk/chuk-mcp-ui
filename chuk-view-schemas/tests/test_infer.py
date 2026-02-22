@@ -1,6 +1,5 @@
 """Tests for the infer_view() data shape inference engine."""
 
-import pytest
 from chuk_view_schemas.infer import infer_view, infer_views, ViewSuggestion
 
 
@@ -14,7 +13,11 @@ class TestTier1ExactTypeMatch:
         assert result.confidence == 1.0
 
     def test_iv15_chart_type_pie(self):
-        data = {"type": "chart", "chartType": "pie", "data": [{"label": "A", "values": [1]}]}
+        data = {
+            "type": "chart",
+            "chartType": "pie",
+            "data": [{"label": "A", "values": [1]}],
+        }
         result = infer_view(data)
         assert result.view == "chart"
         assert result.confidence == 1.0
@@ -36,7 +39,10 @@ class TestTier2SignatureFields:
         assert result.confidence >= 0.90
 
     def test_iv04_form_schema_and_submit_tool(self):
-        data = {"schema": {"properties": {"name": {"type": "string"}}}, "submitTool": "save"}
+        data = {
+            "schema": {"properties": {"name": {"type": "string"}}},
+            "submitTool": "save",
+        }
         result = infer_view(data)
         assert result.view == "form"
         assert result.confidence >= 0.90
@@ -48,7 +54,12 @@ class TestTier2SignatureFields:
         assert result.confidence >= 0.85
 
     def test_iv06_gauge_value_and_thresholds(self):
-        data = {"value": 75, "min": 0, "max": 100, "thresholds": [{"value": 50, "color": "yellow"}]}
+        data = {
+            "value": 75,
+            "min": 0,
+            "max": 100,
+            "thresholds": [{"value": 50, "color": "yellow"}],
+        }
         result = infer_view(data)
         assert result.view == "gauge"
         assert result.confidence >= 0.85
@@ -73,7 +84,10 @@ class TestTier2SignatureFields:
 
     def test_chart_type_field_without_type_discriminator(self):
         """chartType field alone should suggest chart even without type: "chart"."""
-        data = {"chartType": "bar", "data": [{"label": "Q1", "values": [{"label": "A", "value": 10}]}]}
+        data = {
+            "chartType": "bar",
+            "data": [{"label": "Q1", "values": [{"label": "A", "value": 10}]}],
+        }
         result = infer_view(data)
         assert result.view == "chart"
         assert result.confidence >= 0.90

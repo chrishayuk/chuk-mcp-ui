@@ -1,9 +1,12 @@
+README.md
 pyproject.toml
 chuk_view_schemas/__init__.py
 chuk_view_schemas/chart.py
 chuk_view_schemas/dashboard.py
 chuk_view_schemas/datatable.py
+chuk_view_schemas/fastmcp.py
 chuk_view_schemas/form.py
+chuk_view_schemas/infer.py
 chuk_view_schemas/map.py
 chuk_view_schemas/markdown.py
 chuk_view_schemas/pdf.py
@@ -15,3 +18,5 @@ chuk_view_schemas.egg-info/SOURCES.txt
 chuk_view_schemas.egg-info/dependency_links.txt
 chuk_view_schemas.egg-info/requires.txt
 chuk_view_schemas.egg-info/top_level.txt
+tests/test_fastmcp.py
+tests/test_infer.py

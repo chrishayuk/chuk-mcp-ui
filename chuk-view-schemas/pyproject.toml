@@ -5,14 +5,45 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "chuk-view-schemas"
 version = "0.1.0"
-description = "Pydantic v2 schemas for chuk-mcp-ui Views"
+description = "Pydantic v2 schemas and FastMCP decorators for chuk-mcp-ui Views"
 requires-python = ">=3.10"
+readme = "README.md"
+authors = [
+  { name = "Chris Hay", email = "chrishayuk@somejunkmailbox.com" }
+]
+keywords = ["mcp", "mcp-apps", "ui", "views", "pydantic", "schemas", "fastmcp"]
+license = "MIT"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = ["pydantic>=2.0"]
-license = {text = "MIT"}
 
 [project.optional-dependencies]
-dev = ["pytest>=7"]
+dev = [
+  "pytest>=7",
+  "pytest-asyncio>=0.25",
+  "pytest-cov>=6.0",
+  "ruff>=0.8",
+]
 fastmcp = ["mcp>=1.0"]
+
+[project.urls]
+Homepage = "https://github.com/chrishayuk/chuk-mcp-ui"
+Repository = "https://github.com/chrishayuk/chuk-mcp-ui"
+Issues = "https://github.com/chrishayuk/chuk-mcp-ui/issues"
 
 [tool.setuptools.packages.find]
 include = ["chuk_view_schemas*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py310"

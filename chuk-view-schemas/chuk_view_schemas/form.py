@@ -28,9 +28,18 @@ class JSONSchemaField(BaseModel):
 class FieldUI(BaseModel):
     widget: Optional[
         Literal[
-            "text", "textarea", "select", "radio", "checkbox",
-            "slider", "date", "datetime", "color", "password",
-            "hidden", "number",
+            "text",
+            "textarea",
+            "select",
+            "radio",
+            "checkbox",
+            "slider",
+            "date",
+            "datetime",
+            "color",
+            "password",
+            "hidden",
+            "number",
         ]
     ] = None
     placeholder: Optional[str] = None
