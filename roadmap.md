@@ -26,7 +26,7 @@ npm inline for Node/TS servers, CDN hosted for Python servers.
 - [x] Python example: heritage exploration using hosted path
 - [x] Python schema package: `chuk-view-schemas` (Pydantic v2)
 - [ ] Publish to npm (`@chuk/view-map`, `@chuk/view-datatable`)
-- [ ] Publish to PyPI (`chuk-view-schemas`)
+- [x] Publish to PyPI (`chuk-view-schemas`) — v0.1.0 on PyPI
 
 ---
 
@@ -118,7 +118,8 @@ have no View. Ordered by how frequently MCP servers produce this shape.
 ### Deliverables
 
 - [ ] Publish all to npm + deploy to Fly.io
-- [ ] Updated schema packages on npm and PyPI
+- [x] Updated schema packages on PyPI (`chuk-view-schemas` v0.1.0)
+- [ ] Updated schema packages on npm
 
 ### Success Criteria
 
@@ -354,7 +355,8 @@ full host. Also powers Phase 9 catalogue thumbnails.
 - [x] Live playground MVP at `apps/playground/`
 - [ ] `infer_view()` inference helper (Python + TypeScript)
 - [ ] `chuk-view-test` snapshot testing CLI
-- [ ] Publish all to npm + PyPI
+- [x] Publish Python schemas to PyPI (`chuk-view-schemas` v0.1.0)
+- [ ] Publish all to npm
 
 ### Success Criteria
 
@@ -588,7 +590,7 @@ community-contributed Views.
 | Design system (Tailwind + shadcn + Framer Motion) | 3 | ✓ Done — packages/ui, all 66 Views migrated, dark mode compliant |
 | Storybook (253+ stories, theme toggle) | 3 | ✓ Done — component + View + hook stories, deployed at `/storybook` |
 | First View on npm | 1 | Pending |
-| PyPI publish | 1 | Pending |
+| PyPI publish | 1 | ✅ Done — `chuk-view-schemas` v0.1.0 |
 | Full MCP coverage (10 → 17 Views) | 3 | ✓ Done — Sprint 1 |
 | Full MCP coverage (17 → 27 Views) | 3-4 | ✅ Done — Sprint 3 |
 | Full catalogue (27 → 52 Views) | 3-4 | ✅ Done — Sprint 4 |

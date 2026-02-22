@@ -131,14 +131,36 @@ async def show_chart(chart_type: str = "bar") -> CallToolResult:
 
 ### Python (FastMCP Decorators)
 
-The `chuk-view-schemas` package provides 17 per-view decorators:
+The [`chuk-view-schemas`](https://pypi.org/project/chuk-view-schemas/) package provides Pydantic v2 schemas and 17 per-view decorators:
+
+```bash
+pip install chuk-view-schemas[fastmcp]
+```
 
 ```python
-from chuk_view_schemas.fastmcp import map_tool
+from mcp.server.fastmcp import FastMCP
+from chuk_view_schemas.fastmcp import chart_tool
+from chuk_view_schemas.chart import ChartContent, ChartDataset
 
-@map_tool(mcp, "show_sites")
-async def show_sites() -> MapContent:
-    return MapContent(center={"lat": 51.5, "lon": -0.1}, layers=[...])
+mcp = FastMCP("my-server")
+
+@chart_tool(mcp, "show_popularity")
+async def show_popularity(chart_type: str = "bar") -> ChartContent:
+    """Show programming language popularity as an interactive chart."""
+    return ChartContent(
+        chartType=chart_type,
+        title="Language Popularity",
+        data=[
+            ChartDataset(
+                label="Usage %",
+                values=[
+                    {"label": "Python", "value": 31.0},
+                    {"label": "JavaScript", "value": 25.2},
+                    {"label": "Rust", "value": 18.1},
+                ],
+            )
+        ],
+    )
 ```
 
 ### TypeScript
