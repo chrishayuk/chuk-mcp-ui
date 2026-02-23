@@ -467,6 +467,236 @@ host-specific code in any View.
 
 ---
 
+## Phase 7.5 — ext-apps Protocol Alignment & Python Server Support
+
+**Goal:** Full alignment with the official `@modelcontextprotocol/ext-apps` SDK
+protocol (`2026-01-26`). Views speak the postMessage protocol natively. Python
+MCP servers (via chuk-mcp-server) get first-class MCP Apps support. The
+`chuk-view-schemas` decorators leverage chuk-mcp-server's `@view_tool` for
+permissions, CSP, visibility, and auto resource registration.
+
+**Status:** Server infrastructure complete. Views largely complete via `useView<T>`
+hook. Schema decorators need alignment with new server capabilities.
+
+### Context
+
+The ext-apps protocol is a JSON-RPC 2.0 dialect over `window.postMessage`
+between the host (AppBridge) and the view iframe (App). It defines:
+
+- **Extension ID**: `io.modelcontextprotocol/ui`
+- **Resource MIME type**: `text/html;profile=mcp-app`
+- **Initialization handshake**: `ui/initialize` → response → `ui/notifications/initialized`
+- **Tool lifecycle**: `ontoolinputpartial` (streaming) → `ontoolinput` (complete args) → `ontoolresult` (result)
+- **Bidirectional calls**: View calls `tools/call` (proxied through host to server)
+- **Size reporting**: `ui/notifications/size-changed` via ResizeObserver
+- **Host context**: theme, styles (85+ CSS variables), containerDimensions, safeAreaInsets, locale, displayMode
+- **Display modes**: inline, fullscreen, pip
+- **Model context**: `ui/update-model-context` (view pushes state to LLM)
+- **Chat integration**: `ui/message` (view injects messages into conversation)
+- **Teardown**: `ui/resource-teardown` (graceful shutdown)
+- **Tool visibility**: `["model"]`, `["app"]`, `["model", "app"]`
+- **CSP**: `_meta.ui.csp` on resources (connectDomains, resourceDomains, frameDomains)
+- **Permissions**: `_meta.ui.permissions` (camera, microphone, geolocation, clipboardWrite)
+
+### Current State vs Protocol
+
+| Feature | Status | Where |
+|---------|--------|-------|
+| `_meta.ui.resourceUri` (ui://) | ✅ Done | chuk-mcp-server |
+| `_meta.ui.viewUrl` | ✅ Done | chuk-mcp-server |
+| Resource serves HTML (`text/html;profile=mcp-app`) | ✅ Done | chuk-mcp-server |
+| `structuredContent` in tool results | ✅ Done | chuk-mcp-server |
+| Extension ID `io.modelcontextprotocol/ui` in capabilities | ✅ Done | chuk-mcp-server |
+| Client capability detection | ✅ Done | chuk-mcp-server |
+| Tool visibility (`["model"]`, `["app"]`, `["model", "app"]`) | ✅ Done | chuk-mcp-server |
+| CSP on resources (`_meta.ui.csp`) | ✅ Done | chuk-mcp-server |
+| Permissions on resources (`_meta.ui.permissions`) | ✅ Done | chuk-mcp-server |
+| Legacy meta key normalization | ✅ Done | chuk-mcp-server |
+| Defensive `ui/*` method handling | ✅ Done | chuk-mcp-server |
+| Ext-apps protocol constants (13 methods, 3 display modes) | ✅ Done | chuk-mcp-server |
+| Views use ext-apps `App` class (postMessage) | ✅ Done | chuk-mcp-ui (useView) |
+| `ontoolresult` callback | ✅ Done | chuk-mcp-ui (useView) |
+| Auto-resize (ResizeObserver) | ✅ Done | chuk-mcp-ui (useView) |
+| Host theming (CSS variables, `color-scheme`) | ✅ Done | chuk-mcp-ui (useView) |
+| `callServerTool()` (bidirectional) | ✅ Done | chuk-mcp-ui (useView) |
+| `exclude_none=True` on model_dump | ✅ Done | chuk-view-schemas |
+| chuk-view-schemas uses `@view_tool` | ❌ Gap | chuk-view-schemas |
+| chuk-view-schemas permissions/csp/visibility | ❌ Gap | chuk-view-schemas |
+| VIEW_PATHS covers all 66 views | ❌ Gap | chuk-view-schemas |
+| `ontoolinputpartial` in useView | ❌ Gap | chuk-mcp-ui |
+| `sendMessage` / `updateModelContext` in useView | ❌ Gap | chuk-mcp-ui |
+| `requestDisplayMode` (fullscreen/pip) | ❌ Gap | chuk-mcp-ui |
+| `containerDimensions` / `safeAreaInsets` | ❌ Gap | chuk-mcp-ui |
+| Server-side pagination/drill-down in views | ❌ Gap | chuk-mcp-ui |
+
+### 7.5a — Server Infrastructure ✓ (chuk-mcp-server v0.24.0)
+
+All server-side MCP Apps features are complete in `chuk-mcp-server`:
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Extension ID in capabilities | **Done** | `io.modelcontextprotocol/ui` in `capabilities.extensions` (with `experimental: {}` for backward compat) |
+| Client capability detection | **Done** | `_client_supports_ui()` checks `client_capabilities.extensions["io.modelcontextprotocol/ui"]` |
+| Legacy meta key normalization | **Done** | Sync `_meta.ui.resourceUri` ↔ `_meta["ui/resourceUri"]` on tool registration |
+| `@view_tool` decorator | **Done** | Standalone (`@view_tool(...)`) and instance (`@mcp.view_tool(...)`) with auto `readOnlyHint=True` |
+| CSP metadata | **Done** | `_meta.ui.csp` with `connectDomains`, `resourceDomains`, `frameDomains` |
+| Tool visibility | **Done** | `["model"]`, `["app"]`, `["model", "app"]`; app-only tools hidden from `tools/list` |
+| Permissions metadata | **Done** | `_meta.ui.permissions` (camera, microphone, geolocation, clipboard-write) |
+| Auto view resource registration | **Done** | `ui://` URI → auto-fetch HTML from `viewUrl`, cache 1hr, `text/html;profile=mcp-app` |
+| `prefersBorder` on resources | **Done** | Propagated from tool meta to auto-registered resource `_meta` |
+| Ext-apps protocol constants | **Done** | 13 `MCP_APPS_METHOD_UI_*` method names, 3 `MCP_APPS_DISPLAY_*` constants |
+| Defensive `ui/*` handling | **Done** | `ui/*` requests → `METHOD_NOT_FOUND`; `ui/*` notifications → silent ignore |
+| Documentation + examples | **Done** | `docs/guides/mcp-apps.md`, `examples/mcp_apps_view_example.py` |
+
+### 7.5b — chuk-view-schemas Alignment
+
+The Python schema package (`chuk-view-schemas`) decorators need updating to
+leverage chuk-mcp-server's `@view_tool`. Currently they bypass it and manually
+construct `meta={"ui": {...}}`, missing key features.
+
+#### `chuk_mcp.py` (ChukMCPServer target)
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Use `mcp.view_tool()` | Planned | Replace `mcp.tool(meta={...})` with `mcp.view_tool(resource_uri=..., view_url=...)` |
+| `permissions` parameter | Planned | Pass through to `mcp.view_tool(permissions={...})` |
+| `csp` parameter | Planned | Pass through to `mcp.view_tool(csp={...})` |
+| `visibility` parameter | Planned | Pass through to `mcp.view_tool(visibility=[...])` |
+| `prefers_border` parameter | Planned | Pass through to `mcp.view_tool(prefers_border=True)` |
+| Auto resource registration | Planned | Handled by chuk-mcp-server — remove manual wiring |
+
+#### `fastmcp.py` (FastMCP target)
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Keep `mcp.tool(meta={...})` | N/A | FastMCP doesn't have `view_tool` — keep existing pattern |
+| Add `permissions` to meta | Planned | Serialize `permissions` into `meta["ui"]["permissions"]` |
+| Add `csp` to meta | Planned | Serialize `csp` into `meta["ui"]["csp"]` |
+| Add `visibility` to meta | Planned | Serialize `visibility` into `meta["ui"]["visibility"]` |
+
+#### VIEW_PATHS Registry
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Complete 66-view registry | Planned | Currently only 17 of 66 views registered in `VIEW_PATHS` |
+| Missing per-view decorators | Planned | `gallery_tool`, `timeline_tool` exist as functions but missing from `VIEW_PATHS` |
+| 49 new view paths | Planned | Add all remaining views: alert, annotation, audio, boxplot, calendar, carousel, chat, compare, crosstab, diff, embed, filter, flowchart, funnel, gantt, gauge, geostory, gis-legend, globe, graph, heatmap, image, investigation, kanban, layers, log, minimap, neural, notebook, pivot, poll, profile, quiz, ranked, sankey, scatter, settings, slides, spectrogram, stepper, sunburst, swimlane, terminal, threed, timeseries, tree, treemap |
+
+#### Pydantic Schemas
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| 10 existing schemas | ✅ Done | chart, map, datatable, form, dashboard, split, tabs, markdown, video, pdf |
+| 56 missing schemas | Planned | Add incrementally by priority tier — core views first, then specialist |
+
+### 7.5c — View Protocol Completeness (Mostly Done)
+
+The `useView<T>` hook (`packages/shared/src/use-view.ts`) already uses the
+official ext-apps SDK via `useApp`, `useHostStyles`, and `useDocumentTheme`
+from `@modelcontextprotocol/ext-apps/react`.
+
+#### Done
+
+| Feature | Implementation |
+|---------|---------------|
+| `useApp` + ext-apps handshake | `use-view.ts:58` — via `@modelcontextprotocol/ext-apps/react` |
+| `ontoolresult` → typed data | `use-view.ts:65` — validates `structuredContent.type` matches expected |
+| `onhostcontextchanged` → theme | `use-view.ts:83` — applies theme via `applyTheme()` |
+| `useHostStyles` (CSS variables) | `use-view.ts:159` — applies host style variables |
+| `useDocumentTheme` (color-scheme) | `use-view.ts:160` — reactive theme string |
+| `callServerTool` | `use-view.ts:164` — via `app.callServerTool()` with error handling |
+| Auto-resize | Via `useApp` defaults — ResizeObserver enabled automatically |
+| Dashboard `update-structured-content` | `use-view.ts:117` — incremental updates from patch engine |
+| Dashboard `updateModelContext` | `use-dashboard-runtime.ts` — pushes `<ui_state>` + `<ui_events>` |
+| Dashboard `sendMessage` | `use-dashboard-runtime.ts` — for high-priority events (draw, submit) |
+| Dashboard `ontoolinputpartial` | `use-dashboard-runtime.ts` — progressive panel rendering |
+| URL hash data injection | `use-view.ts:37` — synchronous initial data for playground |
+| `mcp-app:view-ready` signal | `use-view.ts:141` — signal to parent that listener is ready |
+
+#### Gaps — Extend `useView` Return Value
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| `ontoolinputpartial` | Planned | Streaming preview — dashboard has it, general `useView` doesn't |
+| `ontoolcancelled` | Planned | Show cancelled state in view |
+| `onteardown` | Planned | Clean up timers, connections, observers |
+| `sendMessage()` | Planned | Inject messages into conversation (dashboard only currently) |
+| `updateModelContext()` | Planned | Push view state to LLM (dashboard only currently) |
+| `requestDisplayMode()` | Planned | Fullscreen/pip toggle for maps, globes, 3D, presentations |
+| `openLink()` | Planned | Open external URLs via host |
+| `sendLog()` | Planned | Debug logging to host console |
+| `containerDimensions` | Planned | Respect fixed vs flexible sizing from host |
+| `safeAreaInsets` | Planned | Apply as padding on main container |
+
+### 7.5d — Bidirectional Interaction
+
+Interactive views should use `callServerTool` for server-side operations.
+
+#### Done
+
+| View | Interaction | Implementation |
+|------|------------|---------------|
+| form | Submit → `callServerTool` | Working (compat test: PASS) |
+| confirm | Confirm → `callServerTool` | Working (compat test: PASS) |
+| poll | Vote → `callServerTool` | Working (compat test: PASS) |
+| dashboard | Patches via `ontoolresult` + `get_ui_state` via `oncalltool` | Working |
+
+#### Gaps
+
+| View | Interaction | Status |
+|------|------------|--------|
+| map | Load feature details, search area | Planned |
+| chart | Drill-down, filter by segment | Planned |
+| datatable | Paginate, server-side sort, load next page | Planned |
+| gallery | Load more, filter server-side | Planned |
+| App-only tools | `visibility: ["app"]` for refresh, paginate, export, filter | Planned |
+| `updateModelContext` | Map: bounding box; Chart: current filter; Table: selected rows | Planned |
+| `sendMessage` | Form: "User submitted: {data}"; Confirm: "User confirmed deletion" | Planned |
+| `requestDisplayMode` | Maps, globes, 3D, dashboards, presentations — fullscreen/pip | Planned |
+| `openLink` | Open external URLs via host browser | Planned |
+
+### Deliverables
+
+- [x] chuk-mcp-server: `@view_tool` decorator with permissions, CSP, visibility, prefersBorder
+- [x] chuk-mcp-server: Extension ID in capabilities, client capability detection
+- [x] chuk-mcp-server: Tool visibility filtering in `tools/list`
+- [x] chuk-mcp-server: Auto view resource registration with permissions passthrough
+- [x] chuk-mcp-server: Ext-apps constants, defensive `ui/*` handling
+- [x] chuk-mcp-server: Documentation (`docs/guides/mcp-apps.md`) + examples
+- [x] chuk-mcp-ui: All 66 views using ext-apps SDK via `useView<T>` hook
+- [x] chuk-mcp-ui: Host theming with CSS variables via `useHostStyles`
+- [x] chuk-mcp-ui: Auto-resize for all views via `useApp` defaults
+- [x] chuk-mcp-ui: `callServerTool` in interactive views (form, confirm, poll)
+- [x] chuk-mcp-ui: 166 Playwright tests (compat harness)
+- [ ] chuk-view-schemas: Update `chuk_mcp.py` to use `mcp.view_tool()`
+- [ ] chuk-view-schemas: Add permissions/CSP/visibility params to decorators
+- [ ] chuk-view-schemas: Complete VIEW_PATHS registry (17 → 66 views)
+- [ ] chuk-view-schemas: Add Pydantic schemas for remaining views
+- [ ] chuk-mcp-ui: Extend `useView` with streaming, sendMessage, updateModelContext
+- [ ] chuk-mcp-ui: `callServerTool` in more views (map, chart, datatable, gallery)
+- [ ] chuk-mcp-ui: Fullscreen support in appropriate views
+- [ ] Tests: Bidirectional tool call tests, streaming preview tests
+
+### Success Criteria
+
+A Python developer using `@chart_tool(mcp, "show_data", permissions={"camera": {}})` gets:
+1. Tool with `_meta.ui` including permissions, CSP, viewUrl
+2. Auto-registered resource with permissions metadata
+3. View initializes via `ui/initialize` handshake
+4. View receives data via `ontoolresult`
+5. View reports size via `ui/notifications/size-changed`
+6. View applies host theme (matches Claude.ai's look)
+7. `callServerTool` works for drill-down and refresh
+8. Fullscreen mode where appropriate
+
+### Priority
+
+1. **7.5b first** — chuk-view-schemas alignment. Unblocks Python developers wanting permissions/CSP.
+2. **7.5c gaps** — extend `useView` hook with streaming, sendMessage, updateModelContext.
+3. **7.5d** — bidirectional interaction in more views. Largest scope, highest impact.
+
+---
+
 ## Phase 8 — View Runtime (SSR)
 
 **Goal:** Server-side rendering engine that dynamically composes Views
