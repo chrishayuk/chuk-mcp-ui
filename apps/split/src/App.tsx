@@ -1,16 +1,15 @@
 import { useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { fadeIn } from "@chuk/view-ui/animations";
-import { useView, Fallback, ViewBusProvider, useViewBusContainer } from "@chuk/view-shared";
+import { useView, ViewBusProvider, useViewBusContainer } from "@chuk/view-shared";
 import { cn } from "@chuk/view-ui";
 import type { SplitContent, SplitPanel } from "./schema";
 
 export function SplitView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<SplitContent>("split", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return (
     <ViewBusProvider>

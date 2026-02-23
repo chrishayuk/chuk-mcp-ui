@@ -15,7 +15,7 @@ import {
   Tooltip,
 } from "chart.js";
 import "chartjs-adapter-date-fns";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import { cn } from "@chuk/view-ui";
 import { motion } from "framer-motion";
 import { fadeIn } from "@chuk/view-ui/animations";
@@ -139,11 +139,10 @@ function mapSeriesData(series: TimeseriesSeries) {
 }
 
 export function TimeseriesView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<TimeseriesContent>("timeseries", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <TimeseriesRenderer data={data} />;
 }

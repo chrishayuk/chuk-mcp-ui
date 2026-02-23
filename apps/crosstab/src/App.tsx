@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import {
   Card,
   CardContent,
@@ -21,11 +21,10 @@ import type { CrosstabContent, CrosstabAnnotation } from "./schema";
 /* ------------------------------------------------------------------ */
 
 export function CrosstabView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<CrosstabContent>("crosstab", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <CrosstabRenderer data={data} />;
 }

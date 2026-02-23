@@ -1,4 +1,4 @@
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import { Card, CardContent, ScrollArea, cn } from "@chuk/view-ui";
 import { motion } from "framer-motion";
 import { fadeIn, listContainer, listItem } from "@chuk/view-ui/animations";
@@ -10,11 +10,10 @@ import type {
 } from "./schema";
 
 export function GisLegendView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<GisLegendContent>("gis-legend", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <GisLegendRenderer data={data} />;
 }

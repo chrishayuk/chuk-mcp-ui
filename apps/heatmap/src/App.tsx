@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import {
   Card,
   CardContent,
@@ -19,11 +19,10 @@ import type { HeatmapContent, HeatmapAnnotation } from "./schema";
 /* ------------------------------------------------------------------ */
 
 export function HeatmapView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<HeatmapContent>("heatmap", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <HeatmapRenderer data={data} />;
 }

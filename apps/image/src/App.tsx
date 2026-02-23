@@ -6,11 +6,10 @@ import { fadeIn } from "@chuk/view-ui/animations";
 import type { ImageContent, ImageAnnotation } from "./schema";
 
 export function ImageView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<ImageContent>("image", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <ImageRenderer data={data} />;
 }

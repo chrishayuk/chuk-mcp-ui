@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { useView, Fallback, resolveTemplates, useViewEvents } from "@chuk/view-shared";
+import { useView, resolveTemplates, useViewEvents } from "@chuk/view-shared";
 import {
   Button,
   Input,
@@ -18,16 +18,10 @@ import { fadeIn } from "@chuk/view-ui/animations";
 import type { DataTableContent, Column, RowAction } from "./schema";
 
 export function DataTableView() {
-  const { data, content, callTool, isConnected } =
+  const { data, callTool } =
     useView<DataTableContent>("datatable", "1.0");
 
-  if (!isConnected) {
-    return <Fallback message="Connecting..." />;
-  }
-
-  if (!data) {
-    return <Fallback content={content ?? undefined} />;
-  }
+  if (!data) return null;
 
   return <DataTable data={data} onCallTool={callTool} />;
 }

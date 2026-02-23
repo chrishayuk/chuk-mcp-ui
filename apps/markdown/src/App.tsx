@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { fadeIn } from "@chuk/view-ui/animations";
 import { marked } from "marked";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import type { MarkdownContent } from "./schema";
 
 // Configure marked: links open in new tab
@@ -16,11 +16,10 @@ renderer.link = function (token) {
 marked.setOptions({ renderer, breaks: true });
 
 export function MarkdownView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<MarkdownContent>("markdown", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <MarkdownRenderer data={data} />;
 }

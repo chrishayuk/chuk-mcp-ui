@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { useView, Fallback, useViewFilter } from "@chuk/view-shared";
+import { useView, useViewFilter } from "@chuk/view-shared";
 import {
   Card,
   CardContent,
@@ -29,13 +29,12 @@ import type {
 /* ------------------------------------------------------------------ */
 
 export function FilterView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<FilterContent>("filter", "1.0");
 
   const { setFilter, clearAll } = useViewFilter();
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return (
     <FilterRenderer

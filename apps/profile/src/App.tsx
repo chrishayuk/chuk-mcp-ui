@@ -10,7 +10,7 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import { Card } from "@chuk/view-ui";
 import { motion } from "framer-motion";
 import { fadeIn } from "@chuk/view-ui/animations";
@@ -46,11 +46,10 @@ function getThemeColors() {
 }
 
 export function ProfileView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<ProfileContent>("profile", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <ProfileRenderer data={data} />;
 }

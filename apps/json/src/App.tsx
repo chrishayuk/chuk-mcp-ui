@@ -1,16 +1,15 @@
 import { useState, useMemo } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import { ScrollArea, Input, Button } from "@chuk/view-ui";
 import { motion } from "framer-motion";
 import { fadeIn } from "@chuk/view-ui/animations";
 import type { JsonContent } from "./schema";
 
 export function JsonView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<JsonContent>("json", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <JsonRenderer data={data} />;
 }

@@ -1,7 +1,7 @@
 {
   "name": "@chuk/view-graph",
   "version": "1.0.0",
-  "description": "Force-directed graph View for MCP Apps — nodes and edges visualization",
+  "description": "Force-directed graph View for MCP Apps \u2014 nodes and edges visualization",
   "type": "module",
   "main": "dist/mcp-app.html",
   "exports": {
@@ -16,13 +16,20 @@
     "src/schema.ts",
     "src/zod.ts"
   ],
-  "keywords": ["mcp", "mcp-apps", "ext-apps", "view", "graph"],
+  "keywords": [
+    "mcp",
+    "mcp-apps",
+    "ext-apps",
+    "view",
+    "graph"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "build:ssr": "vite build --config vite.config.ssr.ts"
   },
   "dependencies": {
     "@chuk/view-shared": "workspace:*",

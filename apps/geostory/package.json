@@ -10,14 +10,26 @@
     "./types": "./src/schema.ts",
     "./zod": "./src/zod.ts"
   },
-  "files": ["dist/mcp-app.html", "schemas/input.json", "src/schema.ts", "src/zod.ts"],
-  "keywords": ["mcp", "mcp-apps", "ext-apps", "view", "geostory"],
+  "files": [
+    "dist/mcp-app.html",
+    "schemas/input.json",
+    "src/schema.ts",
+    "src/zod.ts"
+  ],
+  "keywords": [
+    "mcp",
+    "mcp-apps",
+    "ext-apps",
+    "view",
+    "geostory"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "build:ssr": "vite build --config vite.config.ssr.ts"
   },
   "dependencies": {
     "@chuk/view-shared": "workspace:*",

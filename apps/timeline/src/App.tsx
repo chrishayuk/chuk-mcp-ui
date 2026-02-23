@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import {
   Card,
   CardContent,
@@ -29,11 +29,10 @@ import type {
 /* ------------------------------------------------------------------ */
 
 export function TimelineView() {
-  const { data, content, callTool, isConnected } =
+  const { data, callTool } =
     useView<TimelineContent>("timeline", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <TimelineRenderer data={data} onCallTool={callTool} />;
 }

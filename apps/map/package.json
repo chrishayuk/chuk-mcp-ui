@@ -30,7 +30,8 @@
     "build": "vite build",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "build:ssr": "vite build --config vite.config.ssr.ts"
   },
   "dependencies": {
     "@chuk/view-shared": "workspace:*",

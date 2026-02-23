@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import { Card, CardContent, cn } from "@chuk/view-ui";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -16,11 +16,10 @@ import type { StepperContent, Step } from "./schema";
 /* ------------------------------------------------------------------ */
 
 export function StepperView() {
-  const { data, content, callTool, isConnected } =
+  const { data, callTool } =
     useView<StepperContent>("stepper", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <StepperRenderer data={data} onCallTool={callTool} />;
 }

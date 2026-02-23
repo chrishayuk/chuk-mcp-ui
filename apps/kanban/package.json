@@ -1,7 +1,7 @@
 {
   "name": "@chuk/view-kanban",
   "version": "1.0.0",
-  "description": "Kanban board View for MCP Apps — card columns with drag-and-drop and WIP limits",
+  "description": "Kanban board View for MCP Apps \u2014 card columns with drag-and-drop and WIP limits",
   "type": "module",
   "main": "dist/mcp-app.html",
   "exports": {
@@ -10,14 +10,26 @@
     "./types": "./src/schema.ts",
     "./zod": "./src/zod.ts"
   },
-  "files": ["dist/mcp-app.html", "schemas/input.json", "src/schema.ts", "src/zod.ts"],
-  "keywords": ["mcp", "mcp-apps", "ext-apps", "view", "kanban"],
+  "files": [
+    "dist/mcp-app.html",
+    "schemas/input.json",
+    "src/schema.ts",
+    "src/zod.ts"
+  ],
+  "keywords": [
+    "mcp",
+    "mcp-apps",
+    "ext-apps",
+    "view",
+    "kanban"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "build:ssr": "vite build --config vite.config.ssr.ts"
   },
   "dependencies": {
     "@chuk/view-shared": "workspace:*",

@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import { Button, Input, ScrollArea, cn } from "@chuk/view-ui";
 import { motion, AnimatePresence } from "framer-motion";
 import { listItem } from "@chuk/view-ui/animations";
@@ -10,11 +10,10 @@ import type { ChatContent, ChatMessage } from "./schema";
 /* ------------------------------------------------------------------ */
 
 export function ChatView() {
-  const { data, content, callTool, isConnected } =
+  const { data, callTool } =
     useView<ChatContent>("chat", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <ChatRenderer data={data} onCallTool={callTool} />;
 }

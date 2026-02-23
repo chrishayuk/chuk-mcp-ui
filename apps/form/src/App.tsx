@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { useView, Fallback, useViewEvents } from "@chuk/view-shared";
+import { useView, useViewEvents } from "@chuk/view-shared";
 import { motion } from "framer-motion";
 import { fadeIn } from "@chuk/view-ui/animations";
 import {
@@ -20,11 +20,10 @@ import {
 import type { FormContent, FieldSchema, FieldUI, FieldGroup } from "./schema";
 
 export function FormView() {
-  const { data, content, callTool, isConnected } =
+  const { data, callTool } =
     useView<FormContent>("form", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <DynamicForm data={data} onCallTool={callTool} />;
 }

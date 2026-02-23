@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useRef } from "react";
-import { useView, Fallback, useViewResize } from "@chuk/view-shared";
+import { useView, useViewResize } from "@chuk/view-shared";
 import {
   Card,
   CardContent,
@@ -23,11 +23,10 @@ import type { GalleryContent, GalleryItem, GalleryAction } from "./schema";
 /* ------------------------------------------------------------------ */
 
 export function GalleryView() {
-  const { data, content, callTool, isConnected } =
+  const { data, callTool } =
     useView<GalleryContent>("gallery", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <GalleryRenderer data={data} onCallTool={callTool} />;
 }

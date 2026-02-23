@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-import { useView, Fallback, resolveTemplates, useViewEvents } from "@chuk/view-shared";
+import { useView, resolveTemplates, useViewEvents } from "@chuk/view-shared";
 import type { MapContent, MapLayer, PopupAction } from "./schema";
 
 // Fix Leaflet default icon paths (broken when bundled)
@@ -24,16 +24,10 @@ const BASEMAPS: Record<string, string> = {
 };
 
 export function MapView() {
-  const { data, content, app, callTool, isConnected } =
+  const { data, app, callTool } =
     useView<MapContent>("map", "1.0");
 
-  if (!isConnected) {
-    return <Fallback message="Connecting..." />;
-  }
-
-  if (!data) {
-    return <Fallback content={content ?? undefined} />;
-  }
+  if (!data) return null;
 
   return <LeafletMap data={data} app={app} onCallTool={callTool} />;
 }

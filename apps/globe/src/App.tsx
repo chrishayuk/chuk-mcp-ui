@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import { Card, CardContent } from "@chuk/view-ui";
 import { motion } from "framer-motion";
 import { fadeIn } from "@chuk/view-ui/animations";
@@ -199,11 +199,10 @@ function ArcPath({
 /* ------------------------------------------------------------------ */
 
 export function GlobeView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<GlobeContent>("globe", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <GlobeRenderer data={data} />;
 }

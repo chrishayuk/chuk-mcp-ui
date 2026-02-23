@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import {
   Card,
   CardContent,
@@ -16,11 +16,10 @@ import type { RankedContent, RankedItem, RankedAction } from "./schema";
 /* ------------------------------------------------------------------ */
 
 export function RankedView() {
-  const { data, content, callTool, isConnected } =
+  const { data, callTool } =
     useView<RankedContent>("ranked", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <RankedRenderer data={data} onCallTool={callTool} />;
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, useMemo } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import { motion } from "framer-motion";
 import { fadeIn } from "@chuk/view-ui/animations";
 import type {
@@ -46,11 +46,10 @@ const EXTENT_STYLE: L.PathOptions = {
 /* ------------------------------------------------------------------ */
 
 export function MinimapView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<MinimapContent>("minimap", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <MinimapRenderer data={data} />;
 }

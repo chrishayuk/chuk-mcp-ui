@@ -1,16 +1,15 @@
 import { useMemo } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import { Card, CardContent, cn } from "@chuk/view-ui";
 import { motion } from "framer-motion";
 import { fadeIn } from "@chuk/view-ui/animations";
 import type { GaugeContent, GaugeThreshold } from "./schema";
 
 export function GaugeView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<GaugeContent>("gauge", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <GaugeRenderer data={data} />;
 }

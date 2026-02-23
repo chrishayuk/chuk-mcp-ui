@@ -6,11 +6,10 @@ import { fadeIn } from "@chuk/view-ui/animations";
 import type { CarouselContent, CarouselItem } from "./schema";
 
 export function CarouselView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<CarouselContent>("carousel", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <CarouselRenderer data={data} />;
 }

@@ -10,7 +10,7 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import { cn } from "@chuk/view-ui";
 import { motion } from "framer-motion";
 import { fadeIn } from "@chuk/view-ui/animations";
@@ -50,11 +50,10 @@ const POINT_STYLE_MAP: Record<string, string> = {
 };
 
 export function ScatterView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<ScatterContent>("scatter", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <ScatterRenderer data={data} />;
 }

@@ -1,17 +1,16 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { fadeIn } from "@chuk/view-ui/animations";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import { Button, ScrollArea, cn } from "@chuk/view-ui";
 import { highlight } from "./highlighter";
 import type { CodeContent } from "./schema";
 
 export function CodeView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<CodeContent>("code", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <CodeRenderer data={data} />;
 }

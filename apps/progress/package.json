@@ -1,7 +1,7 @@
 {
   "name": "@chuk/view-progress",
   "version": "1.0.0",
-  "description": "Multi-track progress View for MCP Apps — displays progress bars with status indicators",
+  "description": "Multi-track progress View for MCP Apps \u2014 displays progress bars with status indicators",
   "type": "module",
   "main": "dist/mcp-app.html",
   "exports": {
@@ -10,14 +10,26 @@
     "./types": "./src/schema.ts",
     "./zod": "./src/zod.ts"
   },
-  "files": ["dist/mcp-app.html", "schemas/input.json", "src/schema.ts", "src/zod.ts"],
-  "keywords": ["mcp", "mcp-apps", "ext-apps", "view", "progress"],
+  "files": [
+    "dist/mcp-app.html",
+    "schemas/input.json",
+    "src/schema.ts",
+    "src/zod.ts"
+  ],
+  "keywords": [
+    "mcp",
+    "mcp-apps",
+    "ext-apps",
+    "view",
+    "progress"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "build:ssr": "vite build --config vite.config.ssr.ts"
   },
   "dependencies": {
     "@chuk/view-shared": "workspace:*",

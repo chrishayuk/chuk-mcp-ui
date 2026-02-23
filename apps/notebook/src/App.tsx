@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { marked } from "marked";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import { Card, CardContent, ScrollArea, cn } from "@chuk/view-ui";
 import { motion } from "framer-motion";
 import { listContainer, listItem, fadeIn } from "@chuk/view-ui/animations";
@@ -268,11 +268,10 @@ function CellRenderer({ cell }: { cell: NotebookCell }) {
 /* ------------------------------------------------------------------ */
 
 export function NotebookView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<NotebookContent>("notebook", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <NotebookRenderer data={data} />;
 }

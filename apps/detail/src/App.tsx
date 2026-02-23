@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useView, Fallback, useViewEvents } from "@chuk/view-shared";
+import { useView, useViewEvents } from "@chuk/view-shared";
 import {
   Card,
   CardContent,
@@ -12,11 +12,10 @@ import { fadeIn, listContainer, listItem } from "@chuk/view-ui/animations";
 import type { DetailContent, DetailField, DetailAction } from "./schema";
 
 export function DetailView() {
-  const { data, content, callTool, isConnected } =
+  const { data, callTool } =
     useView<DetailContent>("detail", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <DetailRenderer data={data} onCallTool={callTool} />;
 }

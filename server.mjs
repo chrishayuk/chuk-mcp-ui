@@ -46,18 +46,26 @@ for (const view of VIEWS) {
   }
 }
 
-// Load SSR modules (only for views that have dist-ssr builds)
+// SSR modules loaded lazily on first request to avoid OOM at startup
 const ssrModules = {};
+const ssrAvailable = new Set();
 for (const view of VIEWS) {
   const ssrPath = resolve(__dirname, "apps", view, "dist-ssr", "ssr-entry.js");
-  if (existsSync(ssrPath)) {
-    try {
-      const mod = await import(ssrPath);
-      ssrModules[view] = mod;
-      console.log(`SSR loaded: ${view}`);
-    } catch (e) {
-      console.warn(`SSR warning: Could not load ${view}: ${e.message}`);
-    }
+  if (existsSync(ssrPath)) ssrAvailable.add(view);
+}
+async function getSSRModule(view) {
+  if (ssrModules[view]) return ssrModules[view];
+  if (!ssrAvailable.has(view)) return null;
+  try {
+    const ssrPath = resolve(__dirname, "apps", view, "dist-ssr", "ssr-entry.js");
+    const mod = await import(ssrPath);
+    ssrModules[view] = mod;
+    console.log(`SSR loaded: ${view}`);
+    return mod;
+  } catch (e) {
+    console.warn(`SSR warning: Could not load ${view}: ${e.message}`);
+    ssrAvailable.delete(view);
+    return null;
   }
 }
 
@@ -109,7 +117,7 @@ const server = createServer((req, res) => {
     res.end(JSON.stringify({
       status: "ok",
       views: Object.keys(viewHtml),
-      ssr: Object.keys(ssrModules),
+      ssr: [...ssrAvailable],
     }));
     return;
   }
@@ -124,7 +132,7 @@ const server = createServer((req, res) => {
         name: v,
         url: `/${v}/v1`,
         loaded: !!viewHtml[v],
-        ssr: !!ssrModules[v],
+        ssr: ssrAvailable.has(v),
       })),
     }));
     return;
@@ -138,14 +146,19 @@ const server = createServer((req, res) => {
 
     // POST /<view>/v1/ssr — server-side render with data
     if (isSsr && req.method === "POST") {
-      const ssrMod = ssrModules[view];
       const parts = viewHtmlParts[view];
-      if (!ssrMod || !parts) {
+      if (!ssrAvailable.has(view) || !parts) {
         res.writeHead(404, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: `SSR not available for ${view}` }));
         return;
       }
-      readJsonBody(req).then((body) => {
+      readJsonBody(req).then(async (body) => {
+        const ssrMod = await getSSRModule(view);
+        if (!ssrMod) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: `Failed to load SSR module for ${view}` }));
+          return;
+        }
         const data = body.data;
         if (!data) {
           res.writeHead(400, { "Content-Type": "application/json" });
@@ -235,8 +248,7 @@ const server = createServer((req, res) => {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`chuk-mcp-ui-views listening on port ${PORT}`);
   console.log(`Views: ${Object.keys(viewHtml).join(", ")}`);
-  const ssrViews = Object.keys(ssrModules);
-  if (ssrViews.length > 0) {
-    console.log(`SSR: ${ssrViews.join(", ")}`);
+  if (ssrAvailable.size > 0) {
+    console.log(`SSR available: ${ssrAvailable.size} views (lazy-loaded on first request)`);
   }
 });

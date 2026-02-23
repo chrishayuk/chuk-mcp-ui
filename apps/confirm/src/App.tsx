@@ -1,16 +1,15 @@
 import { useCallback } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import { Card, CardContent, Button, Badge, Separator, cn } from "@chuk/view-ui";
 import { motion } from "framer-motion";
 import { slideUp } from "@chuk/view-ui/animations";
 import type { ConfirmContent } from "./schema";
 
 export function ConfirmView() {
-  const { data, content, callTool, isConnected } =
+  const { data, callTool } =
     useView<ConfirmContent>("confirm", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <ConfirmRenderer data={data} onCallTool={callTool} />;
 }

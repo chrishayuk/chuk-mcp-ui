@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import { Card, CardContent, CardHeader, CardTitle } from "@chuk/view-ui";
 import { fadeIn } from "@chuk/view-ui/animations";
 import type { AnnotationContent, Annotation } from "./schema";
@@ -10,11 +10,10 @@ import type { AnnotationContent, Annotation } from "./schema";
 /* ------------------------------------------------------------------ */
 
 export function AnnotationView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<AnnotationContent>("annotation", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <AnnotationRenderer data={data} />;
 }

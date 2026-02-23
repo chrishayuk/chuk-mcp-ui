@@ -1,14 +1,13 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { useView, Fallback, ViewBusProvider, useViewBusContainer } from "@chuk/view-shared";
+import { useView, ViewBusProvider, useViewBusContainer } from "@chuk/view-shared";
 import { cn } from "@chuk/view-ui";
 import type { TabsContent, Tab } from "./schema";
 
 export function TabsView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<TabsContent>("tabs", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return (
     <ViewBusProvider>

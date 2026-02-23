@@ -1,5 +1,5 @@
 import { useMemo, useState, useCallback } from "react";
-import { useView, Fallback } from "@chuk/view-shared";
+import { useView } from "@chuk/view-shared";
 import {
   Card,
   CardContent,
@@ -21,11 +21,10 @@ import type { PivotContent, PivotValue } from "./schema";
 /* ------------------------------------------------------------------ */
 
 export function PivotView() {
-  const { data, content, isConnected } =
+  const { data } =
     useView<PivotContent>("pivot", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  if (!data) return null;
 
   return <PivotRenderer data={data} />;
 }

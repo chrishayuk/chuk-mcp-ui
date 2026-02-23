@@ -1,7 +1,7 @@
 {
   "name": "@chuk/view-layers",
   "version": "1.0.0",
-  "description": "Multi-layer map View for MCP Apps — Leaflet map with layer controls and choropleth styling",
+  "description": "Multi-layer map View for MCP Apps \u2014 Leaflet map with layer controls and choropleth styling",
   "type": "module",
   "main": "dist/mcp-app.html",
   "exports": {
@@ -30,7 +30,8 @@
     "build": "vite build",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "build:ssr": "vite build --config vite.config.ssr.ts"
   },
   "dependencies": {
     "@chuk/view-shared": "workspace:*",
