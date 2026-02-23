@@ -210,9 +210,11 @@ export function ChartRenderer({ data }: { data: ChartContent }) {
       variants={fadeIn}
       initial="hidden"
       animate="visible"
-      className="w-full h-full p-4 font-sans bg-background flex items-center justify-center"
+      className="w-full min-h-[400px] p-4 font-sans bg-background"
     >
-      <canvas ref={canvasRef} />
+      <div className="relative w-full h-full min-h-[360px]">
+        <canvas ref={canvasRef} />
+      </div>
     </motion.div>
   );
 }
