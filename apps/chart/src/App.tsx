@@ -24,7 +24,7 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import { useView, Fallback, useViewEvents } from "@chuk/view-shared";
+import { useView, useViewEvents } from "@chuk/view-shared";
 import type { ChartContent, ChartDataset, DataPoint } from "./schema";
 
 ChartJS.register(
@@ -68,8 +68,19 @@ export function ChartView() {
   const { data, content, isConnected } =
     useView<ChartContent>("chart", "1.0");
 
-  if (!isConnected) return <Fallback message="Connecting..." />;
-  if (!data) return <Fallback content={content ?? undefined} />;
+  // Before data arrives, render a visible placeholder at the same
+  // aspect ratio Chart.js will use (2:1). Must have visible content
+  // so Claude.ai sizes the iframe to this container, not its own
+  // "No data to display" overlay.
+  if (!data)
+    return (
+      <div
+        className="w-full p-4 font-sans bg-background flex items-center justify-center"
+        style={{ aspectRatio: "2 / 1", color: "#999" }}
+      >
+        Loading chart…
+      </div>
+    );
 
   return <ChartRenderer data={data} />;
 }
@@ -124,7 +135,7 @@ export function ChartRenderer({ data }: { data: ChartContent }) {
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
+        maintainAspectRatio: true,
         color: theme.text,
         onClick: (_event: unknown, elements: { index: number; datasetIndex: number }[]) => {
           if (elements.length === 0) return;
@@ -210,11 +221,9 @@ export function ChartRenderer({ data }: { data: ChartContent }) {
       variants={fadeIn}
       initial="hidden"
       animate="visible"
-      className="w-full min-h-[400px] p-4 font-sans bg-background"
+      className="w-full p-4 font-sans bg-background"
     >
-      <div className="relative w-full h-full min-h-[360px]">
-        <canvas ref={canvasRef} />
-      </div>
+      <canvas ref={canvasRef} />
     </motion.div>
   );
 }
@@ -266,4 +275,24 @@ function withAlpha(hex: string, alpha: number): string {
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/**
+ * SSR-safe static renderer — no useEffect, no motion, no Chart.js.
+ * Renders the container at the correct dimensions so the host can size
+ * the iframe correctly on first paint. The client bundle hydrates this
+ * into a full interactive ChartRenderer.
+ */
+export function ChartRendererStatic({ data }: { data: ChartContent }) {
+  return (
+    <div className="w-full p-4 font-sans bg-background" style={{ aspectRatio: "2 / 1" }}>
+      {data.title && (
+        <div className="text-center font-bold text-base mb-2">{data.title}</div>
+      )}
+      {data.subtitle && (
+        <div className="text-center text-sm text-muted-foreground mb-2">{data.subtitle}</div>
+      )}
+      <canvas />
+    </div>
+  );
 }

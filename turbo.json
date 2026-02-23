@@ -6,6 +6,11 @@
       "outputs": ["dist/**"],
       "cache": true
     },
+    "build:ssr": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist-ssr/**"],
+      "cache": true
+    },
     "dev": {
       "dependsOn": ["^build"],
       "cache": false,

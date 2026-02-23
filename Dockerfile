@@ -8,6 +8,7 @@ COPY server.mjs .
 # 66 View apps (single-file HTML each)
 # Phase 1-2 (original 27)
 COPY apps/chart/dist/mcp-app.html      apps/chart/dist/mcp-app.html
+COPY apps/chart/dist-ssr               apps/chart/dist-ssr
 COPY apps/chat/dist/mcp-app.html       apps/chat/dist/mcp-app.html
 COPY apps/code/dist/mcp-app.html       apps/code/dist/mcp-app.html
 COPY apps/compare/dist/mcp-app.html    apps/compare/dist/mcp-app.html

@@ -32,9 +32,16 @@ export function useView<T>(
   // Reserved for future schema version negotiation; part of the public API surface.
   _expectedVersion: string
 ): ViewState<T> {
-  // Check URL hash for initial data (playground embeds data in hash).
-  // This is synchronous — no timing issues with postMessage.
-  const hashData = (() => {
+  // Check for SSR-embedded data (server-side rendered views inject data via script tag).
+  // Falls back to URL hash data (playground embeds data in hash).
+  // Both are synchronous — no timing issues with postMessage.
+  const initialData = (() => {
+    // SSR data takes priority
+    const ssrData = (window as any).__SSR_DATA__;
+    if (ssrData && typeof ssrData === "object" && ssrData.type === expectedType) {
+      return ssrData as T;
+    }
+    // Hash data fallback (playground)
     try {
       const hash = window.location.hash;
       if (!hash || hash.length < 2) return null;
@@ -45,6 +52,7 @@ export function useView<T>(
     } catch { /* not hash-encoded data */ }
     return null;
   })();
+  const hashData = initialData;
 
   const [data, setData] = useState<T | null>(hashData);
   const [content, setContent] = useState<Array<{

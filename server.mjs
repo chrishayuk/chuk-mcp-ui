@@ -25,21 +25,73 @@ const VIEWS = [
 
 // Pre-load all HTML into memory at startup
 const viewHtml = {};
+// Pre-split HTML at <div id="root"></div> for SSR injection
+const viewHtmlParts = {};
 for (const view of VIEWS) {
   const filePath = resolve(__dirname, "apps", view, "dist", "mcp-app.html");
   try {
     viewHtml[view] = readFileSync(filePath, "utf-8");
     console.log(`Loaded: ${view} (${(viewHtml[view].length / 1024).toFixed(0)} KB)`);
+    // Split at root div for SSR: before + after
+    const marker = '<div id="root"></div>';
+    const idx = viewHtml[view].indexOf(marker);
+    if (idx !== -1) {
+      viewHtmlParts[view] = {
+        before: viewHtml[view].slice(0, idx + '<div id="root">'.length),
+        after: viewHtml[view].slice(idx + marker.length),
+      };
+    }
   } catch (e) {
     console.warn(`Warning: Could not load ${view}: ${e.message}`);
   }
+}
+
+// Load SSR modules (only for views that have dist-ssr builds)
+const ssrModules = {};
+for (const view of VIEWS) {
+  const ssrPath = resolve(__dirname, "apps", view, "dist-ssr", "ssr-entry.js");
+  if (existsSync(ssrPath)) {
+    try {
+      const mod = await import(ssrPath);
+      ssrModules[view] = mod;
+      console.log(`SSR loaded: ${view}`);
+    } catch (e) {
+      console.warn(`SSR warning: Could not load ${view}: ${e.message}`);
+    }
+  }
+}
+
+/** Read full request body and parse as JSON */
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let size = 0;
+    const MAX = 2 * 1024 * 1024; // 2 MB limit
+    req.on("data", (chunk) => {
+      size += chunk.length;
+      if (size > MAX) {
+        req.destroy();
+        reject(new Error("Body too large"));
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on("end", () => {
+      try {
+        resolve(JSON.parse(Buffer.concat(chunks).toString()));
+      } catch (e) {
+        reject(new Error("Invalid JSON"));
+      }
+    });
+    req.on("error", reject);
+  });
 }
 
 const PORT = parseInt(process.env.PORT || "8000", 10);
 
 const server = createServer((req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") {
@@ -54,7 +106,11 @@ const server = createServer((req, res) => {
   // Health check
   if (path === "/health") {
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ status: "ok", views: Object.keys(viewHtml) }));
+    res.end(JSON.stringify({
+      status: "ok",
+      views: Object.keys(viewHtml),
+      ssr: Object.keys(ssrModules),
+    }));
     return;
   }
 
@@ -68,20 +124,65 @@ const server = createServer((req, res) => {
         name: v,
         url: `/${v}/v1`,
         loaded: !!viewHtml[v],
+        ssr: !!ssrModules[v],
       })),
     }));
     return;
   }
 
-  // View routes: /<view>/v1
-  const match = path.match(/^\/([a-z][a-z0-9-]*)\/v1$/);
-  if (match && viewHtml[match[1]]) {
-    res.writeHead(200, {
-      "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "public, max-age=3600",
-    });
-    res.end(viewHtml[match[1]]);
-    return;
+  // View routes: /<view>/v1 (GET) and /<view>/v1/ssr (POST)
+  const match = path.match(/^\/([a-z][a-z0-9-]*)\/v1(\/ssr)?$/);
+  if (match) {
+    const view = match[1];
+    const isSsr = match[2] === "/ssr";
+
+    // POST /<view>/v1/ssr — server-side render with data
+    if (isSsr && req.method === "POST") {
+      const ssrMod = ssrModules[view];
+      const parts = viewHtmlParts[view];
+      if (!ssrMod || !parts) {
+        res.writeHead(404, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: `SSR not available for ${view}` }));
+        return;
+      }
+      readJsonBody(req).then((body) => {
+        const data = body.data;
+        if (!data) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Missing 'data' field in body" }));
+          return;
+        }
+        try {
+          const rendered = ssrMod.render(data);
+          // Embed SSR data for client hydration + pre-rendered DOM
+          const ssrScript = `<script>window.__SSR_DATA__=${JSON.stringify(data).replace(/</g, "\\u003c")}</script>`;
+          const html = parts.before + rendered + parts.after.replace("</body>", ssrScript + "</body>");
+          res.writeHead(200, {
+            "Content-Type": "text/html; charset=utf-8",
+            "Cache-Control": "no-cache",
+          });
+          res.end(html);
+        } catch (e) {
+          console.error(`SSR render error for ${view}:`, e);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "SSR render failed" }));
+        }
+      }).catch((e) => {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: e.message }));
+      });
+      return;
+    }
+
+    // GET /<view>/v1 — serve static SPA HTML
+    if (!isSsr && viewHtml[view]) {
+      res.writeHead(200, {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "public, max-age=3600",
+      });
+      res.end(viewHtml[view]);
+      return;
+    }
   }
 
   // Static app helper: serve files from a directory at a URL prefix
@@ -134,4 +235,8 @@ const server = createServer((req, res) => {
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`chuk-mcp-ui-views listening on port ${PORT}`);
   console.log(`Views: ${Object.keys(viewHtml).join(", ")}`);
+  const ssrViews = Object.keys(ssrModules);
+  if (ssrViews.length > 0) {
+    console.log(`SSR: ${ssrViews.join(", ")}`);
+  }
 });

@@ -520,9 +520,9 @@ between the host (AppBridge) and the view iframe (App). It defines:
 | Host theming (CSS variables, `color-scheme`) | ✅ Done | chuk-mcp-ui (useView) |
 | `callServerTool()` (bidirectional) | ✅ Done | chuk-mcp-ui (useView) |
 | `exclude_none=True` on model_dump | ✅ Done | chuk-view-schemas |
-| chuk-view-schemas uses `@view_tool` | ❌ Gap | chuk-view-schemas |
-| chuk-view-schemas permissions/csp/visibility | ❌ Gap | chuk-view-schemas |
-| VIEW_PATHS covers all 66 views | ❌ Gap | chuk-view-schemas |
+| chuk-view-schemas uses `@view_tool` | ✅ Done | chuk-view-schemas |
+| chuk-view-schemas permissions/csp/visibility | ✅ Done | chuk-view-schemas |
+| VIEW_PATHS covers all 66 views | ✅ Done | chuk-view-schemas |
 | `ontoolinputpartial` in useView | ❌ Gap | chuk-mcp-ui |
 | `sendMessage` / `updateModelContext` in useView | ❌ Gap | chuk-mcp-ui |
 | `requestDisplayMode` (fullscreen/pip) | ❌ Gap | chuk-mcp-ui |
@@ -558,29 +558,29 @@ construct `meta={"ui": {...}}`, missing key features.
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| Use `mcp.view_tool()` | Planned | Replace `mcp.tool(meta={...})` with `mcp.view_tool(resource_uri=..., view_url=...)` |
-| `permissions` parameter | Planned | Pass through to `mcp.view_tool(permissions={...})` |
-| `csp` parameter | Planned | Pass through to `mcp.view_tool(csp={...})` |
-| `visibility` parameter | Planned | Pass through to `mcp.view_tool(visibility=[...])` |
-| `prefers_border` parameter | Planned | Pass through to `mcp.view_tool(prefers_border=True)` |
-| Auto resource registration | Planned | Handled by chuk-mcp-server — remove manual wiring |
+| Use `mcp.view_tool()` | **Done** | `_has_view_tool()` detects ChukMCPServer >= 0.24; uses `mcp.view_tool(resource_uri=..., view_url=...)` |
+| `permissions` parameter | **Done** | Pass through to `mcp.view_tool(permissions={...})` |
+| `csp` parameter | **Done** | Pass through to `mcp.view_tool(csp={...})` |
+| `visibility` parameter | **Done** | Pass through to `mcp.view_tool(visibility=[...])` |
+| `prefers_border` parameter | **Done** | Pass through to `mcp.view_tool(prefers_border=True)` |
+| Auto resource registration | **Done** | Handled by chuk-mcp-server — remove manual wiring |
 
 #### `fastmcp.py` (FastMCP target)
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| Keep `mcp.tool(meta={...})` | N/A | FastMCP doesn't have `view_tool` — keep existing pattern |
-| Add `permissions` to meta | Planned | Serialize `permissions` into `meta["ui"]["permissions"]` |
-| Add `csp` to meta | Planned | Serialize `csp` into `meta["ui"]["csp"]` |
-| Add `visibility` to meta | Planned | Serialize `visibility` into `meta["ui"]["visibility"]` |
+| Keep `mcp.tool(meta={...})` | **Done** | FastMCP doesn't have `view_tool` — keeps existing pattern |
+| Add `permissions` to meta | **Done** | Serializes `permissions` into `meta["ui"]["permissions"]` |
+| Add `csp` to meta | **Done** | Serializes `csp` into `meta["ui"]["csp"]` |
+| Add `visibility` to meta | **Done** | Serializes `visibility` into `meta["ui"]["visibility"]` |
 
 #### VIEW_PATHS Registry
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| Complete 66-view registry | Planned | Currently only 17 of 66 views registered in `VIEW_PATHS` |
-| Missing per-view decorators | Planned | `gallery_tool`, `timeline_tool` exist as functions but missing from `VIEW_PATHS` |
-| 49 new view paths | Planned | Add all remaining views: alert, annotation, audio, boxplot, calendar, carousel, chat, compare, crosstab, diff, embed, filter, flowchart, funnel, gantt, gauge, geostory, gis-legend, globe, graph, heatmap, image, investigation, kanban, layers, log, minimap, neural, notebook, pivot, poll, profile, quiz, ranked, sankey, scatter, settings, slides, spectrogram, stepper, sunburst, swimlane, terminal, threed, timeseries, tree, treemap |
+| Complete 66-view registry | **Done** | All 66 views registered in `VIEW_PATHS` |
+| 66 per-view decorators | **Done** | All convenience decorators in both `fastmcp.py` and `chuk_mcp.py` |
+| `__init__.py` exports | **Done** | All 66 decorators exported from package |
 
 #### Pydantic Schemas
 
@@ -668,9 +668,9 @@ Interactive views should use `callServerTool` for server-side operations.
 - [x] chuk-mcp-ui: Auto-resize for all views via `useApp` defaults
 - [x] chuk-mcp-ui: `callServerTool` in interactive views (form, confirm, poll)
 - [x] chuk-mcp-ui: 166 Playwright tests (compat harness)
-- [ ] chuk-view-schemas: Update `chuk_mcp.py` to use `mcp.view_tool()`
-- [ ] chuk-view-schemas: Add permissions/CSP/visibility params to decorators
-- [ ] chuk-view-schemas: Complete VIEW_PATHS registry (17 → 66 views)
+- [x] chuk-view-schemas: Update `chuk_mcp.py` to use `mcp.view_tool()` with `_has_view_tool()` detection
+- [x] chuk-view-schemas: Add permissions/CSP/visibility params to both `fastmcp.py` and `chuk_mcp.py`
+- [x] chuk-view-schemas: Complete VIEW_PATHS registry (17 → 66 views) + 66 per-view decorators
 - [ ] chuk-view-schemas: Add Pydantic schemas for remaining views
 - [ ] chuk-mcp-ui: Extend `useView` with streaming, sendMessage, updateModelContext
 - [ ] chuk-mcp-ui: `callServerTool` in more views (map, chart, datatable, gallery)
