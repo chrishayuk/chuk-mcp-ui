@@ -29,6 +29,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme, requestDisplayMode |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `GlobeContent`
@@ -97,6 +105,44 @@ Orthographic projection from lat/lon to 2D screen coordinates. Only points on th
 ## 5. Interactions
 
 - **Drag to rotate**: Pointer drag rotates the globe view. Latitude clamped to +/- 80 degrees.
+
+---
+
+## 5b. Model Context Updates
+
+None. The globe view does not call `updateModelContext`.
+
+---
+
+## 5c. Display Mode
+
+Fullscreen toggle button in top-right corner (`absolute top-2 right-2 z-[1000]`).
+Uses semi-transparent background (`bg-background/80 backdrop-blur-sm`).
+Toggles between `"inline"` and `"fullscreen"` via `requestDisplayMode()`.
+Button label shows "Fullscreen" or "Exit Fullscreen". Only rendered when
+`onRequestDisplayMode` is available (host supports it).
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond the shared Fallback behaviour.
+
+---
+
+## 5e. Cross-View Events
+
+None. The globe view does not emit ViewBus events or listen for messages
+from sibling Views.
+
+---
+
+## 5f. SSR Entry
+
+- **File:** `apps/globe/src/ssr-entry.tsx`
+- **Renders:** `GlobeRenderer` via `renderToString`
+- **Config:** `apps/globe/vite.config.ssr.ts`
+- **Output:** `apps/globe/dist-ssr/ssr-entry.js`
 
 ---
 

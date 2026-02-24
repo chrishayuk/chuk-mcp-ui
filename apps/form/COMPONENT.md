@@ -27,6 +27,15 @@
 
 ---
 
+## Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme, callTool |
+| `useViewEvents` | Cross-view event emission |
+
+---
+
 ## Schema
 
 ### `FormContent`
@@ -219,6 +228,24 @@ The call is wrapped in try/finally so that `submitting` state is always reset, r
 
 ---
 
+## Model Context Updates
+
+None.
+
+---
+
+## Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## Streaming
 
 Not implemented. The form renders from a single `structuredContent` payload delivered via `postMessage`.
@@ -231,6 +258,10 @@ Not implemented. The form renders from a single `structuredContent` payload deli
 |-----------|---------------------------------------------------------------------------|
 | As Child  | Receives `structuredContent` via `postMessage` through the `useView` hook |
 | As Parent | Not applicable -- this component does not embed child views               |
+
+### Cross-View Events
+
+None.
 
 ---
 
@@ -260,6 +291,15 @@ None. The component is built as a single-file HTML artifact (`vite-plugin-single
 |----------|----------|---------------------|
 | Raw      | < 150 KB | 809 KB              |
 | Gzip     | --       | 230 KB              |
+
+---
+
+## SSR Entry
+
+- **File:** `apps/form/src/ssr-entry.tsx`
+- **Renders:** `DynamicForm` via `renderToString`
+- **Config:** `apps/form/vite.config.ssr.ts`
+- **Output:** `apps/form/dist-ssr/ssr-entry.js`
 
 ---
 

@@ -30,6 +30,15 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+| `useViewFilter` | Cross-view filter bus broadcasting |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `FilterContent`
@@ -134,6 +143,24 @@ The connected `FilterView` uses `useViewFilter` from `@chuk/view-shared` to broa
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented.
@@ -149,6 +176,11 @@ Works inside dashboard, split, and tabs containers.
 ### 7.2 As Parent
 
 Not applicable.
+
+### 7.3 Cross-View Events
+
+The filter view broadcasts filter changes via `useViewFilter` on the cross-view
+bus. Sibling views can subscribe to `filter` messages to react to value changes.
 
 ---
 
@@ -174,6 +206,15 @@ No external resources loaded. No iframes or scripts.
 |--------------|-------------|---------------------|
 | Raw          | < 800 KB    | TBD                 |
 | Gzip         | --          | TBD                 |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/filter/src/ssr-entry.tsx`
+- **Renders:** `FilterRenderer` via `renderToString`
+- **Config:** `apps/filter/vite.config.ssr.ts`
+- **Output:** `apps/filter/dist-ssr/ssr-entry.js`
 
 ---
 

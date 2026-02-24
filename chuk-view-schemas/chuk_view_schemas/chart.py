@@ -1,4 +1,4 @@
-from typing import Any, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -52,6 +52,14 @@ class Annotation(BaseModel):
     color: Optional[str] = None
 
 
+class ChartClickAction(BaseModel):
+    """Action to call when a chart element is clicked."""
+    tool: str
+    arguments: Optional[Dict[str, str]] = None  # template strings: {"label": "{{label}}"}
+
+    model_config = {"populate_by_name": True}
+
+
 ChartType = Literal[
     "bar", "line", "scatter", "pie", "doughnut", "area", "radar", "bubble"
 ]
@@ -69,5 +77,6 @@ class ChartContent(BaseModel):
     legend: Optional[LegendConfig] = None
     annotations: Optional[List[Annotation]] = None
     interactive: Optional[bool] = None
+    on_click_tool: Optional[ChartClickAction] = Field(None, alias="onClickTool")
 
     model_config = {"populate_by_name": True}

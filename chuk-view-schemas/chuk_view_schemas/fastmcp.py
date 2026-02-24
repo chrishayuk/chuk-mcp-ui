@@ -16,17 +16,6 @@ from typing import Any, Callable, Optional, TypeVar
 
 from pydantic import BaseModel
 
-from .chart import ChartContent
-from .dashboard import DashboardContent
-from .datatable import DataTableContent
-from .form import FormContent
-from .map import MapContent
-from .markdown import MarkdownContent
-from .pdf import PdfContent
-from .split import SplitContent
-from .tabs import TabsContent
-from .video import VideoContent
-
 # CDN URL registry
 CDN_BASE = "https://mcp-views.chukai.io"
 
@@ -109,78 +98,6 @@ def _get_cdn_url(view_type: str) -> str:
     return f"{CDN_BASE}{path}"
 
 
-# Text fallback generators
-def _map_fallback(data: MapContent) -> str:
-    n = sum(
-        len(layer.features.get("features", []))
-        if isinstance(layer.features, dict)
-        else 0
-        for layer in data.layers
-    )
-    names = ", ".join(layer.label for layer in data.layers)
-    return f"Map with {n} features across {len(data.layers)} layers ({names})."
-
-
-def _chart_fallback(data: ChartContent) -> str:
-    labels = ", ".join(ds.label for ds in data.data)
-    return f"Chart: {data.title or 'Untitled'} ({labels})."
-
-
-def _datatable_fallback(data: DataTableContent) -> str:
-    return f"Table: {data.title or 'Untitled'} — {len(data.rows)} rows, {len(data.columns)} columns."
-
-
-def _form_fallback(data: FormContent) -> str:
-    return f"Form: {data.title or 'Untitled'}."
-
-
-def _markdown_fallback(data: MarkdownContent) -> str:
-    preview = data.content[:200].replace("\n", " ").strip()
-    return f"{data.title or 'Document'}: {preview}..."
-
-
-def _video_fallback(data: VideoContent) -> str:
-    return f"Video: {data.title or data.url}"
-
-
-def _pdf_fallback(data: PdfContent) -> str:
-    return f"PDF: {data.title or data.url}"
-
-
-def _dashboard_fallback(data: DashboardContent) -> str:
-    return f"Dashboard: {data.title or 'Untitled'} — {len(data.panels)} panels."
-
-
-def _split_fallback(data: SplitContent) -> str:
-    return f"Split view ({data.direction or 'horizontal'})."
-
-
-def _tabs_fallback(data: TabsContent) -> str:
-    names = ", ".join(t.label for t in data.tabs)
-    return f"Tabs: {names}."
-
-
-def _generic_fallback(data: Any) -> str:
-    view_type = (
-        getattr(data, "type", "unknown") if isinstance(data, BaseModel) else "unknown"
-    )
-    return f"Showing {view_type} view."
-
-
-_FALLBACK_GENERATORS: dict[type, Callable[..., str]] = {
-    MapContent: _map_fallback,
-    ChartContent: _chart_fallback,
-    DataTableContent: _datatable_fallback,
-    FormContent: _form_fallback,
-    MarkdownContent: _markdown_fallback,
-    VideoContent: _video_fallback,
-    PdfContent: _pdf_fallback,
-    DashboardContent: _dashboard_fallback,
-    SplitContent: _split_fallback,
-    TabsContent: _tabs_fallback,
-}
-
-
 F = TypeVar("F", bound=Callable[..., Any])
 
 
@@ -234,22 +151,16 @@ def _view_tool(
 
             if isinstance(result, BaseModel):
                 structured = result.model_dump(by_alias=True, exclude_none=True)
-                fallback_gen = _FALLBACK_GENERATORS.get(type(result), _generic_fallback)
-                fallback_text = fallback_gen(result)
             elif isinstance(result, dict):
                 if "structuredContent" in result:
                     return result
                 structured = result
-                fallback_text = f"Showing {view_type} view."
             else:
                 raise TypeError(
                     f"Expected BaseModel or dict, got {type(result).__name__}"
                 )
 
-            return {
-                "content": [{"type": "text", "text": fallback_text}],
-                "structuredContent": structured,
-            }
+            return {"structuredContent": structured}
 
         mcp_server.tool(**decorator_kwargs)(wrapper)
         return func  # type: ignore

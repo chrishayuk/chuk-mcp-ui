@@ -14,6 +14,13 @@
 - **Build:** vite, vite-plugin-singlefile, typescript
 - **Protocol:** @modelcontextprotocol/ext-apps
 
+## Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme, callTool, updateModelContext, requestDisplayMode |
+| `useViewEvents` | Cross-view event emission (`emitSelect` on feature click) |
+
 ## Schema
 
 ### Input (structuredContent)
@@ -170,6 +177,29 @@ Resolved from the feature's GeoJSON properties object using
 `resolveTemplates` from `@chuk/view-shared`. Nested paths are supported
 with dot notation. Missing values resolve to empty string.
 
+## Model Context Updates
+
+On `moveend` (debounced 500ms), the map pushes the current viewport state to
+the LLM via `updateModelContext`:
+
+```
+Map view: center {lat},{lon} zoom {zoom} bounds {south},{west} to {north},{east}
+```
+
+This fires once on mount (initial state) and after each pan/zoom settles.
+
+## Display Mode
+
+Fullscreen toggle button in top-right corner (`absolute top-2 right-2 z-[1000]`).
+Uses semi-transparent background (`bg-background/80 backdrop-blur-sm`).
+Toggles between `"inline"` and `"fullscreen"` via `requestDisplayMode()`.
+Button label shows current state: "Fullscreen" or "Exit". Only rendered when
+`onRequestDisplayMode` is available (host supports it).
+
+## Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
 ## Streaming
 
 ### ontoolinputpartial
@@ -205,6 +235,13 @@ When embedded in a `view-dashboard` or `view-split`:
 
 Not applicable. `view-map` does not embed other Views.
 Use `view-dashboard` to compose map with other Views.
+
+### Cross-View Events
+
+| Direction | Event | Payload | When |
+|-----------|-------|---------|------|
+| **Emit** | `select` | `[featureId]` (field: `"feature_id"`) | Feature clicked |
+| **Listen** | `row-click` (postMessage) | `{ nhle_id, properties }` | Sibling datatable row clicked -- pans to matching feature |
 
 ## Basemaps
 
@@ -243,6 +280,13 @@ Use `view-dashboard` to compose map with other Views.
 **Target:** < 200KB (Leaflet ~140KB + markercluster ~30KB + app code ~30KB)
 
 **Actual:** 754 KB / 208 KB gzip (includes Tailwind CSS + shadcn/ui)
+
+## SSR Entry
+
+- **File:** `apps/map/src/ssr-entry.tsx`
+- **Renders:** `LeafletMap` with `app={null}`, `onCallTool={noop}`
+- **Config:** `apps/map/vite.config.ssr.ts`
+- **Output:** `apps/map/dist-ssr/ssr-entry.js`
 
 ## Test Cases
 

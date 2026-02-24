@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `LogContent`
@@ -129,6 +137,24 @@ Clicking an entry expands it to show metadata as formatted JSON below the entry 
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Supports streaming via `useView` hook. New entries appended to the log trigger auto-scroll when enabled. The `maxEntries` field can be used to limit the number of visible entries.
@@ -144,6 +170,10 @@ Works inside dashboard, split, and tabs containers.
 ### 7.2 As Parent
 
 Not applicable.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -168,6 +198,15 @@ No external resources loaded. All rendering is inline.
 |--------------|-------------|---------------------|
 | Raw          | < 800 KB    | TBD                 |
 | Gzip         | --          | TBD                 |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/log/src/ssr-entry.tsx`
+- **Renders:** `LogRenderer` via `renderToString`
+- **Config:** `apps/log/vite.config.ssr.ts`
+- **Output:** `apps/log/dist-ssr/ssr-entry.js`
 
 ---
 

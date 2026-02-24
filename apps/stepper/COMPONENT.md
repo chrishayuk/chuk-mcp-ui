@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `StepperContent`
@@ -111,6 +119,24 @@ Step circles use the `pressable` animation variant only when `allowNavigation` i
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented.
@@ -126,6 +152,10 @@ Works inside dashboard, split, and tabs containers.
 ### 7.2 As Parent
 
 Not applicable.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -151,6 +181,15 @@ No external resources loaded. All rendering is self-contained with inline SVGs.
 |--------------|-------------|---------------------|
 | Raw          | < 800 KB    | TBD                 |
 | Gzip         | --          | TBD                 |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/stepper/src/ssr-entry.tsx`
+- **Renders:** `StepperRenderer` via `renderToString`
+- **Config:** `apps/stepper/vite.config.ssr.ts`
+- **Output:** `apps/stepper/dist-ssr/ssr-entry.js`
 
 ---
 

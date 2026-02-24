@@ -35,3 +35,9 @@ class DataTableContent(BaseModel):
     filterable: Optional[bool] = None
     exportable: Optional[bool] = None
     actions: Optional[List[RowAction]] = None
+    pagination_tool: Optional[str] = Field(None, alias="paginationTool")
+    total_rows: Optional[int] = Field(None, alias="totalRows")
+    page_size: Optional[int] = Field(None, alias="pageSize")
+    current_page: Optional[int] = Field(None, alias="currentPage")
+
+    model_config = {"populate_by_name": True}

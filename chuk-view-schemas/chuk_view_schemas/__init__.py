@@ -1,7 +1,7 @@
 """Pydantic v2 schemas for chuk-mcp-ui Views."""
 
 from .infer import infer_view, infer_views, ViewSuggestion
-from .chart import ChartContent, ChartDataset
+from .chart import ChartContent, ChartDataset, ChartClickAction
 from .dashboard import DashboardContent, Panel
 from .datatable import DataTableContent, Column, RowAction
 from .form import (
@@ -18,6 +18,62 @@ from .pdf import PdfContent
 from .split import SplitContent, SplitPanel
 from .tabs import TabsContent, Tab
 from .video import VideoContent
+from .detail import DetailContent, DetailField, DetailAction
+from .counter import CounterContent, CounterTrend
+from .code import CodeContent
+from .status import StatusContent, StatusItem
+from .timeline import TimelineContent, TimelineEvent
+from .gallery import GalleryContent, GalleryItem
+from .kanban import KanbanContent, KanbanColumn, KanbanItem
+from .image import ImageContent, ImageItem
+from .log import LogContent, LogEntry
+from .alert import AlertContent, AlertItem
+from .compare import CompareContent, CompareImage, CompareLabels
+from .ranked import RankedContent, RankedItem
+from .chat import ChatContent, ChatMessage
+from .quiz import QuizContent, QuizQuestion, QuizOption
+from .poll import PollContent, PollQuestion, PollOption
+from .diff import DiffContent, DiffHunk, DiffLine
+from .embed import EmbedContent
+from .filter import FilterContent, FilterField, FilterOption
+from .settings import SettingsContent, SettingsSection, SettingsField, SettingsOption
+from .stepper import StepperContent, Step
+from .gauge import GaugeContent, GaugeThreshold
+from .heatmap import HeatmapContent, HeatmapColorScale
+from .crosstab import CrosstabContent
+from .scatter import ScatterContent, ScatterDataset, ScatterPoint, ScatterAxisConfig
+from .boxplot import BoxplotContent, BoxplotGroup, BoxplotStats
+from .timeseries import TimeseriesContent, TimeseriesSeries, TimeseriesDataPoint
+from .treemap import TreemapContent, TreemapNode
+from .sunburst import SunburstContent, SunburstNode
+from .pivot import PivotContent, PivotValue
+from .profile import ProfileContent, ProfilePoint
+from .audio import AudioContent
+from .carousel import CarouselContent, CarouselItem
+from .terminal import TerminalContent, TerminalLine
+from .gis_legend import GisLegendContent, GisLegendSection, GisLegendItem, GradientStop
+from .layers import LayersContent, LayersLayer, LayersCenter
+from .minimap import MinimapContent, MinimapPane, MinimapLayer, MinimapCenter
+from .spectrogram import SpectrogramContent, SpectrogramData
+from .notebook import NotebookContent, NotebookCell
+from .funnel import FunnelContent, FunnelStage
+from .swimlane import SwimlaneContent, SwimlaneLane, SwimlaneColumn, SwimlaneActivity
+from .slides import SlidesContent, Slide
+from .annotation import AnnotationContent, AnnotationItem
+from .neural import NeuralContent, NeuralLayer
+from .sankey import SankeyContent, SankeyNode, SankeyLink
+from .geostory import GeostoryContent, GeostoryStep, StepLocation
+from .investigation import InvestigationContent, Evidence, Connection
+from .gantt import GanttContent, GanttTask
+from .calendar_view import CalendarContent, CalendarEvent
+from .graph import GraphContent, GraphNode, GraphEdge
+from .flowchart import FlowchartContent, FlowchartNode, FlowchartEdge
+from .globe import GlobeContent, GlobePoint, GlobeArc, GlobeRotation
+from .threed import ThreeDContent, ThreeDObject
+from .tree import TreeContent, TreeNode
+from .progress import ProgressContent, ProgressTrack, OverallProgress
+from .confirm import ConfirmContent
+from .json_view import JsonContent
 
 __all__ = [
     "infer_view",
@@ -25,6 +81,7 @@ __all__ = [
     "ViewSuggestion",
     "ChartContent",
     "ChartDataset",
+    "ChartClickAction",
     "DashboardContent",
     "Panel",
     "DataTableContent",
@@ -48,6 +105,140 @@ __all__ = [
     "TabsContent",
     "Tab",
     "VideoContent",
+    "DetailContent",
+    "DetailField",
+    "DetailAction",
+    "CounterContent",
+    "CounterTrend",
+    "CodeContent",
+    "StatusContent",
+    "StatusItem",
+    "TimelineContent",
+    "TimelineEvent",
+    "GalleryContent",
+    "GalleryItem",
+    "KanbanContent",
+    "KanbanColumn",
+    "KanbanItem",
+    "ImageContent",
+    "ImageItem",
+    "LogContent",
+    "LogEntry",
+    "AlertContent",
+    "AlertItem",
+    "CompareContent",
+    "CompareImage",
+    "CompareLabels",
+    "RankedContent",
+    "RankedItem",
+    "ChatContent",
+    "ChatMessage",
+    "QuizContent",
+    "QuizQuestion",
+    "QuizOption",
+    "PollContent",
+    "PollQuestion",
+    "PollOption",
+    "DiffContent",
+    "DiffHunk",
+    "DiffLine",
+    "EmbedContent",
+    "FilterContent",
+    "FilterField",
+    "FilterOption",
+    "SettingsContent",
+    "SettingsSection",
+    "SettingsField",
+    "SettingsOption",
+    "StepperContent",
+    "Step",
+    "GaugeContent",
+    "GaugeThreshold",
+    "HeatmapContent",
+    "HeatmapColorScale",
+    "CrosstabContent",
+    "ScatterContent",
+    "ScatterDataset",
+    "ScatterPoint",
+    "ScatterAxisConfig",
+    "BoxplotContent",
+    "BoxplotGroup",
+    "BoxplotStats",
+    "TimeseriesContent",
+    "TimeseriesSeries",
+    "TimeseriesDataPoint",
+    "TreemapContent",
+    "TreemapNode",
+    "SunburstContent",
+    "SunburstNode",
+    "PivotContent",
+    "PivotValue",
+    "ProfileContent",
+    "ProfilePoint",
+    "AudioContent",
+    "CarouselContent",
+    "CarouselItem",
+    "TerminalContent",
+    "TerminalLine",
+    "GisLegendContent",
+    "GisLegendSection",
+    "GisLegendItem",
+    "GradientStop",
+    "LayersContent",
+    "LayersLayer",
+    "LayersCenter",
+    "MinimapContent",
+    "MinimapPane",
+    "MinimapLayer",
+    "MinimapCenter",
+    "SpectrogramContent",
+    "SpectrogramData",
+    "NotebookContent",
+    "NotebookCell",
+    "FunnelContent",
+    "FunnelStage",
+    "SwimlaneContent",
+    "SwimlaneLane",
+    "SwimlaneColumn",
+    "SwimlaneActivity",
+    "SlidesContent",
+    "Slide",
+    "AnnotationContent",
+    "AnnotationItem",
+    "NeuralContent",
+    "NeuralLayer",
+    "SankeyContent",
+    "SankeyNode",
+    "SankeyLink",
+    "GeostoryContent",
+    "GeostoryStep",
+    "StepLocation",
+    "InvestigationContent",
+    "Evidence",
+    "Connection",
+    "GanttContent",
+    "GanttTask",
+    "CalendarContent",
+    "CalendarEvent",
+    "GraphContent",
+    "GraphNode",
+    "GraphEdge",
+    "FlowchartContent",
+    "FlowchartNode",
+    "FlowchartEdge",
+    "GlobeContent",
+    "GlobePoint",
+    "GlobeArc",
+    "GlobeRotation",
+    "ThreeDContent",
+    "ThreeDObject",
+    "TreeContent",
+    "TreeNode",
+    "ProgressContent",
+    "ProgressTrack",
+    "OverallProgress",
+    "ConfirmContent",
+    "JsonContent",
 ]
 
 # Server-side decorator helpers (optional — requires mcp package)

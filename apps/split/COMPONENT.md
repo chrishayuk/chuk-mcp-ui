@@ -12,6 +12,14 @@
 - **Build:** vite, vite-plugin-singlefile, typescript
 - **Protocol:** @modelcontextprotocol/ext-apps
 
+## Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+| `ViewBusProvider` | Provides message bus context for child views |
+| `useViewBusContainer` | Manages iframe-to-iframe message routing |
+
 ## Schema
 ```typescript
 interface SplitContent {
@@ -47,15 +55,38 @@ interface SplitPanel {
 |--------|---------|--------|
 | Panel loaded | iframe onLoad | postMessage structuredContent to child |
 
+## Model Context Updates
+
+None.
+
+## Display Mode
+
+Not applicable. The view stays inline-only.
+
+## Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
 ## Composition
 - **As Child:** Can be embedded in dashboard/tabs
 - **As Parent:** Two child Views via iframes
+
+### Cross-View Events
+
+None.
 
 ## CSP
 Depends on child Views.
 
 ## Size Budget
 Target: < 150KB. Actual: 691 KB / 191 KB gzip (includes Tailwind CSS + shadcn/ui)
+
+## SSR Entry
+
+- **File:** `apps/split/src/ssr-entry.tsx`
+- **Renders:** `Split` via `renderToString`
+- **Config:** `apps/split/vite.config.ssr.ts`
+- **Output:** `apps/split/dist-ssr/ssr-entry.js`
 
 ## Test Cases
 

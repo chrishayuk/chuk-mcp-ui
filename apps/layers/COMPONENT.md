@@ -14,6 +14,12 @@
 - **Build:** vite, vite-plugin-singlefile, typescript
 - **Protocol:** @modelcontextprotocol/ext-apps
 
+## Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
 ## Schema
 
 ### Input (structuredContent)
@@ -133,6 +139,32 @@ When a `LayerPopup` is configured on a layer:
 | Click feature | `click` on marker/polygon | Open popup with template-rendered content |
 | Pan/zoom | Drag / scroll / buttons | Update viewport |
 
+## Model Context Updates
+
+None.
+
+## Display Mode
+
+Not applicable. The view stays inline-only.
+
+## Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+## Composition
+
+### As Child
+
+Works inside dashboard, split, and tabs containers.
+
+### As Parent
+
+Not applicable.
+
+### Cross-View Events
+
+None.
+
 ## Basemaps
 
 | Key | Provider | URL Template |
@@ -165,6 +197,13 @@ When a `LayerPopup` is configured on a layer:
 ## Size Budget
 
 **Target:** < 180KB (Leaflet ~140KB + app code ~40KB)
+
+## SSR Entry
+
+- **File:** `apps/layers/src/ssr-entry.tsx`
+- **Renders:** `LayersRenderer` via `renderToString`
+- **Config:** `apps/layers/vite.config.ssr.ts`
+- **Output:** `apps/layers/dist-ssr/ssr-entry.js`
 
 ## Test Cases
 

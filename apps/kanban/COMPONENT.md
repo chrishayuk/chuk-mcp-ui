@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme, callTool |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `KanbanContent`
@@ -141,6 +149,24 @@ Uses HTML5 Drag API:
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented.
@@ -156,6 +182,10 @@ Works inside dashboard, split, and tabs containers.
 ### 7.2 As Parent
 
 Not applicable.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -181,6 +211,15 @@ No external resources loaded unless card `image` URLs point to external origins.
 |--------------|-------------|---------------------|
 | Raw          | < 800 KB    | TBD                 |
 | Gzip         | --          | TBD                 |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/kanban/src/ssr-entry.tsx`
+- **Renders:** `KanbanRenderer` via `renderToString`
+- **Config:** `apps/kanban/vite.config.ssr.ts`
+- **Output:** `apps/kanban/dist-ssr/ssr-entry.js`
 
 ---
 

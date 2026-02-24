@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `PdfContent`
@@ -125,6 +133,24 @@ None currently implemented.
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented. The View renders on full `ontoolresult`. No progressive
@@ -144,6 +170,10 @@ The pdf view registers with `type: "pdf"` and `version: "1.0"`.
 ### 7.2 As Parent
 
 Not applicable. The pdf view does not embed child views.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -182,6 +212,12 @@ Additionally, if the `url` field points to an external PDF, the CSP must allow
 
 The bundle does not include pdf.js itself (loaded from CDN). The size is
 primarily React and the shared UI component library.
+
+---
+
+## 10b. SSR Entry
+
+Not yet implemented. No `ssr-entry.tsx` exists for this view.
 
 ---
 

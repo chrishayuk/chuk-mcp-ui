@@ -29,6 +29,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `FlowchartContent`
@@ -100,6 +108,49 @@ SVG line segments with arrowhead markers. Dashed style available. Optional label
 ## 5. Interactions
 
 Display-only. No user interactions currently implemented.
+
+---
+
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
+## 5e. Composition
+
+### As Child
+
+Works inside dashboard, split, and tabs containers.
+
+### As Parent
+
+Not applicable.
+
+### Cross-View Events
+
+None.
+
+---
+
+## 5f. SSR Entry
+
+- **File:** `apps/flowchart/src/ssr-entry.tsx`
+- **Renders:** `FlowchartRenderer` via `renderToString`
+- **Config:** `apps/flowchart/vite.config.ssr.ts`
+- **Output:** `apps/flowchart/dist-ssr/ssr-entry.js`
 
 ---
 

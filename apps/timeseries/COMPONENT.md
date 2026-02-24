@@ -33,6 +33,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `TimeseriesContent`
@@ -149,6 +157,24 @@ Each series data point `{ t, v }` is mapped to `{ x: new Date(t), y: v }` for Ch
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented. The component renders a complete chart from the full `TimeseriesContent` payload. Incremental updates require a full re-render (the previous `ChartJS` instance is destroyed and recreated on every `data` change).
@@ -164,6 +190,10 @@ Works inside dashboard, split, and tabs containers. Receives data via the `postM
 ### 7.2 As Parent
 
 Not applicable. The timeseries view does not embed child views.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -181,6 +211,15 @@ None. The component is bundled as a single HTML file via `vite-plugin-singlefile
 | Gzip         | < 100 KB    |
 
 The bundle includes Chart.js (line/bar controllers, time scale), chartjs-adapter-date-fns, and date-fns locale support.
+
+---
+
+## 9b. SSR Entry
+
+- **File:** `apps/timeseries/src/ssr-entry.tsx`
+- **Renders:** `TimeseriesRenderer` via `renderToString`
+- **Config:** `apps/timeseries/vite.config.ssr.ts`
+- **Output:** `apps/timeseries/dist-ssr/ssr-entry.js`
 
 ---
 

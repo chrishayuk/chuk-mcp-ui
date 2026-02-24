@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `JsonContent`
@@ -92,6 +100,24 @@ When `searchable: true`, a search input filters and highlights matching string v
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented.
@@ -107,6 +133,10 @@ Works inside dashboard, split, and tabs containers.
 ### 7.2 As Parent
 
 Not applicable.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -130,6 +160,15 @@ None.
 |--------------|-------------|---------------------|
 | Raw          | < 800 KB    | TBD                 |
 | Gzip         | --          | TBD                 |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/json/src/ssr-entry.tsx`
+- **Renders:** `JsonRenderer` via `renderToString`
+- **Config:** `apps/json/vite.config.ssr.ts`
+- **Output:** `apps/json/dist-ssr/ssr-entry.js`
 
 ---
 

@@ -4,6 +4,7 @@ import {
   Button,
   Input,
   Badge,
+  Checkbox,
   Table,
   TableHeader,
   TableBody,
@@ -18,20 +19,30 @@ import { fadeIn } from "@chuk/view-ui/animations";
 import type { DataTableContent, Column, RowAction } from "./schema";
 
 export function DataTableView() {
-  const { data, callTool } =
+  const { data, callTool, updateModelContext } =
     useView<DataTableContent>("datatable", "1.0");
 
   if (!data) return null;
 
-  return <DataTable data={data} onCallTool={callTool} />;
+  return (
+    <DataTable
+      data={data}
+      onCallTool={callTool}
+      onUpdateModelContext={updateModelContext}
+    />
+  );
 }
 
 export interface DataTableProps {
   data: DataTableContent;
   onCallTool: (name: string, args: Record<string, unknown>) => Promise<void>;
+  onUpdateModelContext?: (params: {
+    content?: Array<{ type: string; text: string }>;
+    structuredContent?: Record<string, unknown>;
+  }) => Promise<void>;
 }
 
-export function DataTable({ data, onCallTool }: DataTableProps) {
+export function DataTable({ data, onCallTool, onUpdateModelContext }: DataTableProps) {
   const { emitSelect } = useViewEvents();
   const {
     title,
@@ -40,7 +51,12 @@ export function DataTable({ data, onCallTool }: DataTableProps) {
     sortable = true,
     filterable = true,
     exportable = false,
+    selectable = false,
     actions,
+    paginationTool,
+    totalRows,
+    pageSize = 50,
+    currentPage = 1,
   } = data;
 
   const [sortKey, setSortKey] = useState<string | null>(null);
@@ -49,6 +65,8 @@ export function DataTable({ data, onCallTool }: DataTableProps) {
   const [panelId, setPanelId] = useState<string | null>(null);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const highlightRef = useRef<HTMLTableRowElement | null>(null);
+  const [selectedRowIndices, setSelectedRowIndices] = useState<Set<number>>(new Set());
+  const [paginationLoading, setPaginationLoading] = useState(false);
 
   // Cross-View messaging: listen for feature-click from other panels
   useEffect(() => {
@@ -144,12 +162,90 @@ export function DataTable({ data, onCallTool }: DataTableProps) {
     [onCallTool]
   );
 
+  // Push selected rows to model context whenever selection changes
+  useEffect(() => {
+    if (!onUpdateModelContext) return;
+    if (selectedRowIndices.size === 0) return;
+    const selectedRows = Array.from(selectedRowIndices).map((idx) => rows[idx]).filter(Boolean);
+    if (selectedRows.length > 0) {
+      onUpdateModelContext({
+        content: [{
+          type: "text",
+          text: `DataTable: ${selectedRows.length} row(s) selected`
+        }],
+      });
+    }
+  }, [selectedRowIndices, rows, onUpdateModelContext]);
+
+  // Row selection toggle
+  const toggleRowSelection = useCallback(
+    (rowIndex: number) => {
+      setSelectedRowIndices((prev) => {
+        const next = new Set(prev);
+        if (next.has(rowIndex)) {
+          next.delete(rowIndex);
+        } else {
+          next.add(rowIndex);
+        }
+        return next;
+      });
+    },
+    []
+  );
+
+  // Select / deselect all visible rows
+  const toggleSelectAll = useCallback(() => {
+    setSelectedRowIndices((prev) => {
+      const allVisibleIndices = sortedRows.map((_, i) => i);
+      const allSelected = allVisibleIndices.every((i) => prev.has(i));
+      if (allSelected) {
+        return new Set<number>();
+      }
+      return new Set(allVisibleIndices);
+    });
+  }, [sortedRows]);
+
+  // Server-side pagination handler
+  const totalPages = paginationTool && totalRows != null
+    ? Math.max(1, Math.ceil(totalRows / pageSize))
+    : null;
+
+  const handlePageChange = useCallback(
+    async (newPage: number) => {
+      if (!paginationTool) return;
+      if (totalPages != null && (newPage < 1 || newPage > totalPages)) return;
+      setPaginationLoading(true);
+      try {
+        await onCallTool(paginationTool, { page: newPage, pageSize });
+      } finally {
+        setPaginationLoading(false);
+      }
+    },
+    [paginationTool, totalPages, pageSize, onCallTool]
+  );
+
+  // Clear selection when rows change (e.g. new page loaded)
+  useEffect(() => {
+    setSelectedRowIndices(new Set());
+  }, [rows]);
+
+  const colSpan =
+    (selectable ? 1 : 0) + columns.length + (actions && actions.length > 0 ? 1 : 0);
+
+  const allVisibleSelected =
+    sortedRows.length > 0 && sortedRows.every((_, i) => selectedRowIndices.has(i));
+
   return (
     <div className="flex flex-col h-full font-sans text-foreground bg-background">
       {(title || filterable || exportable) && (
         <div className="flex items-center justify-between px-4 py-3 border-b flex-wrap gap-2">
           {title && <h2 className="m-0 text-base font-semibold">{title}</h2>}
           <div className="flex items-center gap-2">
+            {selectable && selectedRowIndices.size > 0 && (
+              <span className="text-xs text-muted-foreground">
+                {selectedRowIndices.size} selected
+              </span>
+            )}
             {filterable && (
               <Input
                 type="text"
@@ -173,6 +269,15 @@ export function DataTable({ data, onCallTool }: DataTableProps) {
           <Table>
             <TableHeader>
               <TableRow>
+                {selectable && (
+                  <TableHead className="sticky top-0 bg-muted w-10">
+                    <Checkbox
+                      checked={allVisibleSelected}
+                      onCheckedChange={toggleSelectAll}
+                      aria-label="Select all rows"
+                    />
+                  </TableHead>
+                )}
                 {columns.map((col) => (
                   <TableHead
                     key={col.key}
@@ -211,7 +316,7 @@ export function DataTable({ data, onCallTool }: DataTableProps) {
               {sortedRows.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={columns.length + (actions ? 1 : 0)}
+                    colSpan={colSpan}
                     className="py-8 text-center text-muted-foreground"
                   >
                     {filter ? "No matching rows." : "No data."}
@@ -221,6 +326,7 @@ export function DataTable({ data, onCallTool }: DataTableProps) {
                 sortedRows.map((row, i) => {
                   const rowId = String(row.nhle_id ?? row.id ?? "");
                   const isHighlighted = rowId && rowId === highlightedId;
+                  const isSelected = selectedRowIndices.has(i);
                   return (
                     <TableRow
                       key={i}
@@ -228,6 +334,7 @@ export function DataTable({ data, onCallTool }: DataTableProps) {
                       className={cn(
                         "border-b transition-colors",
                         isHighlighted && "bg-primary/15",
+                        isSelected && "bg-primary/10",
                         rowId && "cursor-pointer"
                       )}
                       onClick={() => {
@@ -246,6 +353,16 @@ export function DataTable({ data, onCallTool }: DataTableProps) {
                         }
                       }}
                     >
+                      {selectable && (
+                        <TableCell className="w-10">
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => toggleRowSelection(i)}
+                            onClick={(e) => e.stopPropagation()}
+                            aria-label={`Select row ${i + 1}`}
+                          />
+                        </TableCell>
+                      )}
                       {columns.map((col) => (
                         <TableCell
                           key={col.key}
@@ -266,7 +383,10 @@ export function DataTable({ data, onCallTool }: DataTableProps) {
                                 variant="ghost"
                                 size="sm"
                                 className="text-xs"
-                                onClick={() => handleAction(action, row)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAction(action, row);
+                                }}
                               >
                                 {action.label}
                               </Button>
@@ -282,12 +402,81 @@ export function DataTable({ data, onCallTool }: DataTableProps) {
           </Table>
         </motion.div>
       </ScrollArea>
-      <div className="px-4 py-2 text-xs text-muted-foreground border-t">
-        {sortedRows.length} of {rows.length} rows
-        {filter && ` (filtered)`}
+      {/* Footer: row count + pagination controls */}
+      <div className="px-4 py-2 text-xs text-muted-foreground border-t flex items-center justify-between gap-2">
+        <span>
+          {paginationTool && totalRows != null
+            ? `${rows.length} rows (${totalRows.toLocaleString()} total)`
+            : `${sortedRows.length} of ${rows.length} rows`}
+          {filter && ` (filtered)`}
+        </span>
+        {paginationTool && totalPages != null && (
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-6 px-2 text-xs"
+              disabled={currentPage <= 1 || paginationLoading}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              Prev
+            </Button>
+            {generatePageNumbers(currentPage, totalPages).map((p, idx) =>
+              p === "..." ? (
+                <span key={`ellipsis-${idx}`} className="px-1">&hellip;</span>
+              ) : (
+                <Button
+                  key={p}
+                  variant={p === currentPage ? "default" : "outline"}
+                  size="sm"
+                  className="h-6 w-6 px-0 text-xs"
+                  disabled={paginationLoading}
+                  onClick={() => handlePageChange(p as number)}
+                >
+                  {p}
+                </Button>
+              )
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-6 px-2 text-xs"
+              disabled={currentPage >= totalPages || paginationLoading}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              Next
+            </Button>
+            <span className="ml-1 text-muted-foreground">
+              Page {currentPage} of {totalPages}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
+}
+
+/**
+ * Generate a compact list of page numbers with ellipsis for large page counts.
+ * Always shows first, last, and a window around the current page.
+ */
+function generatePageNumbers(
+  current: number,
+  total: number
+): (number | "...")[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  const pages: (number | "...")[] = [];
+  const left = Math.max(2, current - 1);
+  const right = Math.min(total - 1, current + 1);
+
+  pages.push(1);
+  if (left > 2) pages.push("...");
+  for (let i = left; i <= right; i++) pages.push(i);
+  if (right < total - 1) pages.push("...");
+  pages.push(total);
+  return pages;
 }
 
 function CellValue({ column, value }: { column: Column; value: unknown }) {

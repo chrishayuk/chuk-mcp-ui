@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `AlertContent`
@@ -124,6 +132,24 @@ Each alert card contains:
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented.
@@ -139,6 +165,10 @@ Works inside dashboard, split, and tabs containers.
 ### 7.2 As Parent
 
 Not applicable.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -163,6 +193,15 @@ No external resources loaded. Action buttons invoke MCP tools via postMessage.
 |--------------|-------------|---------------------|
 | Raw          | < 800 KB    | TBD                 |
 | Gzip         | --          | TBD                 |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/alert/src/ssr-entry.tsx`
+- **Renders:** `AlertRenderer` via `renderToString`
+- **Config:** `apps/alert/vite.config.ssr.ts`
+- **Output:** `apps/alert/dist-ssr/ssr-entry.js`
 
 ---
 

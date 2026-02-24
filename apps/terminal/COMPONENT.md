@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `TerminalContent`
@@ -109,6 +117,24 @@ Optional gutter with right-aligned line numbers. Gutter width adjusts to accommo
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Auto-scroll behaviour supports streaming: new lines appended to the `lines` array cause automatic scroll-to-bottom unless the user has scrolled up.
@@ -124,6 +150,10 @@ Works inside dashboard, split, and tabs containers.
 ### 7.2 As Parent
 
 Not applicable.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -148,6 +178,15 @@ No external resources loaded. All rendering is inline.
 |--------------|-------------|---------------------|
 | Raw          | < 800 KB    | TBD                 |
 | Gzip         | --          | TBD                 |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/terminal/src/ssr-entry.tsx`
+- **Renders:** `TerminalRenderer` via `renderToString`
+- **Config:** `apps/terminal/vite.config.ssr.ts`
+- **Output:** `apps/terminal/dist-ssr/ssr-entry.js`
 
 ---
 

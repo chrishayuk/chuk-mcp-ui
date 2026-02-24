@@ -335,12 +335,12 @@ function ObjectShape({ obj, offset }: { obj: ThreedObject; offset: Point2D }) {
 /* ------------------------------------------------------------------ */
 
 export function ThreedView() {
-  const { data } =
+  const { data, requestDisplayMode, displayMode } =
     useView<ThreedContent>("threed", "1.0");
 
   if (!data) return null;
 
-  return <ThreedRenderer data={data} />;
+  return <ThreedRenderer data={data} onRequestDisplayMode={requestDisplayMode} displayMode={displayMode} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -349,9 +349,11 @@ export function ThreedView() {
 
 export interface ThreedRendererProps {
   data: ThreedContent;
+  onRequestDisplayMode?: (mode: "inline" | "fullscreen" | "pip") => Promise<string>;
+  displayMode?: "inline" | "fullscreen" | "pip" | null;
 }
 
-export function ThreedRenderer({ data }: ThreedRendererProps) {
+export function ThreedRenderer({ data, onRequestDisplayMode, displayMode }: ThreedRendererProps) {
   // Sort objects by depth (distance from camera) for painter's algorithm
   const sortedObjects = useMemo(() => {
     return [...data.objects].sort((a, b) => {
@@ -391,7 +393,15 @@ export function ThreedRenderer({ data }: ThreedRendererProps) {
   const bgColor = data.background ?? undefined;
 
   return (
-    <div className="h-full flex flex-col font-sans text-foreground bg-background">
+    <div className="h-full flex flex-col font-sans text-foreground bg-background relative">
+      {onRequestDisplayMode && (
+        <button
+          onClick={() => onRequestDisplayMode(displayMode === "fullscreen" ? "inline" : "fullscreen")}
+          className="absolute top-2 right-2 z-[1000] bg-background/80 backdrop-blur-sm border rounded-md px-2 py-1 text-xs hover:bg-muted transition-colors"
+        >
+          {displayMode === "fullscreen" ? "Exit Fullscreen" : "Fullscreen"}
+        </button>
+      )}
       <motion.div
         variants={fadeIn}
         initial="hidden"

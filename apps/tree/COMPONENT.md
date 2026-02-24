@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `TreeContent`
@@ -157,6 +165,24 @@ callTool("get-tree-children", { nodeId: "lazy-node" })
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Animation
 
 | Element            | Variant          | Description                              |
@@ -183,6 +209,10 @@ Works inside dashboard, split, and tabs containers. Receives data via the `postM
 
 Not applicable. The tree view does not embed child views.
 
+### 8.3 Cross-View Events
+
+None.
+
 ---
 
 ## 9. CSP Requirements
@@ -197,6 +227,15 @@ None. The component is bundled as a single HTML file via `vite-plugin-singlefile
 |--------------|-------------|
 | Raw          | < 200 KB    |
 | Gzip         | < 60 KB     |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/tree/src/ssr-entry.tsx`
+- **Renders:** `TreeRenderer` via `renderToString`
+- **Config:** `apps/tree/vite.config.ssr.ts`
+- **Output:** `apps/tree/dist-ssr/ssr-entry.js`
 
 ---
 

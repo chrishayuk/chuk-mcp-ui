@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `EmbedContent`
@@ -130,6 +138,24 @@ None currently implemented.
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented. The View renders on full `ontoolresult`. No progressive
@@ -150,6 +176,10 @@ The embed view registers with `type: "embed"` and `version: "1.0"`.
 
 Not applicable. The embed view does not embed child MCP views (though it
 does embed arbitrary external content via an iframe).
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -187,6 +217,15 @@ embedded content regardless of CSP.
 The bundle is primarily React and the shared UI component library. No
 additional iframe-related libraries are included since the View relies
 entirely on the native HTML5 `<iframe>` element.
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/embed/src/ssr-entry.tsx`
+- **Renders:** `EmbedRenderer` via `renderToString`
+- **Config:** `apps/embed/vite.config.ssr.ts`
+- **Output:** `apps/embed/dist-ssr/ssr-entry.js`
 
 ---
 

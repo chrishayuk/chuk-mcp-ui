@@ -7,7 +7,7 @@ import {
 import type { App } from "@modelcontextprotocol/ext-apps";
 import { applyTheme, applyPreset } from "./theme";
 
-interface ViewState<T> {
+export interface ViewState<T> {
   app: App | null;
   data: T | null;
   content: Array<{ type: string; text?: string }> | null;
@@ -15,6 +15,31 @@ interface ViewState<T> {
   isConnected: boolean;
   error: string | null;
   callTool: (name: string, args: Record<string, unknown>) => Promise<void>;
+
+  // ext-apps methods
+  sendMessage: (params: {
+    role: string;
+    content: Array<{ type: string; text: string }>;
+  }) => Promise<void>;
+  updateModelContext: (params: {
+    content?: Array<{ type: string; text: string }>;
+    structuredContent?: Record<string, unknown>;
+  }) => Promise<void>;
+  requestDisplayMode: (
+    mode: "inline" | "fullscreen" | "pip"
+  ) => Promise<string>;
+  openLink: (url: string) => Promise<void>;
+  sendLog: (level: string, data: string) => Promise<void>;
+
+  // ext-apps state
+  displayMode: "inline" | "fullscreen" | "pip" | null;
+  containerDimensions: {
+    width?: number;
+    height?: number;
+    maxWidth?: number;
+    maxHeight?: number;
+  } | null;
+  isCancelled: boolean;
 }
 
 /**
@@ -26,6 +51,8 @@ interface ViewState<T> {
  * - Provides typed data access
  * - Handles fallback state
  * - Listens for update-structured-content messages from parent dashboard
+ * - Surfaces ext-apps SDK methods: sendMessage, updateModelContext,
+ *   requestDisplayMode, openLink, sendLog
  */
 export function useView<T>(
   expectedType: string,
@@ -63,6 +90,18 @@ export function useView<T>(
   // Track whether data arrived via dashboard postMessage or hash (bypasses ext-apps)
   const [dashboardConnected, setDashboardConnected] = useState(hashData !== null);
 
+  // ext-apps state
+  const [displayMode, setDisplayMode] = useState<
+    "inline" | "fullscreen" | "pip" | null
+  >(null);
+  const [containerDimensions, setContainerDimensions] = useState<{
+    width?: number;
+    height?: number;
+    maxWidth?: number;
+    maxHeight?: number;
+  } | null>(null);
+  const [isCancelled, setIsCancelled] = useState(false);
+
   const { app, isConnected: extAppsConnected, error } = useApp({
     appInfo: {
       name: `@chuk/view-${expectedType}`,
@@ -71,6 +110,8 @@ export function useView<T>(
     capabilities: {},
     onAppCreated: (createdApp: App) => {
       createdApp.ontoolresult = (result) => {
+        setIsCancelled(false);
+
         const sc = result.structuredContent as
           | (T & { type?: string })
           | undefined;
@@ -88,17 +129,32 @@ export function useView<T>(
         }
       };
 
+      createdApp.ontoolcancelled = () => {
+        setIsCancelled(true);
+      };
+
       createdApp.onhostcontextchanged = () => {
         const ctx = createdApp.getHostContext();
         const mode =
           ctx?.theme === "dark" ? "dark" : "light";
         applyTheme(mode);
+        // Sync display mode and container dimensions from host context
+        if (ctx?.displayMode) setDisplayMode(ctx.displayMode as "inline" | "fullscreen" | "pip");
+        if (ctx?.containerDimensions) setContainerDimensions(ctx.containerDimensions as any);
       };
     },
   });
 
   // Connected if ext-apps handshake completed OR data arrived from dashboard
   const isConnected = extAppsConnected || dashboardConnected;
+
+  // Read initial host context once connected
+  useEffect(() => {
+    if (!app || !extAppsConnected) return;
+    const ctx = app.getHostContext();
+    if (ctx?.displayMode) setDisplayMode(ctx.displayMode as "inline" | "fullscreen" | "pip");
+    if (ctx?.containerDimensions) setContainerDimensions(ctx.containerDimensions as any);
+  }, [app, extAppsConnected]);
 
   // Listen for messages from parent dashboard:
   // - "mcp-app:tool-result": initial data delivery when iframe loads
@@ -184,6 +240,76 @@ export function useView<T>(
     [app]
   );
 
+  const sendMessage = useCallback(
+    async (params: {
+      role: string;
+      content: Array<{ type: string; text: string }>;
+    }) => {
+      if (!app) return;
+      try {
+        await app.sendMessage(params as any);
+      } catch (err) {
+        setCallToolError(
+          err instanceof Error ? err.message : "sendMessage failed"
+        );
+      }
+    },
+    [app]
+  );
+
+  const updateModelContext = useCallback(
+    async (params: {
+      content?: Array<{ type: string; text: string }>;
+      structuredContent?: Record<string, unknown>;
+    }) => {
+      if (!app) return;
+      try {
+        await app.updateModelContext(params as any);
+      } catch {
+        // Swallow — host may not support updateModelContext
+      }
+    },
+    [app]
+  );
+
+  const requestDisplayMode = useCallback(
+    async (mode: "inline" | "fullscreen" | "pip"): Promise<string> => {
+      if (!app) return "inline";
+      try {
+        const result = await app.requestDisplayMode({ mode });
+        setDisplayMode(result.mode);
+        return result.mode;
+      } catch {
+        return "inline";
+      }
+    },
+    [app]
+  );
+
+  const openLink = useCallback(
+    async (url: string) => {
+      if (!app) return;
+      try {
+        await app.openLink({ url });
+      } catch {
+        window.open(url, "_blank");
+      }
+    },
+    [app]
+  );
+
+  const sendLog = useCallback(
+    async (level: string, logData: string) => {
+      if (!app) return;
+      try {
+        await app.sendLog({ level: level as any, data: logData });
+      } catch {
+        // Swallow
+      }
+    },
+    [app]
+  );
+
   return {
     app,
     data,
@@ -192,5 +318,13 @@ export function useView<T>(
     isConnected,
     error: error?.toString() ?? callToolError,
     callTool,
+    sendMessage,
+    updateModelContext,
+    requestDisplayMode,
+    openLink,
+    sendLog,
+    displayMode,
+    containerDimensions,
+    isCancelled,
   };
 }

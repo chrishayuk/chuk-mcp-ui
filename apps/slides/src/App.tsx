@@ -10,12 +10,12 @@ import type { SlidesContent, Slide } from "./schema";
 /* ------------------------------------------------------------------ */
 
 export function SlidesView() {
-  const { data, callTool } =
+  const { data, callTool, requestDisplayMode, displayMode } =
     useView<SlidesContent>("slides", "1.0");
 
   if (!data) return null;
 
-  return <SlidesRenderer data={data} onCallTool={callTool} />;
+  return <SlidesRenderer data={data} onCallTool={callTool} onRequestDisplayMode={requestDisplayMode} displayMode={displayMode} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -25,6 +25,8 @@ export function SlidesView() {
 export interface SlidesRendererProps {
   data: SlidesContent;
   onCallTool?: (name: string, args: Record<string, unknown>) => Promise<void>;
+  onRequestDisplayMode?: (mode: "inline" | "fullscreen" | "pip") => Promise<string>;
+  displayMode?: "inline" | "fullscreen" | "pip" | null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -71,7 +73,7 @@ function getVariants(transition?: string) {
 /*  Slides Renderer                                                    */
 /* ------------------------------------------------------------------ */
 
-export function SlidesRenderer({ data }: SlidesRendererProps) {
+export function SlidesRenderer({ data, onRequestDisplayMode, displayMode }: SlidesRendererProps) {
   const { title, slides, transition } = data;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
@@ -117,7 +119,15 @@ export function SlidesRenderer({ data }: SlidesRendererProps) {
   const slide = slides[currentIndex];
 
   return (
-    <div className="h-full flex flex-col font-sans text-foreground bg-background select-none">
+    <div className="h-full flex flex-col font-sans text-foreground bg-background select-none relative">
+      {onRequestDisplayMode && (
+        <button
+          onClick={() => onRequestDisplayMode(displayMode === "fullscreen" ? "inline" : "fullscreen")}
+          className="absolute top-2 right-2 z-[1000] bg-background/80 backdrop-blur-sm border rounded-md px-2 py-1 text-xs hover:bg-muted transition-colors"
+        >
+          {displayMode === "fullscreen" ? "Exit Fullscreen" : "Fullscreen"}
+        </button>
+      )}
       <motion.div
         variants={fadeIn}
         initial="hidden"

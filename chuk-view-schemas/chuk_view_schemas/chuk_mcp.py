@@ -19,12 +19,10 @@ from typing import Any, Callable, Optional, TypeVar
 
 from pydantic import BaseModel
 
-# Re-use CDN constants and fallback generators from fastmcp
+# Re-use CDN constants from fastmcp
 from .fastmcp import (
     CDN_BASE,
     VIEW_PATHS,
-    _FALLBACK_GENERATORS,
-    _generic_fallback,
 )
 
 F = TypeVar("F", bound=Callable[..., Any])
@@ -79,22 +77,16 @@ def _view_tool(
 
             if isinstance(result, BaseModel):
                 structured = result.model_dump(by_alias=True, exclude_none=True)
-                fallback_gen = _FALLBACK_GENERATORS.get(type(result), _generic_fallback)
-                fallback_text = fallback_gen(result)
             elif isinstance(result, dict):
                 if "structuredContent" in result:
                     return result
                 structured = result
-                fallback_text = f"Showing {view_type} view."
             else:
                 raise TypeError(
                     f"Expected BaseModel or dict, got {type(result).__name__}"
                 )
 
-            return {
-                "content": [{"type": "text", "text": fallback_text}],
-                "structuredContent": structured,
-            }
+            return {"structuredContent": structured}
 
         if _has_view_tool(mcp_server):
             # Use ChukMCPServer's @view_tool for automatic resource

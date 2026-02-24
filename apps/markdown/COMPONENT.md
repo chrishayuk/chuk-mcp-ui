@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `MarkdownContent`
@@ -122,6 +130,24 @@ None currently implemented.
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented. The View renders on full `ontoolresult`. No progressive
@@ -141,6 +167,10 @@ The markdown view registers with `type: "markdown"` and `version: "1.0"`.
 ### 7.2 As Parent
 
 Not applicable. The markdown view does not embed child views.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -175,6 +205,15 @@ sanitisation; no additional DOMPurify step is applied.
 
 The overshoot is due to the `marked` library being bundled inline alongside
 React.
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/markdown/src/ssr-entry.tsx`
+- **Renders:** `MarkdownRenderer` via `renderToString`
+- **Config:** `apps/markdown/vite.config.ssr.ts`
+- **Output:** `apps/markdown/dist-ssr/ssr-entry.js`
 
 ---
 

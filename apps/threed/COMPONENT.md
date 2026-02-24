@@ -29,6 +29,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme, requestDisplayMode |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `ThreedContent`
@@ -96,6 +104,44 @@ Isometric projection: `x_screen = (x - z) * cos(30deg)`, `y_screen = (x + z) * s
 ## 5. Interactions
 
 Display-only. No user interactions currently implemented.
+
+---
+
+## 5b. Model Context Updates
+
+None. The threed view does not call `updateModelContext`.
+
+---
+
+## 5c. Display Mode
+
+Fullscreen toggle button in top-right corner (`absolute top-2 right-2 z-[1000]`).
+Uses semi-transparent background (`bg-background/80 backdrop-blur-sm`).
+Toggles between `"inline"` and `"fullscreen"` via `requestDisplayMode()`.
+Button label shows "Fullscreen" or "Exit Fullscreen". Only rendered when
+`onRequestDisplayMode` is available (host supports it).
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond the shared Fallback behaviour.
+
+---
+
+## 5e. Cross-View Events
+
+None. The threed view does not emit ViewBus events or listen for messages
+from sibling Views.
+
+---
+
+## 5f. SSR Entry
+
+- **File:** `apps/threed/src/ssr-entry.tsx`
+- **Renders:** `ThreedRenderer` via `renderToString`
+- **Config:** `apps/threed/vite.config.ssr.ts`
+- **Output:** `apps/threed/dist-ssr/ssr-entry.js`
 
 ---
 

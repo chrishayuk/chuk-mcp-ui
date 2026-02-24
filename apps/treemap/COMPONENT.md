@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `TreemapContent`
@@ -127,6 +135,24 @@ None. This is a pure visualisation component with no server-side tool calls.
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Animation
 
 | Element   | Variant  | Description                          |
@@ -151,6 +177,10 @@ Works inside dashboard, split, and tabs containers. Receives data via the `postM
 
 Not applicable. The treemap view does not embed child views.
 
+### 8.3 Cross-View Events
+
+None.
+
 ---
 
 ## 9. CSP Requirements
@@ -165,6 +195,15 @@ None. The component is bundled as a single HTML file via `vite-plugin-singlefile
 |--------------|-------------|
 | Raw          | < 150 KB    |
 | Gzip         | < 45 KB     |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/treemap/src/ssr-entry.tsx`
+- **Renders:** `TreemapRenderer` via `renderToString`
+- **Config:** `apps/treemap/vite.config.ssr.ts`
+- **Output:** `apps/treemap/dist-ssr/ssr-entry.js`
 
 ---
 

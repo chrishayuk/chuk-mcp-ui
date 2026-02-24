@@ -31,6 +31,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `AudioContent`
@@ -144,6 +152,24 @@ None currently implemented.
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented. The View renders on full `ontoolresult`. No progressive
@@ -163,6 +189,10 @@ The audio view registers with `type: "audio"` and `version: "1.0"`.
 ### 7.2 As Parent
 
 Not applicable. The audio view does not embed child views.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -194,6 +224,15 @@ external audio file. The host application's CSP must allow `media-src` (or
 The bundle includes React, framer-motion, the shared UI library, and canvas
 drawing logic. No additional audio processing libraries are included since the
 View relies on the native `HTMLAudioElement`.
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/audio/src/ssr-entry.tsx`
+- **Renders:** `AudioRenderer` via `renderToString`
+- **Config:** `apps/audio/vite.config.ssr.ts`
+- **Output:** `apps/audio/dist-ssr/ssr-entry.js`
 
 ---
 

@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `StatusContent`
@@ -100,6 +108,24 @@ Derived from item statuses: any error → "System Outage" (red badge), any warni
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented.
@@ -115,6 +141,10 @@ Works inside dashboard, split, and tabs containers.
 ### 7.2 As Parent
 
 Not applicable.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -138,6 +168,15 @@ If `url` fields are provided, links open in new tabs. No external resources load
 |--------------|-------------|---------------------|
 | Raw          | < 800 KB    | TBD                 |
 | Gzip         | --          | TBD                 |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/status/src/ssr-entry.tsx`
+- **Renders:** `StatusRenderer` via `renderToString`
+- **Config:** `apps/status/vite.config.ssr.ts`
+- **Output:** `apps/status/dist-ssr/ssr-entry.js`
 
 ---
 

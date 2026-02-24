@@ -31,6 +31,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `MinimapContent`
@@ -165,6 +173,24 @@ Uses `fadeIn` variant from `@chuk/view-ui/animations` for the initial reveal.
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented. Both panels render on initial data load.
@@ -180,6 +206,10 @@ Works inside `view-dashboard`, `view-split`, and `view-tabs` containers.
 ### 7.2 As Parent
 
 Not applicable. Use `view-dashboard` to compose minimap with other Views.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -213,6 +243,15 @@ Not applicable. Use `view-dashboard` to compose minimap with other Views.
 |--------|-------------|--------|
 | Raw    | < 200 KB    | TBD    |
 | Gzip   | --          | TBD    |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/minimap/src/ssr-entry.tsx`
+- **Renders:** `MinimapRenderer` via `renderToString`
+- **Config:** `apps/minimap/vite.config.ssr.ts`
+- **Output:** `apps/minimap/dist-ssr/ssr-entry.js`
 
 ---
 

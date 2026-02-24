@@ -199,12 +199,12 @@ function ArcPath({
 /* ------------------------------------------------------------------ */
 
 export function GlobeView() {
-  const { data } =
+  const { data, requestDisplayMode, displayMode } =
     useView<GlobeContent>("globe", "1.0");
 
   if (!data) return null;
 
-  return <GlobeRenderer data={data} />;
+  return <GlobeRenderer data={data} onRequestDisplayMode={requestDisplayMode} displayMode={displayMode} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -213,9 +213,11 @@ export function GlobeView() {
 
 export interface GlobeRendererProps {
   data: GlobeContent;
+  onRequestDisplayMode?: (mode: "inline" | "fullscreen" | "pip") => Promise<string>;
+  displayMode?: "inline" | "fullscreen" | "pip" | null;
 }
 
-export function GlobeRenderer({ data }: GlobeRendererProps) {
+export function GlobeRenderer({ data, onRequestDisplayMode, displayMode }: GlobeRendererProps) {
   const initialLat = data.rotation?.lat ?? 20;
   const initialLon = data.rotation?.lon ?? 0;
 
@@ -264,7 +266,15 @@ export function GlobeRenderer({ data }: GlobeRendererProps) {
   );
 
   return (
-    <div className="h-full flex flex-col font-sans text-foreground bg-background">
+    <div className="h-full flex flex-col font-sans text-foreground bg-background relative">
+      {onRequestDisplayMode && (
+        <button
+          onClick={() => onRequestDisplayMode(displayMode === "fullscreen" ? "inline" : "fullscreen")}
+          className="absolute top-2 right-2 z-[1000] bg-background/80 backdrop-blur-sm border rounded-md px-2 py-1 text-xs hover:bg-muted transition-colors"
+        >
+          {displayMode === "fullscreen" ? "Exit Fullscreen" : "Fullscreen"}
+        </button>
+      )}
       <motion.div
         variants={fadeIn}
         initial="hidden"

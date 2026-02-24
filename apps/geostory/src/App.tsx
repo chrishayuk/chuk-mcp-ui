@@ -10,12 +10,12 @@ import type { GeostoryContent, GeostoryStep } from "./schema";
 /* ------------------------------------------------------------------ */
 
 export function GeostoryView() {
-  const { data } =
+  const { data, requestDisplayMode, displayMode } =
     useView<GeostoryContent>("geostory", "1.0");
 
   if (!data) return null;
 
-  return <GeostoryRenderer data={data} />;
+  return <GeostoryRenderer data={data} onRequestDisplayMode={requestDisplayMode} displayMode={displayMode} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -24,6 +24,8 @@ export function GeostoryView() {
 
 export interface GeostoryRendererProps {
   data: GeostoryContent;
+  onRequestDisplayMode?: (mode: "inline" | "fullscreen" | "pip") => Promise<string>;
+  displayMode?: "inline" | "fullscreen" | "pip" | null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -71,7 +73,7 @@ const BASEMAP_BG: Record<string, string> = {
 /*  Geostory Renderer                                                  */
 /* ------------------------------------------------------------------ */
 
-export function GeostoryRenderer({ data }: GeostoryRendererProps) {
+export function GeostoryRenderer({ data, onRequestDisplayMode, displayMode }: GeostoryRendererProps) {
   const { title, steps, basemap = "simple" } = data;
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -120,7 +122,15 @@ export function GeostoryRenderer({ data }: GeostoryRendererProps) {
   const activeStep = steps[activeIndex];
 
   return (
-    <div className="h-full flex flex-col font-sans text-foreground bg-background">
+    <div className="h-full flex flex-col font-sans text-foreground bg-background relative">
+      {onRequestDisplayMode && (
+        <button
+          onClick={() => onRequestDisplayMode(displayMode === "fullscreen" ? "inline" : "fullscreen")}
+          className="absolute top-2 right-2 z-[1000] bg-background/80 backdrop-blur-sm border rounded-md px-2 py-1 text-xs hover:bg-muted transition-colors"
+        >
+          {displayMode === "fullscreen" ? "Exit Fullscreen" : "Fullscreen"}
+        </button>
+      )}
       <motion.div
         variants={fadeIn}
         initial="hidden"

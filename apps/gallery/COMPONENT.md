@@ -30,6 +30,15 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme, callTool, updateModelContext |
+| `useViewResize` | Container-aware responsive breakpoint for column count |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `GalleryContent`
@@ -137,6 +146,7 @@ Each card is a `Card` component containing:
 | Filter         | Type in filter input     | Items filtered by title, subtitle, and description.   |
 | Sort           | Select sort field        | Items sorted by selected metadata field value.        |
 | Click action   | Click card action button | Calls `callTool(action.tool, action.arguments)`.      |
+| Click card     | Click on card body       | Selects item (visual `ring-2 ring-primary` highlight, `selectedItemId` state). Pushes selection to model context. |
 
 ### 5.2 Filtering
 
@@ -153,6 +163,33 @@ None currently implemented.
 ### 5.5 Server Calls (callServerTool)
 
 Action buttons invoke `callTool` with the action's `tool` name and `arguments` object.
+
+---
+
+## 5b. Model Context Updates
+
+On card click (selection), the gallery pushes the selected item to the LLM
+via `updateModelContext`:
+
+```
+Gallery: user selected "{title}" ({subtitle}) [id={id}]
+```
+
+Where `{title}`, `{subtitle}`, and `{id}` come from the clicked `GalleryItem`.
+Subtitle is omitted if not present.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The gallery view stays inline-only and does not support
+`requestDisplayMode()`.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond the shared Fallback behaviour.
 
 ---
 
@@ -185,6 +222,11 @@ Works inside dashboard, split, and tabs containers.
 
 Not applicable.
 
+### 8.3 Cross-View Events
+
+None currently. The gallery does not emit ViewBus events or listen for
+messages from sibling Views.
+
 ---
 
 ## 9. CSP Requirements
@@ -209,6 +251,15 @@ External network access may be required if `image.url` points to an external ori
 |--------------|-------------|---------------------|
 | Raw          | < 800 KB    | TBD                 |
 | Gzip         | --          | TBD                 |
+
+---
+
+## 11b. SSR Entry
+
+- **File:** `apps/gallery/src/ssr-entry.tsx`
+- **Renders:** `GalleryRenderer` via `renderToString`
+- **Config:** `apps/gallery/vite.config.ssr.ts`
+- **Output:** `apps/gallery/dist-ssr/ssr-entry.js`
 
 ---
 

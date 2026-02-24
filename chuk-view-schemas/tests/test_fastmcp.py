@@ -85,12 +85,8 @@ class TestMapTool:
         result = run(tool["func"]())
 
         assert "structuredContent" in result
-        assert "content" in result
         assert result["structuredContent"]["type"] == "map"
         assert result["structuredContent"]["version"] == "1.0"
-        assert isinstance(result["content"], list)
-        assert len(result["content"]) >= 1
-        assert "Map with" in result["content"][0]["text"]
 
 
 class TestChartTool:
@@ -109,7 +105,6 @@ class TestChartTool:
         result = run(tool["func"]())
 
         assert result["structuredContent"]["type"] == "chart"
-        assert "Chart:" in result["content"][0]["text"]
 
 
 class TestDictPassthrough:
@@ -140,7 +135,6 @@ class TestDictPassthrough:
         result = run(tool["func"]())
 
         assert "structuredContent" in result
-        assert "content" in result
         assert result["structuredContent"]["type"] == "json"
 
 
@@ -169,7 +163,6 @@ class TestGenericViewTool:
         result = run(tool["func"]())
 
         assert result["structuredContent"]["type"] == "my-custom"
-        assert "Showing my-custom view" in result["content"][0]["text"]
 
 
 class TestViewPaths:

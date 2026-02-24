@@ -31,6 +31,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `ScatterContent`
@@ -144,6 +152,24 @@ If any point in any dataset has an `r` value, the chart renders in bubble mode (
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented. The component renders a complete chart from the full `ScatterContent` payload. Incremental updates require a full re-render (the previous `ChartJS` instance is destroyed and recreated on every `data` change).
@@ -159,6 +185,10 @@ Works inside dashboard, split, and tabs containers. Receives data via the `postM
 ### 7.2 As Parent
 
 Not applicable. The scatter view does not embed child views.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -176,6 +206,15 @@ None. The component is bundled as a single HTML file via `vite-plugin-singlefile
 | Gzip         | < 60 KB     |
 
 The scatter view registers only the ScatterController, BubbleController, LinearScale, LogarithmicScale, and PointElement -- significantly fewer modules than the full chart view.
+
+---
+
+## 9b. SSR Entry
+
+- **File:** `apps/scatter/src/ssr-entry.tsx`
+- **Renders:** `ScatterRenderer` via `renderToString`
+- **Config:** `apps/scatter/vite.config.ssr.ts`
+- **Output:** `apps/scatter/dist-ssr/ssr-entry.js`
 
 ---
 

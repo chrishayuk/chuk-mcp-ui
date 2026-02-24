@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `BoxplotContent`
@@ -140,6 +148,24 @@ None currently implemented.
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented. The View renders on full `ontoolresult`.
@@ -155,6 +181,10 @@ Works inside dashboard, split, and tabs containers. Particularly suited for dash
 ### 7.2 As Parent
 
 Not applicable.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -178,6 +208,15 @@ None.
 |--------------|-------------|---------------------|
 | Raw          | < 800 KB    | TBD                 |
 | Gzip         | --          | TBD                 |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/boxplot/src/ssr-entry.tsx`
+- **Renders:** `BoxplotRenderer` via `renderToString`
+- **Config:** `apps/boxplot/vite.config.ssr.ts`
+- **Output:** `apps/boxplot/dist-ssr/ssr-entry.js`
 
 ---
 

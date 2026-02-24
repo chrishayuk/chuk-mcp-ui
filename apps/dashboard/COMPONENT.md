@@ -12,6 +12,15 @@
 - **Build:** vite, vite-plugin-singlefile, typescript
 - **Protocol:** @modelcontextprotocol/ext-apps
 
+## Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useViewBusContainer` | Cross-view message routing between child panels |
+| `Fallback` | Loading/error state display |
+| `ViewBusProvider` | Context provider for cross-view event bus |
+| `applyTheme` | Theme propagation to child iframes |
+
 ## Schema
 ```typescript
 interface DashboardContent {
@@ -48,6 +57,18 @@ interface Panel {
 - Each panel: optional label header + iframe embedding child View
 - Sends structuredContent to children via postMessage on iframe load
 
+## Model Context Updates
+
+None.
+
+## Display Mode
+
+Not applicable. The view stays inline-only.
+
+## Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
 ## Cross-View Communication
 - Children emit messages with `__chuk_panel_id`
 - Dashboard broadcasts to all other panels with `__chuk_source_panel` added
@@ -63,11 +84,19 @@ interface Panel {
 - **As Child:** Can be embedded in other composition Views
 - **As Parent:** Manages multiple child Views via iframes
 
+### Cross-View Events
+
+Dashboard acts as a message router. Children emit messages with `__chuk_panel_id`, and the dashboard broadcasts to all other panels with `__chuk_source_panel` added.
+
 ## CSP
 Depends on child Views' CSP requirements.
 
 ## Size Budget
 Target: < 150KB. Actual: 692 KB / 191 KB gzip (includes Tailwind CSS + shadcn/ui + Framer Motion)
+
+## SSR Entry
+
+Not applicable. The dashboard view does not have an SSR entry point because it composes child views via iframes rather than rendering static content directly.
 
 ## Test Cases
 

@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme, callTool |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `ChatContent`
@@ -130,6 +138,24 @@ Three dots with CSS opacity bounce animation inside an assistant-style bubble. S
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented.
@@ -145,6 +171,10 @@ Works inside dashboard, split, and tabs containers.
 ### 7.2 As Parent
 
 Not applicable.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -169,6 +199,15 @@ None.
 |--------------|-------------|---------------------|
 | Raw          | < 800 KB    | TBD                 |
 | Gzip         | --          | TBD                 |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/chat/src/ssr-entry.tsx`
+- **Renders:** `ChatRenderer` via `renderToString`
+- **Config:** `apps/chat/vite.config.ssr.ts`
+- **Output:** `apps/chat/dist-ssr/ssr-entry.js`
 
 ---
 

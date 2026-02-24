@@ -14,6 +14,13 @@
 - **Build:** vite, vite-plugin-singlefile, typescript
 - **Protocol:** @modelcontextprotocol/ext-apps
 
+## Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme, callTool, updateModelContext |
+| `useViewEvents` | Cross-view event emission (`emitSelect` on row click) |
+
 ## Schema
 
 ### Input (structuredContent)
@@ -28,7 +35,12 @@ interface DataTableContent {
   sortable?: boolean;
   filterable?: boolean;
   exportable?: boolean;
+  selectable?: boolean;
   actions?: RowAction[];
+  paginationTool?: string;
+  totalRows?: number;
+  pageSize?: number;
+  currentPage?: number;
 }
 
 interface Column {
@@ -59,6 +71,9 @@ interface RowAction {
 | sortable | `true` |
 | filterable | `true` |
 | exportable | `false` |
+| selectable | `false` |
+| pageSize | `50` |
+| currentPage | `1` |
 | column.type | `"text"` |
 | column.sortable | `true` (inherits from parent `sortable`) |
 | column.align | `"left"` |
@@ -108,6 +123,8 @@ scrolling.
 | Filter | Type in filter input | Filters rows across all columns using case-insensitive substring match. Footer updates to show filtered count. |
 | Export CSV | Click "Export CSV" button | Downloads a CSV file named `{title}.csv` (or `export.csv` if no title). Exports all rows, ignoring current filter. |
 | Row action | Click action button in row | Resolves template arguments from row data, optionally shows `confirm` dialog, then calls `callServerTool`. |
+| Row selection | Click checkbox per row | Toggles row selection state; visual highlight `ring-2 ring-primary`. Select-all checkbox in header selects/deselects all visible rows. |
+| Server-side pagination | Click Prev/Next or page number | Calls `callTool(paginationTool, { page, pageSize })`. Page numbers with ellipsis shown for large page counts. |
 
 ### Outbound Events (sendMessage)
 
@@ -149,6 +166,24 @@ Values are resolved by looking up `key` in the `Record<string, unknown>` row
 object. Missing keys resolve to empty string via the shared `resolveTemplates`
 utility.
 
+## Model Context Updates
+
+When row selection changes (and at least one row is selected), the datatable
+pushes the selection count to the LLM via `updateModelContext`:
+
+```
+DataTable: {N} row(s) selected
+```
+
+## Display Mode
+
+Not applicable. The datatable view stays inline-only and does not support
+`requestDisplayMode()`.
+
+## Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
 ## Streaming
 
 Not implemented. The table renders on full `ontoolresult`. No progressive
@@ -165,6 +200,13 @@ View. It renders identically to standalone mode.
 ### As Parent
 
 Not applicable. `view-datatable` does not embed other Views.
+
+### Cross-View Events
+
+| Direction | Event | Payload | When |
+|-----------|-------|---------|------|
+| **Emit** | `select` | `[rowId]` (field: `"id"`) | Row clicked |
+| **Listen** | `feature-click` (postMessage) | `{ nhle_id, properties }` | Sibling map feature clicked -- highlights matching row |
 
 ## CSP Requirements
 
@@ -184,6 +226,13 @@ None -- no external resources loaded. All assets are inlined by
 **Target:** < 150KB (React ~130KB + app code ~20KB)
 
 **Actual:** 810 KB / 230 KB gzip (includes Tailwind CSS + shadcn/ui + Framer Motion)
+
+## SSR Entry
+
+- **File:** `apps/datatable/src/ssr-entry.tsx`
+- **Renders:** `DataTable` with `onCallTool={noop}`
+- **Config:** `apps/datatable/vite.config.ssr.ts`
+- **Output:** `apps/datatable/dist-ssr/ssr-entry.js`
 
 ## Test Cases
 

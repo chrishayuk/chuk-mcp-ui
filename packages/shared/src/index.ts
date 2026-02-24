@@ -1,4 +1,5 @@
 export { useView } from "./use-view";
+export type { ViewState } from "./use-view";
 export { resolveTemplates } from "./actions";
 export {
   applyTheme,

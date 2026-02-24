@@ -118,7 +118,7 @@ have no View. Ordered by how frequently MCP servers produce this shape.
 ### Deliverables
 
 - [ ] Publish all to npm + deploy to Fly.io
-- [x] Updated schema packages on PyPI (`chuk-view-schemas` v0.1.0)
+- [x] Updated schema packages on PyPI (`chuk-view-schemas` v0.1.3)
 - [ ] Updated schema packages on npm
 
 ### Success Criteria
@@ -355,7 +355,7 @@ full host. Also powers Phase 9 catalogue thumbnails.
 - [x] Live playground MVP at `apps/playground/`
 - [ ] `infer_view()` inference helper (Python + TypeScript)
 - [ ] `chuk-view-test` snapshot testing CLI
-- [x] Publish Python schemas to PyPI (`chuk-view-schemas` v0.1.0)
+- [x] Publish Python schemas to PyPI (`chuk-view-schemas` v0.1.3)
 - [ ] Publish all to npm
 
 ### Success Criteria
@@ -586,8 +586,8 @@ construct `meta={"ui": {...}}`, missing key features.
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| 10 existing schemas | ✅ Done | chart, map, datatable, form, dashboard, split, tabs, markdown, video, pdf |
-| 56 missing schemas | Planned | Add incrementally by priority tier — core views first, then specialist |
+| 66 Content schemas | ✅ Done | All 66 views have typed Pydantic v2 Content models with camelCase aliases |
+| No text fallbacks | ✅ Done | Decorators return `{"structuredContent": ...}` only — no `"content"` text fallback (clients struggle with sizing) |
 
 ### 7.5c — View Protocol Completeness (Mostly Done)
 
@@ -671,7 +671,7 @@ Interactive views should use `callServerTool` for server-side operations.
 - [x] chuk-view-schemas: Update `chuk_mcp.py` to use `mcp.view_tool()` with `_has_view_tool()` detection
 - [x] chuk-view-schemas: Add permissions/CSP/visibility params to both `fastmcp.py` and `chuk_mcp.py`
 - [x] chuk-view-schemas: Complete VIEW_PATHS registry (17 → 66 views) + 66 per-view decorators
-- [ ] chuk-view-schemas: Add Pydantic schemas for remaining views
+- [x] chuk-view-schemas: All 66 Pydantic Content schemas (no text fallbacks)
 - [ ] chuk-mcp-ui: Extend `useView` with streaming, sendMessage, updateModelContext
 - [ ] chuk-mcp-ui: `callServerTool` in more views (map, chart, datatable, gallery)
 - [ ] chuk-mcp-ui: Fullscreen support in appropriate views
@@ -702,8 +702,39 @@ A Python developer using `@chart_tool(mcp, "show_data", permissions={"camera": {
 **Goal:** Server-side rendering engine that dynamically composes Views
 from data descriptions. The "Next.js of MCP."
 
+### SSR Memory Consolidation (Critical)
+
+**Problem:** The current SSR approach creates a separate `ssr-entry.tsx` +
+`vite.config.ssr.ts` + `dist-ssr/ssr-entry.js` for each of the 66 views.
+Each SSR module bundles its own copy of React and component code. On 256MB
+Fly.io instances, lazy-loading even a subset of these causes OOM crashes.
+
+**Proposed solution — single universal SSR module:**
+
+Instead of 66 separate SSR bundles, build **one** SSR entry that:
+
+1. Imports all 66 view components into a single bundle sharing one React runtime
+2. Accepts `{ view: "chart", data: {...} }` and renders the correct component
+3. Exposes a single `render(view, data)` function
+4. Dramatically reduces memory footprint (one React copy, not 66)
+5. Eliminates per-view SSR boilerplate (`ssr-entry.tsx`, `vite.config.ssr.ts`)
+6. Simplifies the Dockerfile (one `COPY dist-ssr` instead of 66)
+
+**Approach options:**
+
+| Option | Pros | Cons |
+|--------|------|------|
+| **A) Single Vite library build** | One bundle, shared React, simple | Larger initial bundle, all views loaded |
+| **B) Dynamic import in single runtime** | Lazy per-view loading, shared React | More complex, still separate chunks |
+| **C) Drop SSR entirely** | Simplest, no memory issue | Slower first paint, no SEO benefit |
+
+Option A is likely sufficient — the combined SSR bundle size is manageable
+since views are mostly lightweight React components. The server already
+pre-loads all 66 client HTML files into memory at startup.
+
 ### Deliverables
 
+- [ ] **Single universal SSR module** (replaces 66 per-view SSR bundles)
 - [ ] SSR engine that takes a layout description and renders composed Views
 - [ ] Data shape inference — GeoJSON -> map, tabular -> table, time-series -> chart
   (builds on Phase 5 `infer_view()` helper)
@@ -716,6 +747,7 @@ from data descriptions. The "Next.js of MCP."
 A Python MCP server returns raw data sections without specifying View
 types. The runtime infers the right visualisations, composes a dashboard,
 and returns a single rendered page. Zero UI decisions in the MCP server.
+SSR runs within 256MB memory on Fly.io without OOM.
 
 ---
 
@@ -820,7 +852,7 @@ community-contributed Views.
 | Design system (Tailwind + shadcn + Framer Motion) | 3 | ✓ Done — packages/ui, all 66 Views migrated, dark mode compliant |
 | Storybook (253+ stories, theme toggle) | 3 | ✓ Done — component + View + hook stories, deployed at `/storybook` |
 | First View on npm | 1 | Pending |
-| PyPI publish | 1 | ✅ Done — `chuk-view-schemas` v0.1.0 |
+| PyPI publish | 1 | ✅ Done — `chuk-view-schemas` v0.1.3 (66 schemas) |
 | Full MCP coverage (10 → 17 Views) | 3 | ✓ Done — Sprint 1 |
 | Full MCP coverage (17 → 27 Views) | 3-4 | ✅ Done — Sprint 3 |
 | Full catalogue (27 → 52 Views) | 3-4 | ✅ Done — Sprint 4 |
@@ -834,7 +866,9 @@ community-contributed Views.
 | `view-sankey` | 6 | ✅ Done |
 | `view-geostory` | 6 | ✅ Done |
 | AppRenderer compatibility | 7 | ✅ Done — 166 Playwright tests |
-| SSR runtime | 8 | Not started |
+| 66 Pydantic Content schemas (no fallbacks) | 7.5 | ✅ Done |
+| SSR per-view modules (66) | 8 | ⚠️ OOM on Fly.io — needs consolidation |
+| SSR universal module (single bundle) | 8 | Not started |
 | View catalogue | 9 | Not started |
 | 66 Views in catalogue | 3-6 | ✅ Done — all 66 shipped |
 | Discovery Channel demo | 4-6 | Pending |

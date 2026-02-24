@@ -12,6 +12,14 @@
 - **Build:** vite, vite-plugin-singlefile, typescript
 - **Protocol:** @modelcontextprotocol/ext-apps
 
+## Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+| `ViewBusProvider` | Provides message bus context for child views |
+| `useViewBusContainer` | Manages iframe-to-iframe message routing |
+
 ## Schema
 ```typescript
 interface TabsContent {
@@ -48,6 +56,18 @@ interface Tab {
 | Switch tab | Click tab button | Change active tab, load/show iframe |
 | Tab loaded | iframe onLoad | postMessage structuredContent |
 
+## Model Context Updates
+
+None.
+
+## Display Mode
+
+Not applicable. The view stays inline-only.
+
+## Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
 ## Theme Integration
 Uses: `--chuk-font-family`, `--chuk-color-background`, `--chuk-color-surface`, `--chuk-color-border`, `--chuk-color-primary`, `--chuk-color-text-secondary`.
 
@@ -55,11 +75,22 @@ Uses: `--chuk-font-family`, `--chuk-color-background`, `--chuk-color-surface`, `
 - **As Child:** Can be embedded in dashboard/split
 - **As Parent:** Manages child Views in tab panels
 
+### Cross-View Events
+
+None.
+
 ## CSP
 Depends on child Views.
 
 ## Size Budget
 Target: < 150KB. Actual: 691 KB / 191 KB gzip (includes Tailwind CSS + shadcn/ui + Framer Motion)
+
+## SSR Entry
+
+- **File:** `apps/tabs/src/ssr-entry.tsx`
+- **Renders:** `TabsInner` via `renderToString`
+- **Config:** `apps/tabs/vite.config.ssr.ts`
+- **Output:** `apps/tabs/dist-ssr/ssr-entry.js`
 
 ## Test Cases
 

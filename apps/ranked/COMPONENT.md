@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `RankedContent`
@@ -155,6 +163,24 @@ Action buttons invoke `callTool` with the action's `tool` name and `arguments` o
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented. The View renders on full `ontoolresult`.
@@ -170,6 +196,10 @@ Works inside dashboard, split, and tabs containers.
 ### 7.2 As Parent
 
 Not applicable.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -195,6 +225,15 @@ External network access may be required if `item.image.url` points to an externa
 |--------------|-------------|---------------------|
 | Raw          | < 800 KB    | TBD                 |
 | Gzip         | --          | TBD                 |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/ranked/src/ssr-entry.tsx`
+- **Renders:** `RankedRenderer` via `renderToString`
+- **Config:** `apps/ranked/vite.config.ssr.ts`
+- **Output:** `apps/ranked/dist-ssr/ssr-entry.js`
 
 ---
 

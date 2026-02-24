@@ -1,3 +1,8 @@
+export interface ChartClickAction {
+  tool: string;
+  arguments?: Record<string, string>;
+}
+
 export interface ChartContent {
   type: "chart";
   version: "1.0";
@@ -10,6 +15,7 @@ export interface ChartContent {
   legend?: { position: "top" | "bottom" | "left" | "right" | "none" };
   annotations?: Annotation[];
   interactive?: boolean;
+  onClickTool?: ChartClickAction;
 }
 
 export type ChartType =

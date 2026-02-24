@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `GisLegendContent`
@@ -107,6 +115,24 @@ No interactive actions. Legend is read-only.
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented.
@@ -122,6 +148,10 @@ Works inside dashboard, split, and tabs containers.
 ### 7.2 As Parent
 
 Not applicable.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -145,6 +175,15 @@ No external resources loaded. All SVG is inline.
 |--------------|-------------|---------------------|
 | Raw          | < 800 KB    | TBD                 |
 | Gzip         | --          | TBD                 |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/gis-legend/src/ssr-entry.tsx`
+- **Renders:** `GisLegendRenderer` via `renderToString`
+- **Config:** `apps/gis-legend/vite.config.ssr.ts`
+- **Output:** `apps/gis-legend/dist-ssr/ssr-entry.js`
 
 ---
 

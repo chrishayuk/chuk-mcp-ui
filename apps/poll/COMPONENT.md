@@ -30,6 +30,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme, callTool |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `PollContent`
@@ -191,6 +199,24 @@ Vote button invokes `callTool(voteTool, { questionId, selections })`. When `onCa
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented. The View renders on full `ontoolresult`.
@@ -206,6 +232,10 @@ Works inside dashboard, split, and tabs containers.
 ### 7.2 As Parent
 
 Not applicable.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -233,6 +263,15 @@ External network access may be required if `question.image.url` or `option.image
 |--------------|-------------|---------------------|
 | Raw          | < 800 KB    | TBD                 |
 | Gzip         | --          | TBD                 |
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/poll/src/ssr-entry.tsx`
+- **Renders:** `PollRenderer` via `renderToString`
+- **Config:** `apps/poll/vite.config.ssr.ts`
+- **Output:** `apps/poll/dist-ssr/ssr-entry.js`
 
 ---
 

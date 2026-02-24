@@ -7,7 +7,16 @@ export interface DataTableContent {
   sortable?: boolean;
   filterable?: boolean;
   exportable?: boolean;
+  selectable?: boolean;
   actions?: RowAction[];
+  /** Server-side pagination: tool name to invoke when changing pages */
+  paginationTool?: string;
+  /** Total number of rows across all pages (for server-side pagination) */
+  totalRows?: number;
+  /** Number of rows per page (defaults to 50) */
+  pageSize?: number;
+  /** Current page number (1-based) */
+  currentPage?: number;
 }
 
 export interface Column {

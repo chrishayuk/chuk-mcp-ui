@@ -29,6 +29,14 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `VideoContent`
@@ -126,6 +134,24 @@ None currently implemented.
 
 ---
 
+## 5b. Model Context Updates
+
+None.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The view stays inline-only.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond shared Fallback behaviour.
+
+---
+
 ## 6. Streaming
 
 Not implemented. The View renders on full `ontoolresult`. No progressive
@@ -145,6 +171,10 @@ The video view registers with `type: "video"` and `version: "1.0"`.
 ### 7.2 As Parent
 
 Not applicable. The video view does not embed child views.
+
+### 7.3 Cross-View Events
+
+None.
 
 ---
 
@@ -178,6 +208,15 @@ image origin.
 The bundle is primarily React and the shared UI component library. No
 additional video processing libraries are included since the View relies
 entirely on the native HTML5 `<video>` element.
+
+---
+
+## 10b. SSR Entry
+
+- **File:** `apps/video/src/ssr-entry.tsx`
+- **Renders:** `VideoPlayer` via `renderToString`
+- **Config:** `apps/video/vite.config.ssr.ts`
+- **Output:** `apps/video/dist-ssr/ssr-entry.js`
 
 ---
 

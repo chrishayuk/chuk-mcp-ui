@@ -29,6 +29,15 @@
 
 ---
 
+## 2b. Hook Dependencies
+
+| Hook | Purpose |
+|------|---------|
+| `useView` | MCP protocol connection, data, theme, callTool, updateModelContext |
+| `useViewEvents` | Cross-view event emission (`emitSelect` on data point click) |
+
+---
+
 ## 3. Schema
 
 ### 3.1 Root -- `ChartContent`
@@ -46,6 +55,12 @@ interface ChartContent {
   legend?: { position: "top" | "bottom" | "left" | "right" | "none" };
   annotations?: Annotation[];
   interactive?: boolean;
+  onClickTool?: ChartClickAction;
+}
+
+interface ChartClickAction {
+  tool: string;
+  arguments?: Record<string, string>;
 }
 ```
 
@@ -162,6 +177,31 @@ interface Annotation {
 | Area auto-fill             | `chartType === "area"`     | Automatically sets `fill: true` and applies 0.2 alpha to the background color. |
 | Mixed chart types          | `dataset.type` is set      | Individual datasets can override the root `chartType` to create mixed charts (e.g., bar + line). |
 | Per-dataset fill override  | `dataset.fill === true`    | Any dataset can opt into fill mode regardless of root `chartType`. |
+| Click data point           | `interactive !== false` and `onClickTool` set | Resolves `{{label}}`, `{{datasetIndex}}`, `{{value}}` templates in `onClickTool.arguments`, then calls `callTool`. Also calls `emitSelect` with the clicked label and pushes model context update. |
+
+---
+
+## 5b. Model Context Updates
+
+On click of a data point, the chart pushes the selected label to the LLM via `updateModelContext`:
+
+```
+Chart: user clicked "{label}" in dataset "{datasetLabel}"
+```
+
+Where `{label}` is the resolved label of the clicked data point and `{datasetLabel}` is the dataset's `label` field.
+
+---
+
+## 5c. Display Mode
+
+Not applicable. The chart view stays inline-only and does not support `requestDisplayMode()`.
+
+---
+
+## 5d. Cancellation
+
+Default. No special handling beyond the shared Fallback behaviour.
 
 ---
 
@@ -181,6 +221,12 @@ Works inside dashboard, split, and tabs containers. Receives data via the `postM
 
 Not applicable. The chart view does not embed child views.
 
+### 7.3 Cross-View Events
+
+| Direction | Event | Payload | When |
+|-----------|-------|---------|------|
+| **Emit** | `select` | `[label]` (field: `"label"`) | Data point clicked |
+
 ---
 
 ## 8. CSP Requirements
@@ -197,6 +243,15 @@ None. The component is bundled as a single HTML file via `vite-plugin-singlefile
 | Gzip         | --          | 214 KB              |
 
 The overshoot is due to the full Chart.js library being bundled. Chart.js tree-shaking is limited because all eight chart controllers and their associated elements/scales are registered.
+
+---
+
+## 9b. SSR Entry
+
+- **File:** `apps/chart/src/ssr-entry.tsx`
+- **Renders:** `ChartRendererStatic` via `renderToString`
+- **Config:** `apps/chart/vite.config.ssr.ts`
+- **Output:** `apps/chart/dist-ssr/ssr-entry.js`
 
 ---
 

@@ -24,21 +24,24 @@ const BASEMAPS: Record<string, string> = {
 };
 
 export function MapView() {
-  const { data, app, callTool } =
+  const { data, app, callTool, updateModelContext, requestDisplayMode, displayMode } =
     useView<MapContent>("map", "1.0");
 
   if (!data) return null;
 
-  return <LeafletMap data={data} app={app} onCallTool={callTool} />;
+  return <LeafletMap data={data} app={app} onCallTool={callTool} onUpdateModelContext={updateModelContext} onRequestDisplayMode={requestDisplayMode} displayMode={displayMode} />;
 }
 
 export interface LeafletMapProps {
   data: MapContent;
   app: unknown;
   onCallTool: (name: string, args: Record<string, unknown>) => Promise<void>;
+  onUpdateModelContext?: (params: { content?: Array<{ type: string; text: string }> }) => Promise<void>;
+  onRequestDisplayMode?: (mode: "inline" | "fullscreen" | "pip") => Promise<string>;
+  displayMode?: "inline" | "fullscreen" | "pip" | null;
 }
 
-export function LeafletMap({ data, onCallTool }: LeafletMapProps) {
+export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDisplayMode, displayMode }: LeafletMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const layerGroupsRef = useRef<Map<string, L.LayerGroup>>(new Map());
@@ -177,11 +180,50 @@ export function LeafletMap({ data, onCallTool }: LeafletMapProps) {
     }
   }, [data, handleAction, panelId, emitSelect]);
 
+  // Push map state to LLM model context
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !onUpdateModelContext) return;
+
+    let timer: ReturnType<typeof setTimeout>;
+    const handleMoveEnd = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const bounds = map.getBounds();
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+        onUpdateModelContext({
+          content: [{
+            type: "text",
+            text: `Map view: center ${center.lat.toFixed(4)},${center.lng.toFixed(4)} zoom ${zoom} bounds ${bounds.getSouth().toFixed(4)},${bounds.getWest().toFixed(4)} to ${bounds.getNorth().toFixed(4)},${bounds.getEast().toFixed(4)}`
+          }],
+        });
+      }, 500);
+    };
+
+    map.on("moveend", handleMoveEnd);
+    // Push initial state
+    handleMoveEnd();
+
+    return () => {
+      clearTimeout(timer);
+      map.off("moveend", handleMoveEnd);
+    };
+  }, [onUpdateModelContext]);
+
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-full font-sans"
-    />
+    <div className="relative w-full h-full font-sans">
+      <div ref={containerRef} className="w-full h-full" />
+      {onRequestDisplayMode && (
+        <button
+          onClick={() => onRequestDisplayMode(displayMode === "fullscreen" ? "inline" : "fullscreen")}
+          className="absolute top-2 right-2 z-[1000] px-2 py-1 text-xs rounded bg-background/80 border border-border hover:bg-muted backdrop-blur-sm"
+          title={displayMode === "fullscreen" ? "Exit fullscreen" : "Fullscreen"}
+        >
+          {displayMode === "fullscreen" ? "\u2199 Exit" : "\u26F6 Fullscreen"}
+        </button>
+      )}
+    </div>
   );
 }
 

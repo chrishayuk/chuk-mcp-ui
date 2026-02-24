@@ -23,12 +23,18 @@ import type { GalleryContent, GalleryItem, GalleryAction } from "./schema";
 /* ------------------------------------------------------------------ */
 
 export function GalleryView() {
-  const { data, callTool } =
+  const { data, callTool, updateModelContext } =
     useView<GalleryContent>("gallery", "1.0");
 
   if (!data) return null;
 
-  return <GalleryRenderer data={data} onCallTool={callTool} />;
+  return (
+    <GalleryRenderer
+      data={data}
+      onCallTool={callTool}
+      onUpdateModelContext={updateModelContext}
+    />
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -38,9 +44,13 @@ export function GalleryView() {
 export interface GalleryRendererProps {
   data: GalleryContent;
   onCallTool?: (name: string, args: Record<string, unknown>) => Promise<void>;
+  onUpdateModelContext?: (params: {
+    content?: Array<{ type: string; text: string }>;
+    structuredContent?: Record<string, unknown>;
+  }) => Promise<void>;
 }
 
-export function GalleryRenderer({ data, onCallTool }: GalleryRendererProps) {
+export function GalleryRenderer({ data, onCallTool, onUpdateModelContext }: GalleryRendererProps) {
   const {
     title,
     items,
@@ -53,6 +63,7 @@ export function GalleryRenderer({ data, onCallTool }: GalleryRendererProps) {
 
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState<string>("");
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const { breakpoint } = useViewResize({ ref: containerRef as React.RefObject<HTMLElement> });
@@ -64,6 +75,23 @@ export function GalleryRenderer({ data, onCallTool }: GalleryRendererProps) {
       }
     },
     [onCallTool]
+  );
+
+  const handleSelect = useCallback(
+    (item: GalleryItem) => {
+      setSelectedItemId(item.id);
+      if (onUpdateModelContext) {
+        onUpdateModelContext({
+          content: [
+            {
+              type: "text",
+              text: `Gallery: user selected "${item.title}"${item.subtitle ? ` (${item.subtitle})` : ""} [id=${item.id}]`,
+            },
+          ],
+        });
+      }
+    },
+    [onUpdateModelContext]
   );
 
   /* Filter items by search text */
@@ -154,7 +182,12 @@ export function GalleryRenderer({ data, onCallTool }: GalleryRendererProps) {
           >
             {sortedItems.map((item) => (
               <motion.div key={item.id} variants={listItem}>
-                <GalleryCard item={item} onAction={handleAction} />
+                <GalleryCard
+                  item={item}
+                  isSelected={item.id === selectedItemId}
+                  onAction={handleAction}
+                  onSelect={handleSelect}
+                />
               </motion.div>
             ))}
           </motion.div>
@@ -175,15 +208,20 @@ export function GalleryRenderer({ data, onCallTool }: GalleryRendererProps) {
 
 interface GalleryCardProps {
   item: GalleryItem;
+  isSelected?: boolean;
   onAction: (action: GalleryAction) => void;
+  onSelect?: (item: GalleryItem) => void;
 }
 
-function GalleryCard({ item, onAction }: GalleryCardProps) {
+function GalleryCard({ item, isSelected, onAction, onSelect }: GalleryCardProps) {
   const { title, subtitle, description, image, badges, metadata, actions } =
     item;
 
   return (
-    <Card className="flex flex-col overflow-hidden">
+    <Card
+      className={`flex flex-col overflow-hidden cursor-pointer transition-colors ${isSelected ? "ring-2 ring-primary" : ""}`}
+      onClick={() => onSelect?.(item)}
+    >
       {/* Image */}
       {image && (
         <div className="aspect-video overflow-hidden">
@@ -237,7 +275,7 @@ function GalleryCard({ item, onAction }: GalleryCardProps) {
               key={i}
               variant="outline"
               size="sm"
-              onClick={() => onAction(action)}
+              onClick={(e) => { e.stopPropagation(); onAction(action); }}
             >
               {action.label}
             </Button>

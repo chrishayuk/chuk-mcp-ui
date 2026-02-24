@@ -65,7 +65,7 @@ function getThemeColors() {
 }
 
 export function ChartView() {
-  const { data, content, isConnected } =
+  const { data, callTool, updateModelContext } =
     useView<ChartContent>("chart", "1.0");
 
   // Before data arrives, render a visible placeholder at the same
@@ -82,10 +82,14 @@ export function ChartView() {
       </div>
     );
 
-  return <ChartRenderer data={data} />;
+  return <ChartRenderer data={data} onCallTool={callTool} onUpdateModelContext={updateModelContext} />;
 }
 
-export function ChartRenderer({ data }: { data: ChartContent }) {
+export function ChartRenderer({ data, onCallTool, onUpdateModelContext }: {
+  data: ChartContent;
+  onCallTool?: (name: string, args: Record<string, unknown>) => Promise<void>;
+  onUpdateModelContext?: (params: { content?: Array<{ type: string; text: string }> }) => Promise<void>;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<ChartJS | null>(null);
   const { emitSelect } = useViewEvents();
@@ -148,6 +152,30 @@ export function ChartRenderer({ data }: { data: ChartContent }) {
               ? String((point as { label: string }).label)
               : String(el.index);
           emitSelect([label], "label");
+
+          // Call server tool if onClickTool is configured
+          if (data.onClickTool && onCallTool) {
+            const args: Record<string, unknown> = {};
+            if (data.onClickTool.arguments) {
+              for (const [key, tmpl] of Object.entries(data.onClickTool.arguments)) {
+                args[key] = tmpl
+                  .replace("{{label}}", label)
+                  .replace("{{datasetIndex}}", String(el.datasetIndex))
+                  .replace("{{value}}", String(typeof point === "object" && point !== null && "value" in point ? (point as any).value : el.index));
+              }
+            } else {
+              args.label = label;
+              args.datasetIndex = el.datasetIndex;
+            }
+            onCallTool(data.onClickTool.tool, args);
+          }
+
+          // Push selected label to model context
+          if (onUpdateModelContext) {
+            onUpdateModelContext({
+              content: [{ type: "text", text: `Chart: user clicked "${label}" in dataset "${ds.label}"` }],
+            });
+          }
         },
         interaction: {
           intersect: false,
