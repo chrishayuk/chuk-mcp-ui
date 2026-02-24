@@ -277,7 +277,7 @@ function TorusShape({ obj, offset }: { obj: ThreedObject; offset: Point2D }) {
         cy={cy}
         rx={innerR}
         ry={innerR * ellipseRy}
-        fill={wireframe ? "none" : "var(--color-background, #fff)"}
+        fill={wireframe ? "none" : "var(--chuk-color-background, #fff)"}
         stroke={color}
         strokeWidth={wireframe ? 1 : 1.5}
       />

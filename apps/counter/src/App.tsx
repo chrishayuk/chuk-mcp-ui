@@ -80,7 +80,7 @@ export function CounterRenderer({ data }: CounterRendererProps) {
 
             {sparklinePath && (
               <div className="mt-3 flex justify-center">
-                <svg width="120" height="32" viewBox="0 0 120 32" className="overflow-visible">
+                <svg width="120" height="32" viewBox="0 0 120 32" className="overflow-visible" role="img" aria-label="Value trend sparkline">
                   <polyline
                     points={sparklinePath}
                     fill="none"

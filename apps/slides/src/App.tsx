@@ -281,7 +281,7 @@ function SlideContent({ slide }: { slide: Slide }) {
             />
           )}
           <div className="absolute inset-0 bg-black/50" />
-          <div className="relative h-full flex flex-col items-center justify-center px-12 text-center text-white">
+          <div className="relative h-full flex flex-col items-center justify-center px-12 text-center text-foreground">
             {title && (
               <h1 className="text-3xl font-bold mb-6 drop-shadow-lg">{title}</h1>
             )}

@@ -115,13 +115,25 @@ function shouldUseWhiteText(
   return brightness < 128;
 }
 
+function getThemeTextColors(): { light: string; dark: string } {
+  const root = document.documentElement;
+  const style = getComputedStyle(root);
+  const raw = style.getPropertyValue("--chuk-color-text").trim();
+  // Use the theme text color for "dark on light" and white for "light on dark"
+  return {
+    light: raw || "#1e293b",
+    dark: "#ffffff",
+  };
+}
+
 function getTextColorForBg(bgRgbString: string): string {
   const match = bgRgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-  if (!match) return "#1e293b";
+  const { light, dark } = getThemeTextColors();
+  if (!match) return light;
   const r = parseInt(match[1], 10);
   const g = parseInt(match[2], 10);
   const b = parseInt(match[3], 10);
-  return shouldUseWhiteText(r, g, b) ? "#ffffff" : "#1e293b";
+  return shouldUseWhiteText(r, g, b) ? dark : light;
 }
 
 /* ------------------------------------------------------------------ */

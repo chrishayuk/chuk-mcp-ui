@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { fadeIn } from "@chuk/view-ui/animations";
 import { marked } from "marked";
+import DOMPurify from "dompurify";
 import { useView } from "@chuk/view-shared";
 import type { MarkdownContent } from "./schema";
 
@@ -26,7 +27,7 @@ export function MarkdownView() {
 
 export function MarkdownRenderer({ data }: { data: MarkdownContent }) {
   const html = useMemo(
-    () => marked.parse(data.content) as string,
+    () => DOMPurify.sanitize(marked.parse(data.content) as string),
     [data.content]
   );
 

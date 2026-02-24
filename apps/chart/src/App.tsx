@@ -67,6 +67,7 @@ function getThemeColors() {
 export function ChartView() {
   const { data, callTool, updateModelContext } =
     useView<ChartContent>("chart", "1.0");
+  const { emitSelect } = useViewEvents();
 
   // Before data arrives, render a visible placeholder at the same
   // aspect ratio Chart.js will use (2:1). Must have visible content
@@ -82,17 +83,17 @@ export function ChartView() {
       </div>
     );
 
-  return <ChartRenderer data={data} onCallTool={callTool} onUpdateModelContext={updateModelContext} />;
+  return <ChartRenderer data={data} onCallTool={callTool} onUpdateModelContext={updateModelContext} onEmitSelect={emitSelect} />;
 }
 
-export function ChartRenderer({ data, onCallTool, onUpdateModelContext }: {
+export function ChartRenderer({ data, onCallTool, onUpdateModelContext, onEmitSelect }: {
   data: ChartContent;
   onCallTool?: (name: string, args: Record<string, unknown>) => Promise<void>;
   onUpdateModelContext?: (params: { content?: Array<{ type: string; text: string }> }) => Promise<void>;
+  onEmitSelect?: (ids: string[], field: string) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<ChartJS | null>(null);
-  const { emitSelect } = useViewEvents();
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -151,7 +152,7 @@ export function ChartRenderer({ data, onCallTool, onUpdateModelContext }: {
             typeof point === "object" && point !== null && "label" in point
               ? String((point as { label: string }).label)
               : String(el.index);
-          emitSelect([label], "label");
+          onEmitSelect?.([label], "label");
 
           // Call server tool if onClickTool is configured
           if (data.onClickTool && onCallTool) {

@@ -10,10 +10,10 @@ export function VideoView() {
 
   if (!data) return null;
 
-  return <VideoPlayer data={data} />;
+  return <VideoRenderer data={data} />;
 }
 
-export function VideoPlayer({ data }: { data: VideoContent }) {
+export function VideoRenderer({ data }: { data: VideoContent }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Set initial startTime on first metadata load

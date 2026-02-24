@@ -83,6 +83,8 @@ export function AnnotationRenderer({ data }: { data: AnnotationContent }) {
                 className="absolute inset-0 w-full h-full pointer-events-none"
                 viewBox={viewBox}
                 preserveAspectRatio="xMidYMid meet"
+                role="img"
+                aria-label={data.title ?? "Image annotations"}
               >
                 <defs>
                   {/* Arrowhead markers - one per unique color */}

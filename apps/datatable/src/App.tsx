@@ -348,7 +348,7 @@ export function DataTable({ data, onCallTool, onUpdateModelContext }: DataTableP
                               nhle_id: rowId,
                               properties: row,
                             },
-                            "*"
+                            window.location.origin
                           );
                         }
                       }}

@@ -157,6 +157,7 @@ export function ImageRenderer({ data }: { data: ImageContent }) {
               size="sm"
               onClick={handleZoomOut}
               disabled={zoom <= 0.5}
+              aria-label="Zoom out"
             >
               -
             </Button>
@@ -168,10 +169,11 @@ export function ImageRenderer({ data }: { data: ImageContent }) {
               size="sm"
               onClick={handleZoomIn}
               disabled={zoom >= 5}
+              aria-label="Zoom in"
             >
               +
             </Button>
-            <Button variant="outline" size="sm" onClick={handleFit}>
+            <Button variant="outline" size="sm" onClick={handleFit} aria-label="Fit to view">
               Fit
             </Button>
           </>
@@ -233,6 +235,7 @@ export function ImageRenderer({ data }: { data: ImageContent }) {
             <button
               key={img.id}
               onClick={() => setActiveIndex(i)}
+              aria-label={`View image ${i + 1}`}
               className={`flex-shrink-0 rounded overflow-hidden ${
                 i === activeIndex ? "ring-2 ring-primary" : "opacity-60 hover:opacity-100"
               }`}

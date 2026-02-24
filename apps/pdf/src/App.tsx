@@ -48,10 +48,10 @@ export function PdfView() {
   if (!isConnected) return <Fallback message="Connecting..." />;
   if (!data) return <Fallback content={content ?? undefined} />;
 
-  return <PdfViewer data={data} />;
+  return <PdfRenderer data={data} />;
 }
 
-export function PdfViewer({ data }: { data: PdfContent }) {
+export function PdfRenderer({ data }: { data: PdfContent }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [pdfDoc, setPdfDoc] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(data.initialPage ?? 1);

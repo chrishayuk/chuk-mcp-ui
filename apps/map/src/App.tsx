@@ -219,6 +219,7 @@ export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDi
           onClick={() => onRequestDisplayMode(displayMode === "fullscreen" ? "inline" : "fullscreen")}
           className="absolute top-2 right-2 z-[1000] px-2 py-1 text-xs rounded bg-background/80 border border-border hover:bg-muted backdrop-blur-sm"
           title={displayMode === "fullscreen" ? "Exit fullscreen" : "Fullscreen"}
+          aria-label={displayMode === "fullscreen" ? "Exit fullscreen" : "Enter fullscreen"}
         >
           {displayMode === "fullscreen" ? "\u2199 Exit" : "\u26F6 Fullscreen"}
         </button>
@@ -259,7 +260,7 @@ function createLayerGroup(
               nhle_id: featureId,
               properties: props,
             },
-            "*"
+            window.location.origin
           );
         }
       });
@@ -371,7 +372,7 @@ function injectLeafletThemeStyles(container: HTMLElement) {
       background: var(--chuk-color-background, #fff);
       color: var(--chuk-color-text, #1a1a1a);
       border: 1px solid var(--chuk-color-border, #e0e0e0);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 8px var(--chuk-color-shadow, rgba(0,0,0,0.15));
     }
     .leaflet-popup-tip {
       background: var(--chuk-color-background, #fff);
@@ -390,7 +391,7 @@ function injectLeafletThemeStyles(container: HTMLElement) {
     }
     .popup-action:hover {
       background: var(--chuk-color-primary, #3388ff);
-      color: #fff;
+      color: var(--chuk-color-primary-foreground, #fff);
     }
   `;
   container.appendChild(style);
