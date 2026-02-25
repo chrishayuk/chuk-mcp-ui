@@ -71,6 +71,9 @@ import { TimelineRenderer } from "@apps/timeline/src/App";
 import { TreeRenderer } from "@apps/tree/src/App";
 import { TreemapRenderer } from "@apps/treemap/src/App";
 import { VideoRenderer } from "@apps/video/src/App";
+import { WizardRenderer } from "@apps/wizard/src/App";
+import { TranscriptRenderer } from "@apps/transcript/src/App";
+// ShaderRenderer not imported — WebGL needs canvas, uses placeholder below
 
 // ── Browser-dependent views: chart (Chart.js), map/minimap/layers
 //    (Leaflet), profile/scatter/timeseries (Chart.js), pdf (pdf.js)
@@ -167,6 +170,9 @@ const renderers: Record<string, RenderFn> = {
   tree:          (d) => renderToString(<TreeRenderer data={d} />),
   treemap:       (d) => renderToString(<TreemapRenderer data={d} />),
   video:         (d) => renderToString(<VideoRenderer data={d} />),
+  wizard:        (d) => renderToString(<WizardRenderer data={d} />),
+  transcript:    (d) => renderToString(<TranscriptRenderer data={d} />),
+  shader:        placeholder("shader"),            // WebGL needs canvas
 };
 
 // ── Public API ─────────────────────────────────────────────────────

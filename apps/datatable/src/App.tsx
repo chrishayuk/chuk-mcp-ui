@@ -19,7 +19,7 @@ import { fadeIn } from "@chuk/view-ui/animations";
 import type { DataTableContent, Column, RowAction } from "./schema";
 
 export function DataTableView() {
-  const { data, callTool, updateModelContext } =
+  const { data, callTool, updateModelContext, openLink } =
     useView<DataTableContent>("datatable", "1.0");
 
   if (!data) return null;
@@ -29,6 +29,7 @@ export function DataTableView() {
       data={data}
       onCallTool={callTool}
       onUpdateModelContext={updateModelContext}
+      onOpenLink={openLink}
     />
   );
 }
@@ -40,9 +41,10 @@ export interface DataTableProps {
     content?: Array<{ type: string; text: string }>;
     structuredContent?: Record<string, unknown>;
   }) => Promise<void>;
+  onOpenLink?: (url: string) => Promise<void>;
 }
 
-export function DataTable({ data, onCallTool, onUpdateModelContext }: DataTableProps) {
+export function DataTable({ data, onCallTool, onUpdateModelContext, onOpenLink }: DataTableProps) {
   const { emitSelect } = useViewEvents();
   const {
     title,
@@ -57,6 +59,8 @@ export function DataTable({ data, onCallTool, onUpdateModelContext }: DataTableP
     totalRows,
     pageSize = 50,
     currentPage = 1,
+    refreshTool,
+    exportTool,
   } = data;
 
   const [sortKey, setSortKey] = useState<string | null>(null);
@@ -224,6 +228,28 @@ export function DataTable({ data, onCallTool, onUpdateModelContext }: DataTableP
     [paginationTool, totalPages, pageSize, onCallTool]
   );
 
+  // Push filter/sort/pagination state to model context
+  useEffect(() => {
+    if (!onUpdateModelContext) return;
+    const timer = setTimeout(() => {
+      const parts: string[] = [];
+      if (filter) parts.push(`filter: "${filter}"`);
+      if (sortKey) parts.push(`sorted by ${sortKey} ${sortDir}`);
+      if (paginationTool && totalRows != null) {
+        parts.push(`page ${currentPage} of ${totalPages}`);
+      }
+      if (parts.length > 0) {
+        onUpdateModelContext({
+          content: [{
+            type: "text",
+            text: `DataTable state: ${parts.join(", ")}`,
+          }],
+        });
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [filter, sortKey, sortDir, currentPage, totalPages, paginationTool, totalRows, onUpdateModelContext]);
+
   // Clear selection when rows change (e.g. new page loaded)
   useEffect(() => {
     setSelectedRowIndices(new Set());
@@ -237,7 +263,7 @@ export function DataTable({ data, onCallTool, onUpdateModelContext }: DataTableP
 
   return (
     <div className="flex flex-col h-full font-sans text-foreground bg-background">
-      {(title || filterable || exportable) && (
+      {(title || filterable || exportable || refreshTool || exportTool) && (
         <div className="flex items-center justify-between px-4 py-3 border-b flex-wrap gap-2">
           {title && <h2 className="m-0 text-base font-semibold">{title}</h2>}
           <div className="flex items-center gap-2">
@@ -256,11 +282,20 @@ export function DataTable({ data, onCallTool, onUpdateModelContext }: DataTableP
                 aria-label="Filter table"
               />
             )}
-            {exportable && (
+            {refreshTool && (
+              <Button variant="outline" size="sm" onClick={() => onCallTool(refreshTool, {})}>
+                Refresh
+              </Button>
+            )}
+            {exportTool ? (
+              <Button variant="outline" size="sm" onClick={() => onCallTool(exportTool, { filter, sortKey, sortDir })}>
+                Export
+              </Button>
+            ) : exportable ? (
               <Button variant="outline" size="sm" onClick={handleExport}>
                 Export CSV
               </Button>
-            )}
+            ) : null}
           </div>
         </div>
       )}
@@ -371,7 +406,7 @@ export function DataTable({ data, onCallTool, onUpdateModelContext }: DataTableP
                             col.align === "center" && "text-center"
                           )}
                         >
-                          <CellValue column={col} value={row[col.key]} />
+                          <CellValue column={col} value={row[col.key]} onOpenLink={onOpenLink} />
                         </TableCell>
                       ))}
                       {actions && actions.length > 0 && (
@@ -479,7 +514,7 @@ function generatePageNumbers(
   return pages;
 }
 
-function CellValue({ column, value }: { column: Column; value: unknown }) {
+function CellValue({ column, value, onOpenLink }: { column: Column; value: unknown; onOpenLink?: (url: string) => Promise<void> }) {
   if (value === null || value === undefined) {
     return <span className="text-muted-foreground">&mdash;</span>;
   }
@@ -496,17 +531,26 @@ function CellValue({ column, value }: { column: Column; value: unknown }) {
     }
     case "boolean":
       return <span>{value ? "\u2713" : "\u2717"}</span>;
-    case "link":
-      return (
+    case "link": {
+      const url = String(value);
+      return onOpenLink ? (
+        <button
+          onClick={() => onOpenLink(url)}
+          className="text-primary hover:underline bg-transparent border-none cursor-pointer p-0 text-left text-sm font-normal"
+        >
+          {url}
+        </button>
+      ) : (
         <a
-          href={String(value)}
+          href={url}
           target="_blank"
           rel="noopener noreferrer"
           className="text-primary hover:underline no-underline"
         >
-          {String(value)}
+          {url}
         </a>
       );
+    }
     case "number":
       return <span>{typeof value === "number" ? value.toLocaleString() : String(value)}</span>;
     case "date":

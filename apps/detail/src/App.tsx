@@ -12,20 +12,21 @@ import { fadeIn, listContainer, listItem } from "@chuk/view-ui/animations";
 import type { DetailContent, DetailField, DetailAction } from "./schema";
 
 export function DetailView() {
-  const { data, callTool } =
+  const { data, callTool, openLink } =
     useView<DetailContent>("detail", "1.0");
 
   if (!data) return null;
 
-  return <DetailRenderer data={data} onCallTool={callTool} />;
+  return <DetailRenderer data={data} onCallTool={callTool} onOpenLink={openLink} />;
 }
 
 export interface DetailRendererProps {
   data: DetailContent;
   onCallTool?: (name: string, args: Record<string, unknown>) => Promise<void>;
+  onOpenLink?: (url: string) => Promise<void>;
 }
 
-export function DetailRenderer({ data, onCallTool }: DetailRendererProps) {
+export function DetailRenderer({ data, onCallTool, onOpenLink }: DetailRendererProps) {
   const { emitAction } = useViewEvents();
   const { title, subtitle, image, fields, actions, sections } = data;
 
@@ -75,7 +76,7 @@ export function DetailRenderer({ data, onCallTool }: DetailRendererProps) {
             >
               {fields.map((field, i) => (
                 <motion.div key={i} variants={listItem}>
-                  <FieldRow field={field} />
+                  <FieldRow field={field} onOpenLink={onOpenLink} />
                 </motion.div>
               ))}
             </motion.div>
@@ -93,7 +94,7 @@ export function DetailRenderer({ data, onCallTool }: DetailRendererProps) {
                 >
                   {section.fields.map((field, fi) => (
                     <motion.div key={fi} variants={listItem}>
-                      <FieldRow field={field} />
+                      <FieldRow field={field} onOpenLink={onOpenLink} />
                     </motion.div>
                   ))}
                 </motion.div>
@@ -125,23 +126,30 @@ export function DetailRenderer({ data, onCallTool }: DetailRendererProps) {
   );
 }
 
-function FieldRow({ field }: { field: DetailField }) {
+function FieldRow({ field, onOpenLink }: { field: DetailField; onOpenLink?: (url: string) => Promise<void> }) {
   return (
     <div className="flex items-baseline gap-2">
       <span className="text-sm text-muted-foreground min-w-[120px] flex-shrink-0">
         {field.label}
       </span>
       <span className="text-sm">
-        <FieldValue field={field} />
+        <FieldValue field={field} onOpenLink={onOpenLink} />
       </span>
     </div>
   );
 }
 
-function FieldValue({ field }: { field: DetailField }) {
+function FieldValue({ field, onOpenLink }: { field: DetailField; onOpenLink?: (url: string) => Promise<void> }) {
   switch (field.type) {
     case "link":
-      return (
+      return onOpenLink ? (
+        <button
+          onClick={() => onOpenLink(field.value)}
+          className="text-primary hover:underline bg-transparent border-none cursor-pointer p-0 text-left text-sm font-normal"
+        >
+          {field.value}
+        </button>
+      ) : (
         <a
           href={field.value}
           target="_blank"

@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { VideoPlayer } from "./App";
+import { VideoRenderer } from "./App";
 import type { VideoContent } from "./schema";
 
 const meta = {
-  title: "Views/VideoPlayer",
-  component: VideoPlayer,
+  title: "Views/VideoRenderer",
+  component: VideoRenderer,
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },
   decorators: [(Story) => <div style={{ height: "600px" }}><Story /></div>],
-} satisfies Meta<typeof VideoPlayer>;
+} satisfies Meta<typeof VideoRenderer>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

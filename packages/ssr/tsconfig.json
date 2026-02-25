@@ -1,6 +1,16 @@
 {
   "extends": "../../tsconfig.base.json",
-  "compilerOptions": { "outDir": "./dist", "rootDir": "./src" },
-  "include": ["src"],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "declaration": false,
+    "declarationMap": false,
+    "paths": {
+      "@apps/*": ["../../apps/*"],
+      "@chuk/view-shared": ["../shared/src"],
+      "@chuk/view-ui": ["../ui/src"],
+      "@chuk/view-ui/*": ["../ui/src/*"]
+    }
+  },
+  "include": ["src", "../../apps/*/src/**/*.ts", "../../apps/*/src/**/*.tsx", "../../packages/*/src/**/*.ts", "../../packages/*/src/**/*.tsx"],
   "references": []
 }

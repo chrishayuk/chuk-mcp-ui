@@ -59,6 +59,7 @@ export function GalleryRenderer({ data, onCallTool, onUpdateModelContext }: Gall
     sortable,
     sortFields = [],
     emptyMessage,
+    refreshTool,
   } = data;
 
   const [search, setSearch] = useState("");
@@ -123,7 +124,7 @@ export function GalleryRenderer({ data, onCallTool, onUpdateModelContext }: Gall
     ? { gridTemplateColumns: `repeat(${resolvedColumns}, minmax(0, 1fr))` }
     : { gridTemplateColumns: `repeat(auto-fill, minmax(240px, 1fr))` };
 
-  const showToolbar = title || filterable || (sortable && sortFields.length > 0);
+  const showToolbar = title || filterable || (sortable && sortFields.length > 0) || refreshTool;
 
   return (
     <div
@@ -157,6 +158,11 @@ export function GalleryRenderer({ data, onCallTool, onUpdateModelContext }: Gall
                 ))}
               </SelectContent>
             </Select>
+          )}
+          {refreshTool && onCallTool && (
+            <Button variant="outline" size="sm" onClick={() => onCallTool(refreshTool, {})}>
+              Refresh
+            </Button>
           )}
         </div>
       )}

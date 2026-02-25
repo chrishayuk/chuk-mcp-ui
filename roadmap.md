@@ -351,7 +351,7 @@ full host. Also powers Phase 9 catalogue thumbnails.
 - [x] Typed cross-View message bus protocol
 - [x] Python FastMCP decorators (`@map_tool`, `@chart_tool`, etc.)
 - [x] TypeScript server helpers (`getViewUrl`, `buildViewMeta`, `wrapViewResult`)
-- [ ] Theme presets (default, dark, discovery, ibm, academic, terminal)
+- [x] Theme presets (default, dark, ocean, forest, terminal, academic, discovery, ibm)
 - [x] Live playground MVP at `apps/playground/`
 - [ ] `infer_view()` inference helper (Python + TypeScript)
 - [ ] `chuk-view-test` snapshot testing CLI
@@ -374,7 +374,7 @@ These demonstrate what composition actually means and create genuinely
 novel experiences.
 
 **Status: Complete.** All 15 compound views shipped and deployed to Fly.io.
-Total catalogue now at 66 views.
+Total catalogue now at 69 views.
 
 ### Novel Compound Views
 
@@ -431,9 +431,9 @@ Total catalogue now at 66 views.
 - [x] `view-3d` — Three.js scene renderer (orbit, bloom, streaming)
 - [x] `view-graph` — force-directed network graph
 - [x] `view-calendar` — date-grid with event density
-- [ ] `view-wizard` — multi-step conditional forms
-- [ ] `view-transcript` — timestamped speaker-labelled text
-- [ ] `view-shader` — GLSL playground
+- [x] `view-wizard` — multi-step conditional forms
+- [x] `view-transcript` — timestamped speaker-labelled text
+- [x] `view-shader` — GLSL playground
 - [ ] Publish all to npm + deploy to Fly.io
 
 ### Success Criteria
@@ -475,8 +475,8 @@ MCP servers (via chuk-mcp-server) get first-class MCP Apps support. The
 `chuk-view-schemas` decorators leverage chuk-mcp-server's `@view_tool` for
 permissions, CSP, visibility, and auto resource registration.
 
-**Status:** Server infrastructure complete. Views largely complete via `useView<T>`
-hook. Schema decorators need alignment with new server capabilities.
+**Status: Complete.** Server infrastructure, view protocol completeness, and
+bidirectional interactions all done. Full ext-apps SDK alignment achieved.
 
 ### Context
 
@@ -523,11 +523,11 @@ between the host (AppBridge) and the view iframe (App). It defines:
 | chuk-view-schemas uses `@view_tool` | ✅ Done | chuk-view-schemas |
 | chuk-view-schemas permissions/csp/visibility | ✅ Done | chuk-view-schemas |
 | VIEW_PATHS covers all 66 views | ✅ Done | chuk-view-schemas |
-| `ontoolinputpartial` in useView | ❌ Gap | chuk-mcp-ui |
-| `sendMessage` / `updateModelContext` in useView | ❌ Gap | chuk-mcp-ui |
-| `requestDisplayMode` (fullscreen/pip) | ❌ Gap | chuk-mcp-ui |
-| `containerDimensions` / `safeAreaInsets` | ❌ Gap | chuk-mcp-ui |
-| Server-side pagination/drill-down in views | ❌ Gap | chuk-mcp-ui |
+| `ontoolinputpartial` in useView | ✅ Done | chuk-mcp-ui (via `useViewStream`, `useViewLiveData`) |
+| `sendMessage` / `updateModelContext` in useView | ✅ Done | chuk-mcp-ui (`use-view.ts`) |
+| `requestDisplayMode` (fullscreen/pip) | ✅ Done | chuk-mcp-ui (`use-view.ts`) |
+| `containerDimensions` / `safeAreaInsets` | ✅ Done | chuk-mcp-ui (`use-view.ts`) |
+| Server-side pagination/drill-down in views | ✅ Done | chuk-mcp-ui (datatable `paginationTool`) |
 
 ### 7.5a — Server Infrastructure ✓ (chuk-mcp-server v0.24.0)
 
@@ -589,7 +589,7 @@ construct `meta={"ui": {...}}`, missing key features.
 | 66 Content schemas | ✅ Done | All 66 views have typed Pydantic v2 Content models with camelCase aliases |
 | No text fallbacks | ✅ Done | Decorators return `{"structuredContent": ...}` only — no `"content"` text fallback (clients struggle with sizing) |
 
-### 7.5c — View Protocol Completeness (Mostly Done)
+### 7.5c — View Protocol Completeness ✓
 
 The `useView<T>` hook (`packages/shared/src/use-view.ts`) already uses the
 official ext-apps SDK via `useApp`, `useHostStyles`, and `useDocumentTheme`
@@ -613,20 +613,20 @@ from `@modelcontextprotocol/ext-apps/react`.
 | URL hash data injection | `use-view.ts:37` — synchronous initial data for playground |
 | `mcp-app:view-ready` signal | `use-view.ts:141` — signal to parent that listener is ready |
 
-#### Gaps — Extend `useView` Return Value
+#### `useView` Return Value — Extend Hook ✓
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| `ontoolinputpartial` | Planned | Streaming preview — dashboard has it, general `useView` doesn't |
-| `ontoolcancelled` | Planned | Show cancelled state in view |
-| `onteardown` | Planned | Clean up timers, connections, observers |
-| `sendMessage()` | Planned | Inject messages into conversation (dashboard only currently) |
-| `updateModelContext()` | Planned | Push view state to LLM (dashboard only currently) |
-| `requestDisplayMode()` | Planned | Fullscreen/pip toggle for maps, globes, 3D, presentations |
-| `openLink()` | Planned | Open external URLs via host |
-| `sendLog()` | Planned | Debug logging to host console |
-| `containerDimensions` | Planned | Respect fixed vs flexible sizing from host |
-| `safeAreaInsets` | Planned | Apply as padding on main container |
+| `ontoolinputpartial` | **Done** | Available via `useViewStream` and `useViewLiveData` hooks (by design, not in core `useView`) |
+| `ontoolcancelled` | **Done** | `use-view.ts:132` — sets `isCancelled` state |
+| `onteardown` | **Done** | `use-view.ts` — registered via `registerTeardown()`, invoked on `ui/resource-teardown` |
+| `sendMessage()` | **Done** | `use-view.ts:243` — wraps `app.sendMessage()`. Used by form, confirm, poll, chat views |
+| `updateModelContext()` | **Done** | `use-view.ts:260` — wraps `app.updateModelContext()`. Used by map, chart, datatable, gallery views |
+| `requestDisplayMode()` | **Done** | `use-view.ts:275` — wraps `app.requestDisplayMode()`. Used by map, globe, threed, slides, geostory |
+| `openLink()` | **Done** | `use-view.ts:289` — wraps `app.openLink()`, fallback `window.open()`. Used by datatable, detail views |
+| `sendLog()` | **Done** | `use-view.ts:301` — wraps `app.sendLog()` |
+| `containerDimensions` | **Done** | `use-view.ts:97` — synced from host context via `onhostcontextchanged` |
+| `safeAreaInsets` | **Done** | `use-view.ts` — synced from host context via `onhostcontextchanged` + initial read |
 
 ### 7.5d — Bidirectional Interaction
 
@@ -641,19 +641,24 @@ Interactive views should use `callServerTool` for server-side operations.
 | poll | Vote → `callServerTool` | Working (compat test: PASS) |
 | dashboard | Patches via `ontoolresult` + `get_ui_state` via `oncalltool` | Working |
 
-#### Gaps
+#### Completed
 
 | View | Interaction | Status |
 |------|------------|--------|
-| map | Load feature details, search area | Planned |
-| chart | Drill-down, filter by segment | Planned |
-| datatable | Paginate, server-side sort, load next page | Planned |
-| gallery | Load more, filter server-side | Planned |
-| App-only tools | `visibility: ["app"]` for refresh, paginate, export, filter | Planned |
-| `updateModelContext` | Map: bounding box; Chart: current filter; Table: selected rows | Planned |
-| `sendMessage` | Form: "User submitted: {data}"; Confirm: "User confirmed deletion" | Planned |
-| `requestDisplayMode` | Maps, globes, 3D, dashboards, presentations — fullscreen/pip | Planned |
-| `openLink` | Open external URLs via host browser | Planned |
+| map | Popup actions → `callServerTool`, viewport → `updateModelContext`, fullscreen toggle | **Done** |
+| chart | `onClickTool` → `callServerTool`, click label → `updateModelContext` | **Done** |
+| datatable | Pagination → `callServerTool`, row actions, selection + filter/sort/page → `updateModelContext`, link columns → `openLink` | **Done** |
+| gallery | Item actions → `callServerTool`, selection → `updateModelContext` | **Done** |
+| `updateModelContext` | Map: viewport bounds; Chart: clicked label; DataTable: selected rows + filter/sort/page; Gallery: selected item | **Done** |
+| `sendMessage` | Form: submit summary; Confirm: confirmed/cancelled; Poll: vote; Chat: user messages → LLM conversation | **Done** |
+| `requestDisplayMode` | Map, Globe, Threed, Slides, Geostory — fullscreen toggle buttons | **Done** |
+| `openLink` | DataTable: link columns; Detail: link fields — host-controlled URL opening with `<a>` fallback | **Done** |
+
+#### Remaining
+
+| View | Interaction | Status |
+|------|------------|--------|
+| App-only tools | `visibility: ["app"]` — `refreshTool` in datatable/gallery, `exportTool` in datatable | **Done** |
 
 ### Deliverables
 
@@ -672,10 +677,16 @@ Interactive views should use `callServerTool` for server-side operations.
 - [x] chuk-view-schemas: Add permissions/CSP/visibility params to both `fastmcp.py` and `chuk_mcp.py`
 - [x] chuk-view-schemas: Complete VIEW_PATHS registry (17 → 66 views) + 66 per-view decorators
 - [x] chuk-view-schemas: All 66 Pydantic Content schemas (no text fallbacks)
-- [ ] chuk-mcp-ui: Extend `useView` with streaming, sendMessage, updateModelContext
-- [ ] chuk-mcp-ui: `callServerTool` in more views (map, chart, datatable, gallery)
-- [ ] chuk-mcp-ui: Fullscreen support in appropriate views
-- [ ] Tests: Bidirectional tool call tests, streaming preview tests
+- [x] chuk-mcp-ui: `useView` exposes sendMessage, updateModelContext, requestDisplayMode, openLink, sendLog, displayMode, containerDimensions, isCancelled
+- [x] chuk-mcp-ui: `callServerTool` in map, chart, datatable, gallery (popup actions, click tools, pagination, item actions)
+- [x] chuk-mcp-ui: Fullscreen in map, globe, threed, slides, geostory
+- [x] chuk-mcp-ui: `sendMessage` in form, confirm, poll, chat (discrete event notifications to LLM)
+- [x] chuk-mcp-ui: `openLink` in datatable (link columns), detail (link fields)
+- [x] chuk-mcp-ui: Enhanced `updateModelContext` in datatable (filter/sort/page state, debounced 500ms)
+- [x] chuk-mcp-ui: `onteardown` via `registerTeardown()` — graceful shutdown on `ui/resource-teardown`
+- [x] chuk-mcp-ui: `safeAreaInsets` synced from host context
+- [x] chuk-mcp-ui: App-only tool patterns — `refreshTool` in datatable/gallery, `exportTool` in datatable
+- [x] Tests: Bidirectional tool call tests (`bidirectional.spec.ts`) + streaming update tests (`streaming.spec.ts`)
 
 ### Success Criteria
 
@@ -1088,7 +1099,7 @@ added 15 compound views, bringing the total to **66 Views**.
 
 ## View Catalogue Summary
 
-Total Views: **66 shipped** (+ 3 planned: wizard, transcript, shader)
+Total Views: **69 shipped**
 
 | Category | Views | Phase | Status |
 |----------|-------|-------|--------|

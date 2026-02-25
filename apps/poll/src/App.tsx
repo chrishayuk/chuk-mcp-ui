@@ -28,12 +28,12 @@ import type {
 /* ------------------------------------------------------------------ */
 
 export function PollView() {
-  const { data, callTool } =
+  const { data, callTool, sendMessage } =
     useView<PollContent>("poll", "1.0");
 
   if (!data) return null;
 
-  return <PollRenderer data={data} onCallTool={callTool} />;
+  return <PollRenderer data={data} onCallTool={callTool} onSendMessage={sendMessage} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -43,9 +43,13 @@ export function PollView() {
 export interface PollRendererProps {
   data: PollContent;
   onCallTool?: (name: string, args: Record<string, unknown>) => Promise<void>;
+  onSendMessage?: (params: {
+    role: string;
+    content: Array<{ type: string; text: string }>;
+  }) => Promise<void>;
 }
 
-export function PollRenderer({ data, onCallTool }: PollRendererProps) {
+export function PollRenderer({ data, onCallTool, onSendMessage }: PollRendererProps) {
   const {
     title,
     description,
@@ -145,6 +149,17 @@ export function PollRenderer({ data, onCallTool }: PollRendererProps) {
       });
     }
 
+    if (onSendMessage) {
+      const selectedLabels = selected
+        .map((id) => currentQuestion.options.find((o) => o.id === id)?.label)
+        .filter(Boolean)
+        .join(", ");
+      await onSendMessage({
+        role: "user",
+        content: [{ type: "text", text: `User voted on "${currentQuestion.prompt}": ${selectedLabels}` }],
+      });
+    }
+
     // Simulate results when onCallTool is not available (storybook)
     const simulatedResults = simulateResults(currentQuestion, selected);
     setResults((prev) => new Map(prev).set(questionId, simulatedResults));
@@ -155,7 +170,7 @@ export function PollRenderer({ data, onCallTool }: PollRendererProps) {
     if (questions.every((q) => newVoted.has(q.id))) {
       setScreen("results");
     }
-  }, [currentQuestion, selections, onCallTool, voteTool, voted, questions]);
+  }, [currentQuestion, selections, onCallTool, onSendMessage, voteTool, voted, questions]);
 
   /* ---- Change vote handler ---- */
 

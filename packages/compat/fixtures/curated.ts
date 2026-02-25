@@ -364,4 +364,58 @@ export function CounterView() {
       { id: "p4", label: "Panel 4", viewUrl: "about:blank", structuredContent: {}, width: "50%", height: "50%" },
     ],
   },
+
+  // ── Phase 6 Advanced ────────────────────────────────────────────────
+  wizard: {
+    type: "wizard",
+    version: "1.0",
+    title: "Setup Wizard",
+    steps: [
+      {
+        id: "step1",
+        title: "Your Name",
+        fields: {
+          name: { type: "string", title: "Full Name" },
+        },
+        required: ["name"],
+      },
+      {
+        id: "step2",
+        title: "Preferences",
+        fields: {
+          color: { type: "string", title: "Favorite Color", enum: ["red", "blue", "green"], widget: "radio" },
+        },
+      },
+    ],
+    submitTool: "finish_wizard",
+    submitLabel: "Finish",
+  },
+
+  transcript: {
+    type: "transcript",
+    version: "1.0",
+    title: "Interview",
+    speakers: [
+      { id: "host", name: "Host", color: "#3b82f6" },
+      { id: "guest", name: "Guest", color: "#ef4444" },
+    ],
+    entries: [
+      { id: "1", speaker: "host", text: "Welcome to the show. Tell us about yourself.", timestamp: "0" },
+      { id: "2", speaker: "guest", text: "Thanks for having me. I work in software engineering.", timestamp: "15" },
+      { id: "3", speaker: "host", text: "What are you most excited about right now?", timestamp: "30" },
+      { id: "4", speaker: "guest", text: "The intersection of AI and developer tools. It's transforming how we build software.", timestamp: "45" },
+    ],
+    searchable: true,
+    showTimestamps: true,
+  },
+
+  shader: {
+    type: "shader",
+    version: "1.0",
+    title: "Color Gradient",
+    fragmentShader: "precision mediump float;\\nuniform vec2 iResolution;\\nvoid main() {\\n    vec2 uv = gl_FragCoord.xy / iResolution;\\n    gl_FragColor = vec4(uv.x, uv.y, 0.5, 1.0);\\n}",
+    width: 256,
+    height: 256,
+    animate: false,
+  },
 };

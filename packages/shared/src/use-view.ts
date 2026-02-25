@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   useApp,
   useHostStyles,
@@ -39,7 +39,16 @@ export interface ViewState<T> {
     maxWidth?: number;
     maxHeight?: number;
   } | null;
+  safeAreaInsets: {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  } | null;
   isCancelled: boolean;
+
+  /** Register a teardown callback invoked when the host unmounts this view. */
+  registerTeardown: (fn: () => void | Promise<void>) => void;
 }
 
 /**
@@ -100,7 +109,16 @@ export function useView<T>(
     maxWidth?: number;
     maxHeight?: number;
   } | null>(null);
+  const [safeAreaInsets, setSafeAreaInsets] = useState<{
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  } | null>(null);
   const [isCancelled, setIsCancelled] = useState(false);
+
+  // Teardown callback ref — views register via registerTeardown()
+  const teardownRef = useRef<(() => void | Promise<void>) | null>(null);
 
   const { app, isConnected: extAppsConnected, error } = useApp({
     appInfo: {
@@ -138,9 +156,16 @@ export function useView<T>(
         const mode =
           ctx?.theme === "dark" ? "dark" : "light";
         applyTheme(mode);
-        // Sync display mode and container dimensions from host context
+        // Sync display mode, container dimensions, and safe area insets from host context
         if (ctx?.displayMode) setDisplayMode(ctx.displayMode as "inline" | "fullscreen" | "pip");
         if (ctx?.containerDimensions) setContainerDimensions(ctx.containerDimensions as any);
+        if (ctx?.safeAreaInsets) setSafeAreaInsets(ctx.safeAreaInsets as any);
+      };
+
+      // Graceful teardown — host calls this before unmounting the iframe
+      (createdApp as any).onteardown = async () => {
+        if (teardownRef.current) await teardownRef.current();
+        return {};
       };
     },
   });
@@ -154,6 +179,7 @@ export function useView<T>(
     const ctx = app.getHostContext();
     if (ctx?.displayMode) setDisplayMode(ctx.displayMode as "inline" | "fullscreen" | "pip");
     if (ctx?.containerDimensions) setContainerDimensions(ctx.containerDimensions as any);
+    if (ctx?.safeAreaInsets) setSafeAreaInsets(ctx.safeAreaInsets as any);
   }, [app, extAppsConnected]);
 
   // Listen for messages from parent dashboard:
@@ -310,6 +336,13 @@ export function useView<T>(
     [app]
   );
 
+  const registerTeardown = useCallback(
+    (fn: () => void | Promise<void>) => {
+      teardownRef.current = fn;
+    },
+    []
+  );
+
   return {
     app,
     data,
@@ -325,6 +358,8 @@ export function useView<T>(
     sendLog,
     displayMode,
     containerDimensions,
+    safeAreaInsets,
     isCancelled,
+    registerTeardown,
   };
 }

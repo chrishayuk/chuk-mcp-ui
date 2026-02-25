@@ -2800,6 +2800,52 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@22.19.11)(jiti@2.6.1)(jsdom@25.0.1)(lightningcss@1.30.2)(tsx@4.21.0)
 
+  apps/shader:
+    dependencies:
+      '@chuk/view-shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      '@chuk/view-ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@modelcontextprotocol/ext-apps':
+        specifier: ^1.0.0
+        version: 1.0.1(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(zod@4.3.6)
+      framer-motion:
+        specifier: ^11.0.0
+        version: 11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: ^18.3.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.0
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.0.0
+        version: 4.1.18(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
+      '@types/react':
+        specifier: ^18.3.0
+        version: 18.3.28
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.7(@types/react@18.3.28)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.0
+        version: 4.7.0(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vite:
+        specifier: ^6.0.0
+        version: 6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)
+      vite-plugin-singlefile:
+        specifier: ^2.0.0
+        version: 2.3.0(rollup@4.57.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@22.19.11)(jiti@2.6.1)(jsdom@25.0.1)(lightningcss@1.30.2)(tsx@4.21.0)
+
   apps/slides:
     dependencies:
       '@chuk/view-shared':
@@ -3430,6 +3476,52 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@22.19.11)(jiti@2.6.1)(jsdom@25.0.1)(lightningcss@1.30.2)(tsx@4.21.0)
 
+  apps/transcript:
+    dependencies:
+      '@chuk/view-shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      '@chuk/view-ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@modelcontextprotocol/ext-apps':
+        specifier: ^1.0.0
+        version: 1.0.1(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(zod@4.3.6)
+      framer-motion:
+        specifier: ^11.0.0
+        version: 11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: ^18.3.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.0
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.0.0
+        version: 4.1.18(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
+      '@types/react':
+        specifier: ^18.3.0
+        version: 18.3.28
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.7(@types/react@18.3.28)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.0
+        version: 4.7.0(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vite:
+        specifier: ^6.0.0
+        version: 6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)
+      vite-plugin-singlefile:
+        specifier: ^2.0.0
+        version: 2.3.0(rollup@4.57.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@22.19.11)(jiti@2.6.1)(jsdom@25.0.1)(lightningcss@1.30.2)(tsx@4.21.0)
+
   apps/tree:
     dependencies:
       '@chuk/view-shared':
@@ -3573,6 +3665,52 @@ importers:
       ajv:
         specifier: ^8.17.0
         version: 8.18.0
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vite:
+        specifier: ^6.0.0
+        version: 6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)
+      vite-plugin-singlefile:
+        specifier: ^2.0.0
+        version: 2.3.0(rollup@4.57.1)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@22.19.11)(jiti@2.6.1)(jsdom@25.0.1)(lightningcss@1.30.2)(tsx@4.21.0)
+
+  apps/wizard:
+    dependencies:
+      '@chuk/view-shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      '@chuk/view-ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@modelcontextprotocol/ext-apps':
+        specifier: ^1.0.0
+        version: 1.0.1(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(zod@4.3.6)
+      framer-motion:
+        specifier: ^11.0.0
+        version: 11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: ^18.3.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.0
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@tailwindcss/vite':
+        specifier: ^4.0.0
+        version: 4.1.18(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
+      '@types/react':
+        specifier: ^18.3.0
+        version: 18.3.28
+      '@types/react-dom':
+        specifier: ^18.3.0
+        version: 18.3.7(@types/react@18.3.28)
+      '@vitejs/plugin-react':
+        specifier: ^4.3.0
+        version: 4.7.0(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0))
       typescript:
         specifier: ^5.7.0
         version: 5.9.3

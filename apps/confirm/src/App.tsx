@@ -6,17 +6,21 @@ import { slideUp } from "@chuk/view-ui/animations";
 import type { ConfirmContent } from "./schema";
 
 export function ConfirmView() {
-  const { data, callTool } =
+  const { data, callTool, sendMessage } =
     useView<ConfirmContent>("confirm", "1.0");
 
   if (!data) return null;
 
-  return <ConfirmRenderer data={data} onCallTool={callTool} />;
+  return <ConfirmRenderer data={data} onCallTool={callTool} onSendMessage={sendMessage} />;
 }
 
 export interface ConfirmRendererProps {
   data: ConfirmContent;
   onCallTool?: (name: string, args: Record<string, unknown>) => Promise<void>;
+  onSendMessage?: (params: {
+    role: string;
+    content: Array<{ type: string; text: string }>;
+  }) => Promise<void>;
 }
 
 const SEVERITY_STYLES: Record<string, { border: string; badge: string; badgeLabel: string }> = {
@@ -37,7 +41,7 @@ const SEVERITY_STYLES: Record<string, { border: string; badge: string; badgeLabe
   },
 };
 
-export function ConfirmRenderer({ data, onCallTool }: ConfirmRendererProps) {
+export function ConfirmRenderer({ data, onCallTool, onSendMessage }: ConfirmRendererProps) {
   const {
     title,
     message,
@@ -57,13 +61,25 @@ export function ConfirmRenderer({ data, onCallTool }: ConfirmRendererProps) {
     if (onCallTool && confirmTool) {
       await onCallTool(confirmTool, confirmArgs ?? {});
     }
-  }, [onCallTool, confirmTool, confirmArgs]);
+    if (onSendMessage) {
+      await onSendMessage({
+        role: "user",
+        content: [{ type: "text", text: `User confirmed: "${title}"` }],
+      });
+    }
+  }, [onCallTool, confirmTool, confirmArgs, onSendMessage, title]);
 
   const handleCancel = useCallback(async () => {
     if (onCallTool && cancelTool) {
       await onCallTool(cancelTool, cancelArgs ?? {});
     }
-  }, [onCallTool, cancelTool, cancelArgs]);
+    if (onSendMessage) {
+      await onSendMessage({
+        role: "user",
+        content: [{ type: "text", text: `User cancelled: "${title}"` }],
+      });
+    }
+  }, [onCallTool, cancelTool, cancelArgs, onSendMessage, title]);
 
   return (
     <div className="h-full flex items-center justify-center font-sans text-foreground bg-background p-4">

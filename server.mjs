@@ -21,6 +21,8 @@ const VIEWS = [
   "annotation", "calendar", "flowchart", "funnel", "gantt", "geostory",
   "globe", "graph", "investigation", "neural", "notebook", "sankey",
   "slides", "swimlane", "threed",
+  // Phase 6 Advanced (3 new)
+  "shader", "transcript", "wizard",
 ];
 
 // Pre-load all HTML into memory at startup

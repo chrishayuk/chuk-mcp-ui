@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { PdfViewer } from "./App";
+import { PdfRenderer } from "./App";
 
 // Minimal valid PDF with "Hello World" text, encoded as base64 data URL
 // to avoid CORS issues when loading from external URLs in Storybook.
@@ -8,11 +8,11 @@ const HELLO_WORLD_PDF =
 
 const meta = {
   title: "Views/PDF",
-  component: PdfViewer,
+  component: PdfRenderer,
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },
   decorators: [(Story) => <div style={{ height: "600px" }}><Story /></div>],
-} satisfies Meta<typeof PdfViewer>;
+} satisfies Meta<typeof PdfRenderer>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

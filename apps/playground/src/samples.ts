@@ -68,6 +68,9 @@ export const VIEW_TYPES = [
   "slides",
   "swimlane",
   "threed",
+  "shader",
+  "transcript",
+  "wizard",
 ] as const;
 
 export type ViewType = (typeof VIEW_TYPES)[number];
@@ -2097,5 +2100,78 @@ export const samples: Record<ViewType, object> = {
       { id: "cone", geometry: "cone", position: [-1.5, 0, 3], color: "#ef4444", label: "Cone" },
       { id: "torus", geometry: "torus", position: [2, 0, 3], color: "#8b5cf6", label: "Torus" },
     ],
+  },
+
+  wizard: {
+    type: "wizard",
+    version: "1.0",
+    title: "Account Setup",
+    steps: [
+      {
+        id: "basics",
+        title: "Basic Info",
+        fields: {
+          name: { type: "string", title: "Full Name" },
+          email: { type: "string", title: "Email" },
+        },
+        required: ["name", "email"],
+      },
+      {
+        id: "prefs",
+        title: "Preferences",
+        fields: {
+          theme: { type: "string", title: "Theme", enum: ["light", "dark", "auto"], widget: "radio" },
+          notifications: { type: "boolean", title: "Enable notifications" },
+        },
+      },
+      {
+        id: "confirm",
+        title: "Confirmation",
+        fields: {
+          notes: { type: "string", title: "Additional notes", widget: "textarea" },
+        },
+      },
+    ],
+    submitTool: "create_account",
+    submitLabel: "Create Account",
+    allowNavigation: true,
+  },
+
+  transcript: {
+    type: "transcript",
+    version: "1.0",
+    title: "Product Design Meeting",
+    speakers: [
+      { id: "alice", name: "Alice Chen", role: "Product Manager", color: "#3b82f6" },
+      { id: "bob", name: "Bob Park", role: "Engineer", color: "#ef4444" },
+      { id: "carol", name: "Carol Wu", role: "Designer", color: "#22c55e" },
+    ],
+    entries: [
+      { id: "1", speaker: "alice", text: "Let's kick off the design review. We have three items on the agenda today.", timestamp: "0" },
+      { id: "2", speaker: "bob", text: "Before we start, I wanted to flag a technical constraint with the new layout engine.", timestamp: "15" },
+      { id: "3", speaker: "carol", text: "That's a good point. I've prepared two alternative mockups that work within those constraints.", timestamp: "45" },
+      { id: "4", speaker: "alice", text: "Great, let's look at both options. Carol, can you walk us through them?", timestamp: "60" },
+      { id: "5", speaker: "carol", text: "Sure. Option A keeps the sidebar but reduces it to 240px. Option B replaces it with a collapsible drawer.", timestamp: "90" },
+      { id: "6", speaker: "bob", text: "Option B would be easier to implement and gives us better mobile support out of the box.", timestamp: "120" },
+    ],
+    searchable: true,
+    showTimestamps: true,
+  },
+
+  shader: {
+    type: "shader",
+    version: "1.0",
+    title: "UV Gradient",
+    description: "A simple fragment shader showing UV coordinate visualization",
+    fragmentShader: `precision mediump float;
+uniform vec2 iResolution;
+
+void main() {
+    vec2 uv = gl_FragCoord.xy / iResolution;
+    gl_FragColor = vec4(uv.x, uv.y, 0.5 + 0.5 * sin(uv.x * 6.28), 1.0);
+}`,
+    width: 512,
+    height: 512,
+    animate: false,
   },
 };

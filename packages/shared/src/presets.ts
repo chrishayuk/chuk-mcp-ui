@@ -75,4 +75,27 @@ export const BUILT_IN_PRESETS: Record<string, ThemePreset> = {
       [FF]: "Georgia, 'Times New Roman', serif",
     },
   },
+  discovery: {
+    base: "dark",
+    overrides: {
+      [P]: "#f5a623",
+      [BG]: "#0f1923",
+      [SF]: "#1a2a3a",
+      [TX]: "#f0f0f0",
+      [TX2]: "#a0b4c8",
+      [BD]: "#2a3a4a",
+    },
+  },
+  ibm: {
+    base: "light",
+    overrides: {
+      [P]: "#0f62fe",
+      [BG]: "#f4f4f4",
+      [SF]: "#ffffff",
+      [TX]: "#161616",
+      [TX2]: "#525252",
+      [BD]: "#e0e0e0",
+      [FF]: "'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif",
+    },
+  },
 };

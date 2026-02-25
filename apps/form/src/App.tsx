@@ -20,20 +20,24 @@ import {
 import type { FormContent, FieldSchema, FieldUI, FieldGroup } from "./schema";
 
 export function FormView() {
-  const { data, callTool } =
+  const { data, callTool, sendMessage } =
     useView<FormContent>("form", "1.0");
 
   if (!data) return null;
 
-  return <DynamicForm data={data} onCallTool={callTool} />;
+  return <DynamicForm data={data} onCallTool={callTool} onSendMessage={sendMessage} />;
 }
 
 export interface DynamicFormProps {
   data: FormContent;
-  onCallTool: (name: string, args: Record<string, unknown>) => Promise<void>;
+  onCallTool?: (name: string, args: Record<string, unknown>) => Promise<void>;
+  onSendMessage?: (params: {
+    role: string;
+    content: Array<{ type: string; text: string }>;
+  }) => Promise<void>;
 }
 
-export function DynamicForm({ data, onCallTool }: DynamicFormProps) {
+export function DynamicForm({ data, onCallTool, onSendMessage }: DynamicFormProps) {
   const { emitSubmit } = useViewEvents();
   const { schema, uiSchema, initialValues, submitTool, submitLabel, title, description } = data;
   const [values, setValues] = useState<Record<string, unknown>>(
@@ -62,12 +66,22 @@ export function DynamicForm({ data, onCallTool }: DynamicFormProps) {
       setSubmitting(true);
       try {
         emitSubmit(values, submitTool);
-        await onCallTool(submitTool, values);
+        if (onCallTool) await onCallTool(submitTool, values);
+        if (onSendMessage) {
+          const summary = Object.entries(values)
+            .filter(([, v]) => v !== "" && v !== undefined && v !== null)
+            .map(([k, v]) => `${k}: ${String(v)}`)
+            .join(", ");
+          await onSendMessage({
+            role: "user",
+            content: [{ type: "text", text: `User submitted form "${title ?? submitTool}": ${summary}` }],
+          });
+        }
       } finally {
         setSubmitting(false);
       }
     },
-    [schema, values, submitTool, onCallTool]
+    [schema, values, submitTool, onCallTool, onSendMessage, title, emitSubmit]
   );
 
   const fieldOrder = uiSchema?.order ?? Object.keys(schema.properties);

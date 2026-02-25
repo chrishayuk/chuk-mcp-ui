@@ -8,6 +8,8 @@ export interface GalleryContent {
   sortable?: boolean;
   sortFields?: string[];
   emptyMessage?: string;
+  /** App-only tool to reload gallery data (visibility: ["app"]) */
+  refreshTool?: string;
 }
 
 export interface GalleryItem {

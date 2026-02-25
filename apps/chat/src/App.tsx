@@ -10,12 +10,12 @@ import type { ChatContent, ChatMessage } from "./schema";
 /* ------------------------------------------------------------------ */
 
 export function ChatView() {
-  const { data, callTool } =
+  const { data, callTool, sendMessage } =
     useView<ChatContent>("chat", "1.0");
 
   if (!data) return null;
 
-  return <ChatRenderer data={data} onCallTool={callTool} />;
+  return <ChatRenderer data={data} onCallTool={callTool} onSendMessage={sendMessage} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -25,9 +25,13 @@ export function ChatView() {
 export interface ChatRendererProps {
   data: ChatContent;
   onCallTool?: (name: string, args: Record<string, unknown>) => Promise<void>;
+  onSendMessage?: (params: {
+    role: string;
+    content: Array<{ type: string; text: string }>;
+  }) => Promise<void>;
 }
 
-export function ChatRenderer({ data, onCallTool }: ChatRendererProps) {
+export function ChatRenderer({ data, onCallTool, onSendMessage }: ChatRendererProps) {
   const {
     title,
     messages: initialMessages,
@@ -77,6 +81,13 @@ export function ChatRenderer({ data, onCallTool }: ChatRendererProps) {
           });
         }
 
+        if (onSendMessage) {
+          await onSendMessage({
+            role: "user",
+            content: [{ type: "text", text: msg }],
+          });
+        }
+
         setMessages((prev) =>
           prev.map((m) =>
             m.id === userMessage.id ? { ...m, status: "sent" } : m
@@ -93,7 +104,7 @@ export function ChatRenderer({ data, onCallTool }: ChatRendererProps) {
         inputRef.current?.focus();
       }
     },
-    [inputText, messages, onCallTool, respondTool]
+    [inputText, messages, onCallTool, onSendMessage, respondTool]
   );
 
   const handleKeyDown = useCallback(

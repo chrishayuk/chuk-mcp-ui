@@ -1,6 +1,6 @@
 # chuk-mcp-ui
 
-A monorepo of **66 standalone MCP (Model Context Protocol) UI views**, each built as a single-file HTML app with Vite + vite-plugin-singlefile. Views communicate with LLMs through the MCP ext-apps protocol and with each other through the ViewBus cross-view message bus.
+A monorepo of **69 standalone MCP (Model Context Protocol) UI views**, each built as a single-file HTML app with Vite + vite-plugin-singlefile. Views communicate with LLMs through the MCP ext-apps protocol and with each other through the ViewBus cross-view message bus.
 
 ## Getting Started
 
@@ -33,7 +33,7 @@ chuk-mcp-ui/
 │   ├── datatable/     # Data table view
 │   ├── chart/         # Chart.js chart view
 │   ├── form/          # Dynamic form view
-│   ├── ...            # 65 more view apps
+│   ├── ...            # 68 more view apps
 │   └── playground/    # Dev playground
 ├── packages/
 │   ├── shared/        # @chuk/view-shared — hooks, ViewBus, theme

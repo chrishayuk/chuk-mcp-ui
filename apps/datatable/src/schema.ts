@@ -17,6 +17,10 @@ export interface DataTableContent {
   pageSize?: number;
   /** Current page number (1-based) */
   currentPage?: number;
+  /** App-only tool to reload data (visibility: ["app"]) */
+  refreshTool?: string;
+  /** App-only tool for server-side export (visibility: ["app"]) */
+  exportTool?: string;
 }
 
 export interface Column {
