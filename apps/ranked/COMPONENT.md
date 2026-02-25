@@ -230,10 +230,11 @@ External network access may be required if `item.image.url` points to an externa
 
 ## 10b. SSR Entry
 
-- **File:** `apps/ranked/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `RankedRenderer` via `renderToString`
-- **Config:** `apps/ranked/vite.config.ssr.ts`
-- **Output:** `apps/ranked/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

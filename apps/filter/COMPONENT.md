@@ -211,10 +211,11 @@ No external resources loaded. No iframes or scripts.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/filter/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `FilterRenderer` via `renderToString`
-- **Config:** `apps/filter/vite.config.ssr.ts`
-- **Output:** `apps/filter/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

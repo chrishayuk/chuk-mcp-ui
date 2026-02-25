@@ -171,10 +171,11 @@ None.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/confirm/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `ConfirmRenderer` via `renderToString`
-- **Config:** `apps/confirm/vite.config.ssr.ts`
-- **Output:** `apps/confirm/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

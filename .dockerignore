@@ -1,5 +1,39 @@
 node_modules
 .turbo
 .git
+.github
+.claude
+.storybook
 *.tsbuildinfo
 .DS_Store
+
+# Source files (only dist artifacts are needed)
+apps/*/src
+apps/*/node_modules
+apps/*/*.config.*
+apps/*/tsconfig.json
+apps/*/COMPONENT.md
+apps/*/schemas
+
+# Per-view SSR bundles (replaced by universal module)
+apps/*/dist-ssr
+
+# Packages source (only packages/ssr/dist is needed)
+packages/shared
+packages/ui
+packages/create-chuk-view
+packages/compat
+packages/ssr/src
+packages/ssr/node_modules
+packages/ssr/*.config.*
+packages/ssr/tsconfig.json
+
+# Dev/docs files
+examples
+docs
+chuk-view-schemas
+component-spec.md
+roadmap.md
+CLAUDE.md
+*.md
+!apps/playground/dist/**

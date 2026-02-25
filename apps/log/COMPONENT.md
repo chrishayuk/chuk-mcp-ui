@@ -203,10 +203,11 @@ No external resources loaded. All rendering is inline.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/log/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `LogRenderer` via `renderToString`
-- **Config:** `apps/log/vite.config.ssr.ts`
-- **Output:** `apps/log/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

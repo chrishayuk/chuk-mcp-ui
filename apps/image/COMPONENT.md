@@ -262,10 +262,11 @@ on the native `<img>` element and SVG for annotations.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/image/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `ImageRenderer` via `renderToString`
-- **Config:** `apps/image/vite.config.ssr.ts`
-- **Output:** `apps/image/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

@@ -202,10 +202,11 @@ None.
 
 ## 15. SSR Entry
 
-- **File:** `apps/gantt/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `GanttRenderer` via `renderToString`
-- **Config:** `apps/gantt/vite.config.ssr.ts`
-- **Output:** `apps/gantt/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

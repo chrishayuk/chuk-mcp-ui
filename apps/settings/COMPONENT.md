@@ -204,10 +204,11 @@ No external resources loaded. Native color input is used for the color picker. N
 
 ## 10b. SSR Entry
 
-- **File:** `apps/settings/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `SettingsRenderer` via `renderToString`
-- **Config:** `apps/settings/vite.config.ssr.ts`
-- **Output:** `apps/settings/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

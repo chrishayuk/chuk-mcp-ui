@@ -268,10 +268,11 @@ External network access may be required if `question.image.url` or `option.image
 
 ## 10b. SSR Entry
 
-- **File:** `apps/poll/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `PollRenderer` via `renderToString`
-- **Config:** `apps/poll/vite.config.ssr.ts`
-- **Output:** `apps/poll/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

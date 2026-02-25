@@ -189,10 +189,11 @@ None.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/gauge/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `GaugeRenderer` via `renderToString`
-- **Config:** `apps/gauge/vite.config.ssr.ts`
-- **Output:** `apps/gauge/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

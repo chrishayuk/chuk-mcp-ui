@@ -183,10 +183,11 @@ None.
 
 ## 15. SSR Entry
 
-- **File:** `apps/funnel/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `FunnelRenderer` via `renderToString`
-- **Config:** `apps/funnel/vite.config.ssr.ts`
-- **Output:** `apps/funnel/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

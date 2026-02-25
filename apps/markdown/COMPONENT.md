@@ -212,10 +212,11 @@ React.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/markdown/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `MarkdownRenderer` via `renderToString`
-- **Config:** `apps/markdown/vite.config.ssr.ts`
-- **Output:** `apps/markdown/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

@@ -180,10 +180,11 @@ No external resources loaded. All SVG is inline.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/gis-legend/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `GisLegendRenderer` via `renderToString`
-- **Config:** `apps/gis-legend/vite.config.ssr.ts`
-- **Output:** `apps/gis-legend/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

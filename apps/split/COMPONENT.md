@@ -83,10 +83,11 @@ Target: < 150KB. Actual: 691 KB / 191 KB gzip (includes Tailwind CSS + shadcn/ui
 
 ## SSR Entry
 
-- **File:** `apps/split/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `Split` via `renderToString`
-- **Config:** `apps/split/vite.config.ssr.ts`
-- **Output:** `apps/split/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ## Test Cases
 

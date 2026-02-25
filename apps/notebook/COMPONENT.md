@@ -207,10 +207,11 @@ None. Fully self-contained. (Image cells and markdown images may reference exter
 
 ## SSR Entry
 
-- **File:** `apps/notebook/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `NotebookRenderer` via `renderToString`
-- **Config:** `apps/notebook/vite.config.ssr.ts`
-- **Output:** `apps/notebook/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ## Test Cases
 

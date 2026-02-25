@@ -206,10 +206,11 @@ None.
 
 ## 15. SSR Entry
 
-- **File:** `apps/calendar/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `CalendarRenderer` via `renderToString`
-- **Config:** `apps/calendar/vite.config.ssr.ts`
-- **Output:** `apps/calendar/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

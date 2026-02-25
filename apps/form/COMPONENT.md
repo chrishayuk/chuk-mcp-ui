@@ -296,10 +296,11 @@ None. The component is built as a single-file HTML artifact (`vite-plugin-single
 
 ## SSR Entry
 
-- **File:** `apps/form/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `DynamicForm` via `renderToString`
-- **Config:** `apps/form/vite.config.ssr.ts`
-- **Output:** `apps/form/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

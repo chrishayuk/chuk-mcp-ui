@@ -215,10 +215,11 @@ None.
 
 ## 15. SSR Entry
 
-- **File:** `apps/graph/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `GraphRenderer` via `renderToString`
-- **Config:** `apps/graph/vite.config.ssr.ts`
-- **Output:** `apps/graph/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

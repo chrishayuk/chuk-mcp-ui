@@ -5,10 +5,13 @@
   "packageManager": "pnpm@9.15.4",
   "scripts": {
     "build": "turbo run build",
+    "build:ssr": "pnpm --filter @chuk/ssr build",
     "dev": "turbo run dev",
     "type-check": "turbo run type-check",
     "test": "turbo run test",
     "clean": "turbo run clean",
+    "serve": "node server.mjs",
+    "deploy": "fly deploy --app chuk-mcp-ui-views",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build -o storybook-static",
     "test-storybook": "test-storybook",

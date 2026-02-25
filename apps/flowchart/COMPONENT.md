@@ -147,10 +147,11 @@ None.
 
 ## 5f. SSR Entry
 
-- **File:** `apps/flowchart/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `FlowchartRenderer` via `renderToString`
-- **Config:** `apps/flowchart/vite.config.ssr.ts`
-- **Output:** `apps/flowchart/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

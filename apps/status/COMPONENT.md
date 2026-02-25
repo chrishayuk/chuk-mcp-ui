@@ -173,10 +173,11 @@ If `url` fields are provided, links open in new tabs. No external resources load
 
 ## 10b. SSR Entry
 
-- **File:** `apps/status/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `StatusRenderer` via `renderToString`
-- **Config:** `apps/status/vite.config.ssr.ts`
-- **Output:** `apps/status/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

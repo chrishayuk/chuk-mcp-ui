@@ -169,10 +169,11 @@ None. Fully self-contained.
 
 ## SSR Entry
 
-- **File:** `apps/sankey/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `SankeyRenderer` via `renderToString`
-- **Config:** `apps/sankey/vite.config.ssr.ts`
-- **Output:** `apps/sankey/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ## Test Cases
 

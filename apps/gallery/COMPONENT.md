@@ -256,10 +256,11 @@ External network access may be required if `image.url` points to an external ori
 
 ## 11b. SSR Entry
 
-- **File:** `apps/gallery/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `GalleryRenderer` via `renderToString`
-- **Config:** `apps/gallery/vite.config.ssr.ts`
-- **Output:** `apps/gallery/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

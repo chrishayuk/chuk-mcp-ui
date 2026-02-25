@@ -213,10 +213,11 @@ None.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/boxplot/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `BoxplotRenderer` via `renderToString`
-- **Config:** `apps/boxplot/vite.config.ssr.ts`
-- **Output:** `apps/boxplot/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

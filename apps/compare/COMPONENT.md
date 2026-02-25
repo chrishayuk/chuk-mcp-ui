@@ -199,10 +199,11 @@ External network access is required for image URLs. The host application's CSP m
 
 ## 10b. SSR Entry
 
-- **File:** `apps/compare/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `CompareRenderer` via `renderToString`
-- **Config:** `apps/compare/vite.config.ssr.ts`
-- **Output:** `apps/compare/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

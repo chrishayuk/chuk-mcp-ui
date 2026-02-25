@@ -216,10 +216,11 @@ No external resources loaded unless card `image` URLs point to external origins.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/kanban/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `KanbanRenderer` via `renderToString`
-- **Config:** `apps/kanban/vite.config.ssr.ts`
-- **Output:** `apps/kanban/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

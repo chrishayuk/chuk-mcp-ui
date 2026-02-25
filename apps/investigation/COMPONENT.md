@@ -184,10 +184,11 @@ None. Fully self-contained. (Evidence `image` fields may reference external URLs
 
 ## SSR Entry
 
-- **File:** `apps/investigation/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `InvestigationRenderer` via `renderToString`
-- **Config:** `apps/investigation/vite.config.ssr.ts`
-- **Output:** `apps/investigation/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ## Test Cases
 

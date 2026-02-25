@@ -277,10 +277,11 @@ None.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/quiz/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `QuizRenderer` via `renderToString`
-- **Config:** `apps/quiz/vite.config.ssr.ts`
-- **Output:** `apps/quiz/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

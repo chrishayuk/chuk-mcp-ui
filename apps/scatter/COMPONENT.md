@@ -211,10 +211,11 @@ The scatter view registers only the ScatterController, BubbleController, LinearS
 
 ## 9b. SSR Entry
 
-- **File:** `apps/scatter/src/ssr-entry.tsx`
-- **Renders:** `ScatterRenderer` via `renderToString`
-- **Config:** `apps/scatter/vite.config.ssr.ts`
-- **Output:** `apps/scatter/dist-ssr/ssr-entry.js`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
+- **Renders:** Placeholder ("Loading scatter plot...") — Chart.js requires canvas
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `placeholder`
 
 ---
 

@@ -232,10 +232,11 @@ None. The component is bundled as a single HTML file via `vite-plugin-singlefile
 
 ## 10b. SSR Entry
 
-- **File:** `apps/tree/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `TreeRenderer` via `renderToString`
-- **Config:** `apps/tree/vite.config.ssr.ts`
-- **Output:** `apps/tree/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

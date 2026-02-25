@@ -183,10 +183,11 @@ Note: Shiki grammar bundles significantly increase raw size.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/code/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `CodeRenderer` via `renderToString`
-- **Config:** `apps/code/vite.config.ssr.ts`
-- **Output:** `apps/code/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

@@ -198,10 +198,11 @@ None. All content is inline text.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/diff/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `DiffRenderer` via `renderToString`
-- **Config:** `apps/diff/vite.config.ssr.ts`
-- **Output:** `apps/diff/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

@@ -248,10 +248,11 @@ The overshoot is due to the full Chart.js library being bundled. Chart.js tree-s
 
 ## 9b. SSR Entry
 
-- **File:** `apps/chart/src/ssr-entry.tsx`
-- **Renders:** `ChartRendererStatic` via `renderToString`
-- **Config:** `apps/chart/vite.config.ssr.ts`
-- **Output:** `apps/chart/dist-ssr/ssr-entry.js`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
+- **Renders:** Placeholder ("Loading chart...") — Chart.js requires canvas
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `placeholder`
 
 ---
 

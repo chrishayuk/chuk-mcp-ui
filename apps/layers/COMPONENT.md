@@ -200,10 +200,11 @@ None.
 
 ## SSR Entry
 
-- **File:** `apps/layers/src/ssr-entry.tsx`
-- **Renders:** `LayersRenderer` via `renderToString`
-- **Config:** `apps/layers/vite.config.ssr.ts`
-- **Output:** `apps/layers/dist-ssr/ssr-entry.js`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
+- **Renders:** Placeholder ("Loading map layers...") -- Leaflet requires browser APIs
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `placeholder`
 
 ## Test Cases
 

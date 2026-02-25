@@ -284,10 +284,11 @@ Use `view-dashboard` to compose map with other Views.
 
 ## SSR Entry
 
-- **File:** `apps/map/src/ssr-entry.tsx`
-- **Renders:** `LeafletMap` with `app={null}`, `onCallTool={noop}`
-- **Config:** `apps/map/vite.config.ssr.ts`
-- **Output:** `apps/map/dist-ssr/ssr-entry.js`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
+- **Renders:** Placeholder ("Loading map...") — Leaflet requires browser APIs
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `placeholder`
 
 ## Test Cases
 

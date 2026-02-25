@@ -200,10 +200,11 @@ None. The component is bundled as a single HTML file via `vite-plugin-singlefile
 
 ## 10b. SSR Entry
 
-- **File:** `apps/treemap/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `TreemapRenderer` via `renderToString`
-- **Config:** `apps/treemap/vite.config.ssr.ts`
-- **Output:** `apps/treemap/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

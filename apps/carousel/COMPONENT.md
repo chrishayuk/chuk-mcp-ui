@@ -191,10 +191,11 @@ If `image.url` fields reference external images, the CSP must allow `img-src` fo
 
 ## 10b. SSR Entry
 
-- **File:** `apps/carousel/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `CarouselRenderer` via `renderToString`
-- **Config:** `apps/carousel/vite.config.ssr.ts`
-- **Output:** `apps/carousel/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

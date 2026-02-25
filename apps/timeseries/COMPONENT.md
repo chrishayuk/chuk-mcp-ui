@@ -216,10 +216,11 @@ The bundle includes Chart.js (line/bar controllers, time scale), chartjs-adapter
 
 ## 9b. SSR Entry
 
-- **File:** `apps/timeseries/src/ssr-entry.tsx`
-- **Renders:** `TimeseriesRenderer` via `renderToString`
-- **Config:** `apps/timeseries/vite.config.ssr.ts`
-- **Output:** `apps/timeseries/dist-ssr/ssr-entry.js`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
+- **Renders:** Placeholder ("Loading time series...") -- Chart.js requires canvas
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `placeholder`
 
 ---
 

@@ -198,10 +198,11 @@ No external resources loaded. Action buttons invoke MCP tools via postMessage.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/alert/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `AlertRenderer` via `renderToString`
-- **Config:** `apps/alert/vite.config.ssr.ts`
-- **Output:** `apps/alert/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

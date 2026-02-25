@@ -178,10 +178,11 @@ None.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/progress/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `ProgressRenderer` via `renderToString`
-- **Config:** `apps/progress/vite.config.ssr.ts`
-- **Output:** `apps/progress/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

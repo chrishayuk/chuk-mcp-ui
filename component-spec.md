@@ -286,12 +286,13 @@ participate in cross-view coordination.}
 
 ## SSR Entry
 
-{SSR rendering setup for this View}
+All views are rendered by the **universal SSR module** at `packages/ssr/`.
 
-- **File:** `apps/{name}/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `{RendererComponent}` via `renderToString`
-- **Config:** `apps/{name}/vite.config.ssr.ts`
-- **Output:** `apps/{name}/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr` (single bundle for all 65 views)
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** {`full` — component renders to HTML | `placeholder` — loading skeleton (browser-dependent views)}
 
 ## Test Cases
 
@@ -600,10 +601,11 @@ Use `view-dashboard` to compose map with other Views.
 
 ## SSR Entry
 
-- **File:** `apps/map/src/ssr-entry.tsx`
-- **Renders:** `LeafletMap` with `app={null}`, `onCallTool={noop}`
-- **Config:** `apps/map/vite.config.ssr.ts`
-- **Output:** `apps/map/dist-ssr/ssr-entry.js`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
+- **Renders:** Placeholder ("Loading map…") — Leaflet requires browser APIs
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `placeholder`
 
 ## Test Cases
 

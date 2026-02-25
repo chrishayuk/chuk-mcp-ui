@@ -229,10 +229,11 @@ None -- no external resources loaded. All assets are inlined by
 
 ## SSR Entry
 
-- **File:** `apps/datatable/src/ssr-entry.tsx`
-- **Renders:** `DataTable` with `onCallTool={noop}`
-- **Config:** `apps/datatable/vite.config.ssr.ts`
-- **Output:** `apps/datatable/dist-ssr/ssr-entry.js`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
+- **Renders:** `DataTable` (with onCallTool={noop}) via `renderToString`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ## Test Cases
 

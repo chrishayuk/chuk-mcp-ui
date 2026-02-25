@@ -175,10 +175,11 @@ No external resources loaded. Chart.js renders to canvas.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/profile/src/ssr-entry.tsx`
-- **Renders:** `ProfileRenderer` via `renderToString`
-- **Config:** `apps/profile/vite.config.ssr.ts`
-- **Output:** `apps/profile/dist-ssr/ssr-entry.js`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
+- **Renders:** Placeholder ("Loading profile...") — Chart.js requires canvas
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `placeholder`
 
 ---
 

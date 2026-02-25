@@ -203,10 +203,11 @@ None.
 
 ## 15. SSR Entry
 
-- **File:** `apps/neural/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `NeuralRenderer` via `renderToString`
-- **Config:** `apps/neural/vite.config.ssr.ts`
-- **Output:** `apps/neural/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

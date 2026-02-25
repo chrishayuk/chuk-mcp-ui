@@ -248,10 +248,11 @@ None.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/minimap/src/ssr-entry.tsx`
-- **Renders:** `MinimapRenderer` via `renderToString`
-- **Config:** `apps/minimap/vite.config.ssr.ts`
-- **Output:** `apps/minimap/dist-ssr/ssr-entry.js`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
+- **Renders:** Placeholder ("Loading map...") — Leaflet requires browser APIs
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `placeholder`
 
 ---
 

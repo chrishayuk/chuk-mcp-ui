@@ -139,10 +139,11 @@ from sibling Views.
 
 ## 5f. SSR Entry
 
-- **File:** `apps/globe/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `GlobeRenderer` via `renderToString`
-- **Config:** `apps/globe/vite.config.ssr.ts`
-- **Output:** `apps/globe/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

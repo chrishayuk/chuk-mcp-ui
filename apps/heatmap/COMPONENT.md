@@ -197,10 +197,11 @@ None.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/heatmap/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `HeatmapRenderer` via `renderToString`
-- **Config:** `apps/heatmap/vite.config.ssr.ts`
-- **Output:** `apps/heatmap/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

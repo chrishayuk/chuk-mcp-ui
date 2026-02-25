@@ -210,10 +210,11 @@ No external resources loaded. All values are computed inline.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/pivot/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `PivotRenderer` via `renderToString`
-- **Config:** `apps/pivot/vite.config.ssr.ts`
-- **Output:** `apps/pivot/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

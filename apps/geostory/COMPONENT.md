@@ -173,10 +173,11 @@ Note: The current implementation does not render actual map tiles (it uses gradi
 
 ## SSR Entry
 
-- **File:** `apps/geostory/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `GeostoryRenderer` via `renderToString`
-- **Config:** `apps/geostory/vite.config.ssr.ts`
-- **Output:** `apps/geostory/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ## Test Cases
 

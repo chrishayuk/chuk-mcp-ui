@@ -217,10 +217,11 @@ primarily React and the shared UI component library.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/pdf/src/ssr-entry.tsx`
-- **Renders:** `PdfRenderer` (static placeholder) via `renderToString`
-- **Config:** `apps/pdf/vite.config.ssr.ts`
-- **Output:** `apps/pdf/dist-ssr/ssr-entry.js`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
+- **Renders:** Placeholder ("Loading PDF...") — pdf.js requires browser APIs
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `placeholder`
 
 ---
 

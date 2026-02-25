@@ -179,10 +179,11 @@ None. Fully self-contained.
 
 ## SSR Entry
 
-- **File:** `apps/swimlane/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `SwimlaneRenderer` via `renderToString`
-- **Config:** `apps/swimlane/vite.config.ssr.ts`
-- **Output:** `apps/swimlane/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ## Test Cases
 

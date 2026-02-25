@@ -184,10 +184,11 @@ image origins.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/slides/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `SlidesRenderer` via `renderToString`
-- **Config:** `apps/slides/vite.config.ssr.ts`
-- **Output:** `apps/slides/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

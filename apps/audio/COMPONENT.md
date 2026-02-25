@@ -229,10 +229,11 @@ View relies on the native `HTMLAudioElement`.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/audio/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `AudioRenderer` via `renderToString`
-- **Config:** `apps/audio/vite.config.ssr.ts`
-- **Output:** `apps/audio/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

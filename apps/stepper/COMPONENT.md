@@ -186,10 +186,11 @@ No external resources loaded. All rendering is self-contained with inline SVGs.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/stepper/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `StepperRenderer` via `renderToString`
-- **Config:** `apps/stepper/vite.config.ssr.ts`
-- **Output:** `apps/stepper/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

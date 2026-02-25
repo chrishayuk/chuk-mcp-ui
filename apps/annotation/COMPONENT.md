@@ -232,10 +232,11 @@ Requires `img-src` allowance for the domain hosting the source image specified i
 
 ## 15. SSR Entry
 
-- **File:** `apps/annotation/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `AnnotationRenderer` via `renderToString`
-- **Config:** `apps/annotation/vite.config.ssr.ts`
-- **Output:** `apps/annotation/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

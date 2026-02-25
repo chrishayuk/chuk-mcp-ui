@@ -144,10 +144,11 @@ from sibling Views.
 
 ## 5f. SSR Entry
 
-- **File:** `apps/threed/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `ThreedRenderer` via `renderToString`
-- **Config:** `apps/threed/vite.config.ssr.ts`
-- **Output:** `apps/threed/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 

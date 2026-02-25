@@ -210,10 +210,11 @@ None.
 
 ## 10b. SSR Entry
 
-- **File:** `apps/spectrogram/src/ssr-entry.tsx`
+- **Module:** `packages/ssr/src/ssr-entry.tsx`
 - **Renders:** `SpectrogramRenderer` via `renderToString`
-- **Config:** `apps/spectrogram/vite.config.ssr.ts`
-- **Output:** `apps/spectrogram/dist-ssr/ssr-entry.js`
+- **Build:** `pnpm run build:ssr`
+- **Output:** `packages/ssr/dist/ssr-entry.js`
+- **Mode:** `full`
 
 ---
 
