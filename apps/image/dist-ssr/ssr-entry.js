@@ -27091,6 +27091,7 @@ function ImageRenderer({ data }) {
                 size: "sm",
                 onClick: handleZoomOut,
                 disabled: zoom <= 0.5,
+                "aria-label": "Zoom out",
                 children: "-"
               }
             ),
@@ -27105,10 +27106,11 @@ function ImageRenderer({ data }) {
                 size: "sm",
                 onClick: handleZoomIn,
                 disabled: zoom >= 5,
+                "aria-label": "Zoom in",
                 children: "+"
               }
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "outline", size: "sm", onClick: handleFit, children: "Fit" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "outline", size: "sm", onClick: handleFit, "aria-label": "Fit to view", children: "Fit" })
           ] }),
           showFullscreen && /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "outline", size: "sm", onClick: toggleFullscreen, children: isFullscreen ? "Exit Fullscreen" : "Fullscreen" })
         ] }),
@@ -27161,6 +27163,7 @@ function ImageRenderer({ data }) {
           "button",
           {
             onClick: () => setActiveIndex(i),
+            "aria-label": `View image ${i + 1}`,
             className: `flex-shrink-0 rounded overflow-hidden ${i === activeIndex ? "ring-2 ring-primary" : "opacity-60 hover:opacity-100"}`,
             children: /* @__PURE__ */ jsxRuntimeExports.jsx(
               "img",

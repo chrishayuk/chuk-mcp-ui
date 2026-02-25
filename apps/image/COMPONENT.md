@@ -240,8 +240,9 @@ point to external image files. The host application's CSP must allow `img-src`
 - Images include `alt` attributes when provided in the schema.
 - Thumbnail buttons are focusable and clickable via keyboard.
 - Annotation labels are exposed via SVG `<title>` elements for screen readers and browser tooltips.
-- Zoom controls use semantic `<button>` elements with visible labels.
+- Zoom controls use semantic `<button>` elements with visible labels and `aria-label` attributes.
 - Active thumbnail is visually indicated with a ring highlight.
+- Thumbnail buttons have `aria-label` attributes identifying each image.
 - The fullscreen toggle provides clear text labels for both states.
 
 ---

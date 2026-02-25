@@ -59277,13 +59277,23 @@ function shouldUseWhiteText(rOrHex, g, b) {
   const brightness = (r2 * 299 + gVal * 587 + bVal * 114) / 1e3;
   return brightness < 128;
 }
+function getThemeTextColors() {
+  const root = document.documentElement;
+  const style = getComputedStyle(root);
+  const raw = style.getPropertyValue("--chuk-color-text").trim();
+  return {
+    light: raw || "#1e293b",
+    dark: "#ffffff"
+  };
+}
 function getTextColorForBg(bgRgbString) {
   const match = bgRgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-  if (!match) return "#1e293b";
+  const { light, dark } = getThemeTextColors();
+  if (!match) return light;
   const r2 = parseInt(match[1], 10);
   const g = parseInt(match[2], 10);
   const b = parseInt(match[3], 10);
-  return shouldUseWhiteText(r2, g, b) ? "#ffffff" : "#1e293b";
+  return shouldUseWhiteText(r2, g, b) ? dark : light;
 }
 function findAnnotation(annotations, row, col) {
   return annotations == null ? void 0 : annotations.find((a) => a.row === row && a.col === col);

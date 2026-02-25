@@ -34,7 +34,7 @@
 | Hook | Purpose |
 |------|---------|
 | `useView` | MCP protocol connection, data, theme, callTool, updateModelContext |
-| `useViewEvents` | Cross-view event emission (`emitSelect` on data point click) |
+| `useViewEvents` | Cross-view event emission (`emitSelect` on data point click) -- used in `ChartView` only; `ChartRenderer` receives `onEmitSelect` as an optional callback prop |
 
 ---
 

@@ -56517,8 +56517,7 @@ function GanttRenderer({ data }) {
                             x: x + 6,
                             y: barY + BAR_HEIGHT / 2,
                             dominantBaseline: "central",
-                            className: "pointer-events-none",
-                            fill: "#fff",
+                            className: "pointer-events-none fill-primary-foreground",
                             fontSize: "10",
                             fontWeight: "600",
                             children: task.label.length > Math.floor(barWidth / 7) ? task.label.slice(

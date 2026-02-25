@@ -24235,7 +24235,7 @@ const fadeIn = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 }
 };
-function VideoPlayer({ data }) {
+function VideoRenderer({ data }) {
   const videoRef = reactExports.useRef(null);
   reactExports.useEffect(() => {
     const video = videoRef.current;
@@ -24298,7 +24298,7 @@ function VideoPlayer({ data }) {
   );
 }
 function render(data) {
-  return server_nodeExports.renderToString(/* @__PURE__ */ jsxRuntimeExports.jsx(VideoPlayer, { data }));
+  return server_nodeExports.renderToString(/* @__PURE__ */ jsxRuntimeExports.jsx(VideoRenderer, { data }));
 }
 export {
   render

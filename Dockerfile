@@ -87,6 +87,7 @@ COPY apps/json/dist/mcp-app.html       apps/json/dist/mcp-app.html
 COPY apps/log/dist/mcp-app.html        apps/log/dist/mcp-app.html
 COPY apps/map/dist/mcp-app.html        apps/map/dist/mcp-app.html
 COPY apps/markdown/dist/mcp-app.html   apps/markdown/dist/mcp-app.html
+COPY apps/pdf/dist-ssr                 apps/pdf/dist-ssr
 COPY apps/pdf/dist/mcp-app.html        apps/pdf/dist/mcp-app.html
 COPY apps/poll/dist/mcp-app.html       apps/poll/dist/mcp-app.html
 COPY apps/progress/dist/mcp-app.html   apps/progress/dist/mcp-app.html

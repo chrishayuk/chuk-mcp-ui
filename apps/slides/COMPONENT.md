@@ -87,7 +87,7 @@ Full-height flex column:
 | `default` | Title top-left, content below. Full padding. |
 | `center`  | Title and content centered vertically and horizontally. |
 | `split`   | Two-column grid: text on left, image on right. |
-| `image`   | Full-bleed background image with dark overlay, white text centered. |
+| `image`   | Full-bleed background image with dark overlay, `text-foreground` text centered. |
 
 ### 4.3 States
 

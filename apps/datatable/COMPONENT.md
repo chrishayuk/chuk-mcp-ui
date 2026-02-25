@@ -206,7 +206,7 @@ Not applicable. `view-datatable` does not embed other Views.
 | Direction | Event | Payload | When |
 |-----------|-------|---------|------|
 | **Emit** | `select` | `[rowId]` (field: `"id"`) | Row clicked |
-| **Listen** | `feature-click` (postMessage) | `{ nhle_id, properties }` | Sibling map feature clicked -- highlights matching row |
+| **Listen** | `feature-click` (postMessage, origin-restricted to `window.location.origin`) | `{ nhle_id, properties }` | Sibling map feature clicked -- highlights matching row |
 
 ## CSP Requirements
 

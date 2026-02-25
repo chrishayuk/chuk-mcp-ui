@@ -10292,7 +10292,7 @@ function requireReactDomServerLegacy_node_development() {
         var localId = localIdCounter++;
         return makeId(responseState, treeId, localId);
       }
-      function noop() {
+      function noop2() {
       }
       var Dispatcher = {
         readContext: readContext$1,
@@ -10301,15 +10301,15 @@ function requireReactDomServerLegacy_node_development() {
         useReducer,
         useRef,
         useState,
-        useInsertionEffect: noop,
+        useInsertionEffect: noop2,
         useLayoutEffect,
         useCallback,
         // useImperativeHandle is not run in the server environment
-        useImperativeHandle: noop,
+        useImperativeHandle: noop2,
         // Effects are not run in the server environment.
-        useEffect: noop,
+        useEffect: noop2,
         // Debugging effect
-        useDebugValue: noop,
+        useDebugValue: noop2,
         useDeferredValue,
         useTransition,
         useId,
@@ -15776,7 +15776,7 @@ function requireReactDomServer_node_development() {
         var localId = localIdCounter++;
         return makeId(responseState, treeId, localId);
       }
-      function noop() {
+      function noop2() {
       }
       var Dispatcher = {
         readContext: readContext$1,
@@ -15785,15 +15785,15 @@ function requireReactDomServer_node_development() {
         useReducer,
         useRef,
         useState,
-        useInsertionEffect: noop,
+        useInsertionEffect: noop2,
         useLayoutEffect,
         useCallback,
         // useImperativeHandle is not run in the server environment
-        useImperativeHandle: noop,
+        useImperativeHandle: noop2,
         // Effects are not run in the server environment.
-        useEffect: noop,
+        useEffect: noop2,
         // Debugging effect
-        useDebugValue: noop,
+        useDebugValue: noop2,
         useDeferredValue,
         useTransition,
         useId,
@@ -28741,7 +28741,7 @@ const BASEMAPS = {
   terrain: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
   dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
 };
-function LeafletMap({ data, onCallTool }) {
+function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDisplayMode, displayMode }) {
   const containerRef = reactExports.useRef(null);
   const mapRef = reactExports.useRef(null);
   const layerGroupsRef = reactExports.useRef(/* @__PURE__ */ new Map());
@@ -28846,13 +28846,44 @@ function LeafletMap({ data, onCallTool }) {
       map.setView([data.center.lat, data.center.lon], data.zoom ?? 10);
     }
   }, [data, handleAction, panelId, emitSelect]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    "div",
-    {
-      ref: containerRef,
-      className: "w-full h-full font-sans"
-    }
-  );
+  reactExports.useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !onUpdateModelContext) return;
+    let timer;
+    const handleMoveEnd = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const bounds = map.getBounds();
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+        onUpdateModelContext({
+          content: [{
+            type: "text",
+            text: `Map view: center ${center.lat.toFixed(4)},${center.lng.toFixed(4)} zoom ${zoom} bounds ${bounds.getSouth().toFixed(4)},${bounds.getWest().toFixed(4)} to ${bounds.getNorth().toFixed(4)},${bounds.getEast().toFixed(4)}`
+          }]
+        });
+      }, 500);
+    };
+    map.on("moveend", handleMoveEnd);
+    handleMoveEnd();
+    return () => {
+      clearTimeout(timer);
+      map.off("moveend", handleMoveEnd);
+    };
+  }, [onUpdateModelContext]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full h-full font-sans", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: containerRef, className: "w-full h-full" }),
+    onRequestDisplayMode && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "button",
+      {
+        onClick: () => onRequestDisplayMode(displayMode === "fullscreen" ? "inline" : "fullscreen"),
+        className: "absolute top-2 right-2 z-[1000] px-2 py-1 text-xs rounded bg-background/80 border border-border hover:bg-muted backdrop-blur-sm",
+        title: displayMode === "fullscreen" ? "Exit fullscreen" : "Fullscreen",
+        "aria-label": displayMode === "fullscreen" ? "Exit fullscreen" : "Enter fullscreen",
+        children: displayMode === "fullscreen" ? "↙ Exit" : "⛶ Fullscreen"
+      }
+    )
+  ] });
 }
 function createLayerGroup(layer, onAction, featureLayers, panelId, emitSelect) {
   var _a;
@@ -28873,7 +28904,7 @@ function createLayerGroup(layer, onAction, featureLayers, panelId, emitSelect) {
               nhle_id: featureId,
               properties: props
             },
-            "*"
+            window.location.origin
           );
         }
       });
@@ -28965,7 +28996,7 @@ function injectLeafletThemeStyles(container) {
       background: var(--chuk-color-background, #fff);
       color: var(--chuk-color-text, #1a1a1a);
       border: 1px solid var(--chuk-color-border, #e0e0e0);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 8px var(--chuk-color-shadow, rgba(0,0,0,0.15));
     }
     .leaflet-popup-tip {
       background: var(--chuk-color-background, #fff);
@@ -28984,7 +29015,7 @@ function injectLeafletThemeStyles(container) {
     }
     .popup-action:hover {
       background: var(--chuk-color-primary, #3388ff);
-      color: #fff;
+      color: var(--chuk-color-primary-foreground, #fff);
     }
   `;
   container.appendChild(style);
@@ -28992,8 +29023,10 @@ function injectLeafletThemeStyles(container) {
 function escapeHtml(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
+const noop = async () => {
+};
 function render(data) {
-  return server_nodeExports.renderToString(/* @__PURE__ */ jsxRuntimeExports.jsx(LeafletMap, { data }));
+  return server_nodeExports.renderToString(/* @__PURE__ */ jsxRuntimeExports.jsx(LeafletMap, { data, app: null, onCallTool: noop }));
 }
 export {
   render

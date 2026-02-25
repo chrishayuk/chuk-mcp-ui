@@ -217,7 +217,10 @@ primarily React and the shared UI component library.
 
 ## 10b. SSR Entry
 
-Not yet implemented. No `ssr-entry.tsx` exists for this view.
+- **File:** `apps/pdf/src/ssr-entry.tsx`
+- **Renders:** `PdfRenderer` (static placeholder) via `renderToString`
+- **Config:** `apps/pdf/vite.config.ssr.ts`
+- **Output:** `apps/pdf/dist-ssr/ssr-entry.js`
 
 ---
 

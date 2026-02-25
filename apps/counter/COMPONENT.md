@@ -169,6 +169,7 @@ None.
 
 - Value formatted with `toLocaleString()` for number grouping.
 - Delta direction indicated by visual triangle plus colour.
+- Sparkline SVG has `role="img"` and `aria-label` for screen reader accessibility.
 
 ---
 

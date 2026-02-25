@@ -187,7 +187,7 @@ None.
 - Task bars have cursor pointer indicating interactivity.
 - Group headers use uppercase tracking for visual hierarchy.
 - Date format uses abbreviated month names (e.g., "Mar 15").
-- Colour is supplemented by text labels on bars (when bar width > 40px).
+- Colour is supplemented by text labels on bars (when bar width > 40px). Task bar label text uses the `fill-primary-foreground` class instead of a hardcoded `fill="#fff"`.
 
 ---
 

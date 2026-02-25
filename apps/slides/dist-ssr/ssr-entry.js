@@ -26921,7 +26921,7 @@ function getVariants(transition) {
       return fadeVariants;
   }
 }
-function SlidesRenderer({ data }) {
+function SlidesRenderer({ data, onRequestDisplayMode, displayMode }) {
   const { title, slides, transition } = data;
   const [currentIndex, setCurrentIndex] = reactExports.useState(0);
   const [direction, setDirection] = reactExports.useState(0);
@@ -26954,77 +26954,87 @@ function SlidesRenderer({ data }) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-full flex items-center justify-center font-sans text-muted-foreground", children: "No slides to display" });
   }
   const slide = slides[currentIndex];
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-full flex flex-col font-sans text-foreground bg-background select-none", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-    motion.div,
-    {
-      variants: fadeIn,
-      initial: "hidden",
-      animate: "visible",
-      className: "flex flex-col h-full",
-      children: [
-        title && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-6 pt-4 pb-2 flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-sm font-semibold text-muted-foreground", children: title }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 relative overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AnimatePresence, { mode: "wait", custom: direction, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          motion.div,
-          {
-            custom: direction,
-            variants,
-            initial: "enter",
-            animate: "center",
-            exit: "exit",
-            transition: { duration: transition === "none" ? 0 : 0.35, ease: "easeInOut" },
-            className: "absolute inset-0",
-            children: /* @__PURE__ */ jsxRuntimeExports.jsx(SlideContent, { slide })
-          },
-          currentIndex
-        ) }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-shrink-0 px-6 py-3 flex items-center justify-between border-t border-border", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "button",
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "h-full flex flex-col font-sans text-foreground bg-background select-none relative", children: [
+    onRequestDisplayMode && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "button",
+      {
+        onClick: () => onRequestDisplayMode(displayMode === "fullscreen" ? "inline" : "fullscreen"),
+        className: "absolute top-2 right-2 z-[1000] bg-background/80 backdrop-blur-sm border rounded-md px-2 py-1 text-xs hover:bg-muted transition-colors",
+        children: displayMode === "fullscreen" ? "Exit Fullscreen" : "Fullscreen"
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      motion.div,
+      {
+        variants: fadeIn,
+        initial: "hidden",
+        animate: "visible",
+        className: "flex flex-col h-full",
+        children: [
+          title && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-6 pt-4 pb-2 flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-sm font-semibold text-muted-foreground", children: title }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 relative overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AnimatePresence, { mode: "wait", custom: direction, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            motion.div,
             {
-              onClick: goPrev,
-              disabled: currentIndex === 0,
-              className: cn(
-                "px-3 py-1.5 text-sm rounded-md transition-colors",
-                currentIndex === 0 ? "text-muted-foreground/40 cursor-not-allowed" : "text-foreground hover:bg-muted"
-              ),
-              children: "Previous"
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-1.5", children: slides.map((_, idx) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "button",
-            {
-              onClick: () => goTo(idx),
-              className: cn(
-                "w-2 h-2 rounded-full transition-all",
-                idx === currentIndex ? "bg-primary w-4" : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
-              ),
-              "aria-label": `Go to slide ${idx + 1}`
+              custom: direction,
+              variants,
+              initial: "enter",
+              animate: "center",
+              exit: "exit",
+              transition: { duration: transition === "none" ? 0 : 0.35, ease: "easeInOut" },
+              className: "absolute inset-0",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(SlideContent, { slide })
             },
-            idx
-          )) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-muted-foreground tabular-nums", children: [
-              currentIndex + 1,
-              " / ",
-              total
-            ] }),
+            currentIndex
+          ) }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-shrink-0 px-6 py-3 flex items-center justify-between border-t border-border", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "button",
               {
-                onClick: goNext,
-                disabled: currentIndex === total - 1,
+                onClick: goPrev,
+                disabled: currentIndex === 0,
                 className: cn(
                   "px-3 py-1.5 text-sm rounded-md transition-colors",
-                  currentIndex === total - 1 ? "text-muted-foreground/40 cursor-not-allowed" : "text-foreground hover:bg-muted"
+                  currentIndex === 0 ? "text-muted-foreground/40 cursor-not-allowed" : "text-foreground hover:bg-muted"
                 ),
-                children: "Next"
+                children: "Previous"
               }
-            )
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-1.5", children: slides.map((_, idx) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => goTo(idx),
+                className: cn(
+                  "w-2 h-2 rounded-full transition-all",
+                  idx === currentIndex ? "bg-primary w-4" : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                ),
+                "aria-label": `Go to slide ${idx + 1}`
+              },
+              idx
+            )) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-muted-foreground tabular-nums", children: [
+                currentIndex + 1,
+                " / ",
+                total
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: goNext,
+                  disabled: currentIndex === total - 1,
+                  className: cn(
+                    "px-3 py-1.5 text-sm rounded-md transition-colors",
+                    currentIndex === total - 1 ? "text-muted-foreground/40 cursor-not-allowed" : "text-foreground hover:bg-muted"
+                  ),
+                  children: "Next"
+                }
+              )
+            ] })
           ] })
-        ] })
-      ]
-    }
-  ) });
+        ]
+      }
+    )
+  ] });
 }
 function SlideContent({ slide }) {
   const { title, content, layout: layout2 = "default", image, background } = slide;
@@ -27080,7 +27090,7 @@ function SlideContent({ slide }) {
           }
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-black/50" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative h-full flex flex-col items-center justify-center px-12 text-center text-white", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative h-full flex flex-col items-center justify-center px-12 text-center text-foreground", children: [
           title && /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-3xl font-bold mb-6 drop-shadow-lg", children: title }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "div",

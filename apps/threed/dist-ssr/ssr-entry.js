@@ -26988,7 +26988,7 @@ function TorusShape({ obj, offset }) {
         cy,
         rx: innerR,
         ry: innerR * ellipseRy,
-        fill: wireframe ? "none" : "var(--color-background, #fff)",
+        fill: wireframe ? "none" : "var(--chuk-color-background, #fff)",
         stroke: color2,
         strokeWidth: wireframe ? 1 : 1.5
       }
@@ -27032,7 +27032,7 @@ function ObjectShape({ obj, offset }) {
     )
   ] });
 }
-function ThreedRenderer({ data }) {
+function ThreedRenderer({ data, onRequestDisplayMode, displayMode }) {
   const sortedObjects = reactExports.useMemo(() => {
     return [...data.objects].sort((a, b) => {
       const [ax, ay, az] = a.position;
@@ -27062,27 +27062,37 @@ function ThreedRenderer({ data }) {
     };
   }, [data.objects]);
   const bgColor = data.background ?? void 0;
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-full flex flex-col font-sans text-foreground bg-background", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-    motion.div,
-    {
-      variants: fadeIn,
-      initial: "hidden",
-      animate: "visible",
-      className: "h-full flex flex-col",
-      children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "m-4 flex-1 flex flex-col overflow-hidden", children: [
-        data.title && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-4 py-3 border-b", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-base font-semibold m-0", children: data.title }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "flex-1 p-4 flex items-center justify-center overflow-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "svg",
-          {
-            viewBox,
-            className: "w-full h-full",
-            style: { maxHeight: "100%", background: bgColor },
-            children: sortedObjects.map((obj) => /* @__PURE__ */ jsxRuntimeExports.jsx(ObjectShape, { obj, offset }, obj.id))
-          }
-        ) })
-      ] })
-    }
-  ) });
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "h-full flex flex-col font-sans text-foreground bg-background relative", children: [
+    onRequestDisplayMode && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "button",
+      {
+        onClick: () => onRequestDisplayMode(displayMode === "fullscreen" ? "inline" : "fullscreen"),
+        className: "absolute top-2 right-2 z-[1000] bg-background/80 backdrop-blur-sm border rounded-md px-2 py-1 text-xs hover:bg-muted transition-colors",
+        children: displayMode === "fullscreen" ? "Exit Fullscreen" : "Fullscreen"
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      motion.div,
+      {
+        variants: fadeIn,
+        initial: "hidden",
+        animate: "visible",
+        className: "h-full flex flex-col",
+        children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "m-4 flex-1 flex flex-col overflow-hidden", children: [
+          data.title && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-4 py-3 border-b", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-base font-semibold m-0", children: data.title }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "flex-1 p-4 flex items-center justify-center overflow-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "svg",
+            {
+              viewBox,
+              className: "w-full h-full",
+              style: { maxHeight: "100%", background: bgColor },
+              children: sortedObjects.map((obj) => /* @__PURE__ */ jsxRuntimeExports.jsx(ObjectShape, { obj, offset }, obj.id))
+            }
+          ) })
+        ] })
+      }
+    )
+  ] });
 }
 function render(data) {
   return server_nodeExports.renderToString(/* @__PURE__ */ jsxRuntimeExports.jsx(ThreedRenderer, { data }));

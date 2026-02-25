@@ -15,6 +15,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:ssr": "vite build --config vite.config.ssr.ts",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist"

@@ -215,7 +215,7 @@ Requires `img-src` allowance for the domain hosting the source image specified i
 ## 13. Accessibility
 
 - Image has `alt` attribute set to `title` or fallback "Annotated image".
-- SVG overlay is `pointer-events-none` and decorative.
+- SVG overlay has `role="img"` and `aria-label` describing the annotation layer. It is `pointer-events-none` and decorative.
 - Labels on annotations provide textual context for visual shapes.
 - Colour is supplemented by labels and shape types, not used as sole indicator.
 

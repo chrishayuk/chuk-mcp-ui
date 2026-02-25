@@ -92,7 +92,7 @@ CSS Grid layout inside a Card wrapper with max-width 900px. The grid template ha
 
 ### 4.3 Auto-Contrast Text
 
-Text colour is automatically computed based on perceived brightness of the cell background using the formula `(R*299 + G*587 + B*114) / 1000`. White text is used on dark backgrounds (brightness < 128), dark text on light backgrounds.
+Text colour is automatically computed based on perceived brightness of the cell background using the formula `(R*299 + G*587 + B*114) / 1000`. White text is used on dark backgrounds (brightness < 128); on light backgrounds, the text colour reads from `--chuk-color-text` via `getComputedStyle` instead of using a hardcoded value.
 
 ### 4.4 States
 

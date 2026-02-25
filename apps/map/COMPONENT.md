@@ -121,7 +121,7 @@ to the bounding box of all features across all layers.
 
 | CSS Variable | Usage |
 |-------------|-------|
-| `--chuk-font-family` | All text in popups and map container |
+| `--chuk-font-family` | All text in popups and map container. Injected styles use CSS variable wrappers rather than hardcoded values. |
 
 ## Interactions
 
@@ -241,7 +241,7 @@ Use `view-dashboard` to compose map with other Views.
 | Direction | Event | Payload | When |
 |-----------|-------|---------|------|
 | **Emit** | `select` | `[featureId]` (field: `"feature_id"`) | Feature clicked |
-| **Listen** | `row-click` (postMessage) | `{ nhle_id, properties }` | Sibling datatable row clicked -- pans to matching feature |
+| **Listen** | `row-click` (postMessage, origin-restricted to `window.location.origin`) | `{ nhle_id, properties }` | Sibling datatable row clicked -- pans to matching feature |
 
 ## Basemaps
 
@@ -272,6 +272,7 @@ Use `view-dashboard` to compose map with other Views.
 - Layer toggles are labelled checkboxes.
 - Popup close button has `aria-label="Close"`.
 - Zoom controls have `aria-label="Zoom in"` / `"Zoom out"`.
+- Fullscreen button has `aria-label`.
 - Colour is never the sole indicator -- icons/shapes differentiate features.
 - Focus trapped inside popup when open.
 

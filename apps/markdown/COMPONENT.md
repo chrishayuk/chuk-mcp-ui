@@ -17,6 +17,7 @@
 | Kind     | Dependency                              | Version       |
 |----------|-----------------------------------------|---------------|
 | Runtime  | marked                                  | `^15.0.0`     |
+| Runtime  | dompurify                               | `^3.2.0`      |
 | Runtime  | React                                   | `^18.3.0`     |
 | Runtime  | react-dom                               | `^18.3.0`     |
 | Runtime  | `@chuk/view-shared`                     | `workspace:*` |
@@ -181,8 +182,9 @@ and requires no external network requests at runtime. All `marked` library code
 and assets are inlined.
 
 **Note:** The use of `dangerouslySetInnerHTML` means the rendered HTML output
-from `marked` is injected directly into the DOM. The `marked` library handles
-sanitisation; no additional DOMPurify step is applied.
+from `marked` is injected directly into the DOM. The output of `marked.parse()`
+is sanitized with `DOMPurify.sanitize()` before rendering via
+`dangerouslySetInnerHTML` to prevent XSS attacks.
 
 ---
 

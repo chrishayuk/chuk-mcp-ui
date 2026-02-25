@@ -26805,6 +26805,8 @@ function AnnotationRenderer({ data }) {
               className: "absolute inset-0 w-full h-full pointer-events-none",
               viewBox,
               preserveAspectRatio: "xMidYMid meet",
+              role: "img",
+              "aria-label": data.title ?? "Image annotations",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("defs", { children: data.annotations.filter((a) => a.kind === "arrow").map((a) => {
                   const color2 = a.color ?? "var(--chuk-color-primary, #3b82f6)";

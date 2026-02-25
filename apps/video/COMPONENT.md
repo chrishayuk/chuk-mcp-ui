@@ -214,7 +214,7 @@ entirely on the native HTML5 `<video>` element.
 ## 10b. SSR Entry
 
 - **File:** `apps/video/src/ssr-entry.tsx`
-- **Renders:** `VideoPlayer` via `renderToString`
+- **Renders:** `VideoRenderer` via `renderToString`
 - **Config:** `apps/video/vite.config.ssr.ts`
 - **Output:** `apps/video/dist-ssr/ssr-entry.js`
 

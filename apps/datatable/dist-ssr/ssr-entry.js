@@ -1375,7 +1375,7 @@ function requireReact_development() {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
-        function useInsertionEffect(create, deps) {
+        function useInsertionEffect2(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useInsertionEffect(create, deps);
         }
@@ -2157,7 +2157,7 @@ function requireReact_development() {
         exports$1.useEffect = useEffect;
         exports$1.useId = useId;
         exports$1.useImperativeHandle = useImperativeHandle;
-        exports$1.useInsertionEffect = useInsertionEffect;
+        exports$1.useInsertionEffect = useInsertionEffect2;
         exports$1.useLayoutEffect = useLayoutEffect;
         exports$1.useMemo = useMemo;
         exports$1.useReducer = useReducer;
@@ -10378,7 +10378,7 @@ function requireReactDomServerLegacy_node_development() {
         console["error"](error2);
         return null;
       }
-      function noop$1() {
+      function noop$12() {
       }
       function createRequest(children, responseState, rootFormatContext, progressiveChunkSize, onError2, onAllReady, onShellReady, onShellError, onFatalError) {
         var pingedTasks = [];
@@ -10399,10 +10399,10 @@ function requireReactDomServerLegacy_node_development() {
           completedBoundaries: [],
           partialBoundaries: [],
           onError: onError2 === void 0 ? defaultErrorHandler : onError2,
-          onAllReady: onAllReady === void 0 ? noop$1 : onAllReady,
-          onShellReady: onShellReady === void 0 ? noop$1 : onShellReady,
-          onShellError: noop$1,
-          onFatalError: noop$1
+          onAllReady: onAllReady === void 0 ? noop$12 : onAllReady,
+          onShellReady: onShellReady === void 0 ? noop$12 : onShellReady,
+          onShellError: noop$12,
+          onFatalError: noop$12
         };
         var rootSegment = createPendingSegment(
           request,
@@ -11217,7 +11217,7 @@ function requireReactDomServerLegacy_node_development() {
           }
           request.pendingRootTasks--;
           if (request.pendingRootTasks === 0) {
-            request.onShellError = noop$1;
+            request.onShellError = noop$12;
             var onShellReady = request.onShellReady;
             onShellReady();
           }
@@ -15862,7 +15862,7 @@ function requireReactDomServer_node_development() {
         console["error"](error2);
         return null;
       }
-      function noop$1() {
+      function noop$12() {
       }
       function createRequest(children, responseState, rootFormatContext, progressiveChunkSize, onError, onAllReady, onShellReady, onShellError, onFatalError) {
         var pingedTasks = [];
@@ -15883,10 +15883,10 @@ function requireReactDomServer_node_development() {
           completedBoundaries: [],
           partialBoundaries: [],
           onError: onError === void 0 ? defaultErrorHandler : onError,
-          onAllReady: onAllReady === void 0 ? noop$1 : onAllReady,
-          onShellReady: onShellReady === void 0 ? noop$1 : onShellReady,
-          onShellError: onShellError === void 0 ? noop$1 : onShellError,
-          onFatalError: noop$1
+          onAllReady: onAllReady === void 0 ? noop$12 : onAllReady,
+          onShellReady: onShellReady === void 0 ? noop$12 : onShellReady,
+          onShellError: onShellError === void 0 ? noop$12 : onShellError,
+          onFatalError: noop$12
         };
         var rootSegment = createPendingSegment(
           request,
@@ -16701,7 +16701,7 @@ function requireReactDomServer_node_development() {
           }
           request.pendingRootTasks--;
           if (request.pendingRootTasks === 0) {
-            request.onShellError = noop$1;
+            request.onShellError = noop$12;
             var onShellReady = request.onShellReady;
             onShellReady();
           }
@@ -48380,6 +48380,116 @@ function composeEventHandlers(originalEventHandler, ourEventHandler, { checkForD
 }
 var useLayoutEffect2 = (globalThis == null ? void 0 : globalThis.document) ? reactExports.useLayoutEffect : () => {
 };
+var useInsertionEffect = React[" useInsertionEffect ".trim().toString()] || useLayoutEffect2;
+function useControllableState({
+  prop,
+  defaultProp,
+  onChange = () => {
+  },
+  caller
+}) {
+  const [uncontrolledProp, setUncontrolledProp, onChangeRef] = useUncontrolledState({
+    defaultProp,
+    onChange
+  });
+  const isControlled = prop !== void 0;
+  const value = isControlled ? prop : uncontrolledProp;
+  {
+    const isControlledRef = reactExports.useRef(prop !== void 0);
+    reactExports.useEffect(() => {
+      const wasControlled = isControlledRef.current;
+      if (wasControlled !== isControlled) {
+        const from = wasControlled ? "controlled" : "uncontrolled";
+        const to = isControlled ? "controlled" : "uncontrolled";
+        console.warn(
+          `${caller} is changing from ${from} to ${to}. Components should not switch from controlled to uncontrolled (or vice versa). Decide between using a controlled or uncontrolled value for the lifetime of the component.`
+        );
+      }
+      isControlledRef.current = isControlled;
+    }, [isControlled, caller]);
+  }
+  const setValue = reactExports.useCallback(
+    (nextValue) => {
+      var _a;
+      if (isControlled) {
+        const value2 = isFunction$1(nextValue) ? nextValue(prop) : nextValue;
+        if (value2 !== prop) {
+          (_a = onChangeRef.current) == null ? void 0 : _a.call(onChangeRef, value2);
+        }
+      } else {
+        setUncontrolledProp(nextValue);
+      }
+    },
+    [isControlled, prop, setUncontrolledProp, onChangeRef]
+  );
+  return [value, setValue];
+}
+function useUncontrolledState({
+  defaultProp,
+  onChange
+}) {
+  const [value, setValue] = reactExports.useState(defaultProp);
+  const prevValueRef = reactExports.useRef(value);
+  const onChangeRef = reactExports.useRef(onChange);
+  useInsertionEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+  reactExports.useEffect(() => {
+    var _a;
+    if (prevValueRef.current !== value) {
+      (_a = onChangeRef.current) == null ? void 0 : _a.call(onChangeRef, value);
+      prevValueRef.current = value;
+    }
+  }, [value, prevValueRef]);
+  return [value, setValue, onChangeRef];
+}
+function isFunction$1(value) {
+  return typeof value === "function";
+}
+function usePrevious(value) {
+  const ref = reactExports.useRef({ value, previous: value });
+  return reactExports.useMemo(() => {
+    if (ref.current.value !== value) {
+      ref.current.previous = ref.current.value;
+      ref.current.value = value;
+    }
+    return ref.current.previous;
+  }, [value]);
+}
+function useSize(element) {
+  const [size, setSize] = reactExports.useState(void 0);
+  useLayoutEffect2(() => {
+    if (element) {
+      setSize({ width: element.offsetWidth, height: element.offsetHeight });
+      const resizeObserver = new ResizeObserver((entries) => {
+        if (!Array.isArray(entries)) {
+          return;
+        }
+        if (!entries.length) {
+          return;
+        }
+        const entry = entries[0];
+        let width;
+        let height;
+        if ("borderBoxSize" in entry) {
+          const borderSizeEntry = entry["borderBoxSize"];
+          const borderSize = Array.isArray(borderSizeEntry) ? borderSizeEntry[0] : borderSizeEntry;
+          width = borderSize["inlineSize"];
+          height = borderSize["blockSize"];
+        } else {
+          width = element.offsetWidth;
+          height = element.offsetHeight;
+        }
+        setSize({ width, height });
+      });
+      resizeObserver.observe(element, { box: "border-box" });
+      return () => resizeObserver.unobserve(element);
+    } else {
+      setSize(void 0);
+    }
+  }, [element]);
+  return size;
+}
 function useStateMachine$1(initialState, machine) {
   return reactExports.useReducer((state, event) => {
     const nextState = machine[state][event];
@@ -48618,6 +48728,297 @@ var Primitive = NODES.reduce((primitive, node) => {
   Node.displayName = `Primitive.${node}`;
   return { ...primitive, [node]: Node };
 }, {});
+var CHECKBOX_NAME = "Checkbox";
+var [createCheckboxContext] = createContextScope(CHECKBOX_NAME);
+var [CheckboxProviderImpl, useCheckboxContext] = createCheckboxContext(CHECKBOX_NAME);
+function CheckboxProvider(props) {
+  const {
+    __scopeCheckbox,
+    checked: checkedProp,
+    children,
+    defaultChecked,
+    disabled,
+    form,
+    name,
+    onCheckedChange,
+    required,
+    value = "on",
+    // @ts-expect-error
+    internal_do_not_use_render
+  } = props;
+  const [checked, setChecked] = useControllableState({
+    prop: checkedProp,
+    defaultProp: defaultChecked ?? false,
+    onChange: onCheckedChange,
+    caller: CHECKBOX_NAME
+  });
+  const [control, setControl] = reactExports.useState(null);
+  const [bubbleInput, setBubbleInput] = reactExports.useState(null);
+  const hasConsumerStoppedPropagationRef = reactExports.useRef(false);
+  const isFormControl = control ? !!form || !!control.closest("form") : (
+    // We set this to true by default so that events bubble to forms without JS (SSR)
+    true
+  );
+  const context = {
+    checked,
+    disabled,
+    setChecked,
+    control,
+    setControl,
+    name,
+    form,
+    value,
+    hasConsumerStoppedPropagationRef,
+    required,
+    defaultChecked: isIndeterminate(defaultChecked) ? false : defaultChecked,
+    isFormControl,
+    bubbleInput,
+    setBubbleInput
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    CheckboxProviderImpl,
+    {
+      scope: __scopeCheckbox,
+      ...context,
+      children: isFunction(internal_do_not_use_render) ? internal_do_not_use_render(context) : children
+    }
+  );
+}
+var TRIGGER_NAME = "CheckboxTrigger";
+var CheckboxTrigger = reactExports.forwardRef(
+  ({ __scopeCheckbox, onKeyDown, onClick, ...checkboxProps }, forwardedRef) => {
+    const {
+      control,
+      value,
+      disabled,
+      checked,
+      required,
+      setControl,
+      setChecked,
+      hasConsumerStoppedPropagationRef,
+      isFormControl,
+      bubbleInput
+    } = useCheckboxContext(TRIGGER_NAME, __scopeCheckbox);
+    const composedRefs = useComposedRefs(forwardedRef, setControl);
+    const initialCheckedStateRef = reactExports.useRef(checked);
+    reactExports.useEffect(() => {
+      const form = control == null ? void 0 : control.form;
+      if (form) {
+        const reset = () => setChecked(initialCheckedStateRef.current);
+        form.addEventListener("reset", reset);
+        return () => form.removeEventListener("reset", reset);
+      }
+    }, [control, setChecked]);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Primitive.button,
+      {
+        type: "button",
+        role: "checkbox",
+        "aria-checked": isIndeterminate(checked) ? "mixed" : checked,
+        "aria-required": required,
+        "data-state": getState(checked),
+        "data-disabled": disabled ? "" : void 0,
+        disabled,
+        value,
+        ...checkboxProps,
+        ref: composedRefs,
+        onKeyDown: composeEventHandlers(onKeyDown, (event) => {
+          if (event.key === "Enter") event.preventDefault();
+        }),
+        onClick: composeEventHandlers(onClick, (event) => {
+          setChecked((prevChecked) => isIndeterminate(prevChecked) ? true : !prevChecked);
+          if (bubbleInput && isFormControl) {
+            hasConsumerStoppedPropagationRef.current = event.isPropagationStopped();
+            if (!hasConsumerStoppedPropagationRef.current) event.stopPropagation();
+          }
+        })
+      }
+    );
+  }
+);
+CheckboxTrigger.displayName = TRIGGER_NAME;
+var Checkbox$1 = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const {
+      __scopeCheckbox,
+      name,
+      checked,
+      defaultChecked,
+      required,
+      disabled,
+      value,
+      onCheckedChange,
+      form,
+      ...checkboxProps
+    } = props;
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      CheckboxProvider,
+      {
+        __scopeCheckbox,
+        checked,
+        defaultChecked,
+        disabled,
+        required,
+        onCheckedChange,
+        name,
+        form,
+        value,
+        internal_do_not_use_render: ({ isFormControl }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            CheckboxTrigger,
+            {
+              ...checkboxProps,
+              ref: forwardedRef,
+              __scopeCheckbox
+            }
+          ),
+          isFormControl && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            CheckboxBubbleInput,
+            {
+              __scopeCheckbox
+            }
+          )
+        ] })
+      }
+    );
+  }
+);
+Checkbox$1.displayName = CHECKBOX_NAME;
+var INDICATOR_NAME = "CheckboxIndicator";
+var CheckboxIndicator = reactExports.forwardRef(
+  (props, forwardedRef) => {
+    const { __scopeCheckbox, forceMount, ...indicatorProps } = props;
+    const context = useCheckboxContext(INDICATOR_NAME, __scopeCheckbox);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Presence,
+      {
+        present: forceMount || isIndeterminate(context.checked) || context.checked === true,
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Primitive.span,
+          {
+            "data-state": getState(context.checked),
+            "data-disabled": context.disabled ? "" : void 0,
+            ...indicatorProps,
+            ref: forwardedRef,
+            style: { pointerEvents: "none", ...props.style }
+          }
+        )
+      }
+    );
+  }
+);
+CheckboxIndicator.displayName = INDICATOR_NAME;
+var BUBBLE_INPUT_NAME = "CheckboxBubbleInput";
+var CheckboxBubbleInput = reactExports.forwardRef(
+  ({ __scopeCheckbox, ...props }, forwardedRef) => {
+    const {
+      control,
+      hasConsumerStoppedPropagationRef,
+      checked,
+      defaultChecked,
+      required,
+      disabled,
+      name,
+      value,
+      form,
+      bubbleInput,
+      setBubbleInput
+    } = useCheckboxContext(BUBBLE_INPUT_NAME, __scopeCheckbox);
+    const composedRefs = useComposedRefs(forwardedRef, setBubbleInput);
+    const prevChecked = usePrevious(checked);
+    const controlSize = useSize(control);
+    reactExports.useEffect(() => {
+      const input = bubbleInput;
+      if (!input) return;
+      const inputProto = window.HTMLInputElement.prototype;
+      const descriptor = Object.getOwnPropertyDescriptor(
+        inputProto,
+        "checked"
+      );
+      const setChecked = descriptor.set;
+      const bubbles = !hasConsumerStoppedPropagationRef.current;
+      if (prevChecked !== checked && setChecked) {
+        const event = new Event("click", { bubbles });
+        input.indeterminate = isIndeterminate(checked);
+        setChecked.call(input, isIndeterminate(checked) ? false : checked);
+        input.dispatchEvent(event);
+      }
+    }, [bubbleInput, prevChecked, checked, hasConsumerStoppedPropagationRef]);
+    const defaultCheckedRef = reactExports.useRef(isIndeterminate(checked) ? false : checked);
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Primitive.input,
+      {
+        type: "checkbox",
+        "aria-hidden": true,
+        defaultChecked: defaultChecked ?? defaultCheckedRef.current,
+        required,
+        disabled,
+        name,
+        value,
+        form,
+        ...props,
+        tabIndex: -1,
+        ref: composedRefs,
+        style: {
+          ...props.style,
+          ...controlSize,
+          position: "absolute",
+          pointerEvents: "none",
+          opacity: 0,
+          margin: 0,
+          // We transform because the input is absolutely positioned but we have
+          // rendered it **after** the button. This pulls it back to sit on top
+          // of the button.
+          transform: "translateX(-100%)"
+        }
+      }
+    );
+  }
+);
+CheckboxBubbleInput.displayName = BUBBLE_INPUT_NAME;
+function isFunction(value) {
+  return typeof value === "function";
+}
+function isIndeterminate(checked) {
+  return checked === "indeterminate";
+}
+function getState(checked) {
+  return isIndeterminate(checked) ? "indeterminate" : checked ? "checked" : "unchecked";
+}
+const Checkbox = reactExports.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+  Checkbox$1,
+  {
+    ref,
+    className: cn(
+      "peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground",
+      className
+    ),
+    ...props,
+    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      CheckboxIndicator,
+      {
+        className: cn("flex items-center justify-center text-current"),
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "svg",
+          {
+            xmlns: "http://www.w3.org/2000/svg",
+            width: "16",
+            height: "16",
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            strokeWidth: "2",
+            strokeLinecap: "round",
+            strokeLinejoin: "round",
+            className: "h-4 w-4",
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M20 6 9 17l-5-5" })
+          }
+        )
+      }
+    )
+  }
+));
+Checkbox.displayName = Checkbox$1.displayName;
 function useCallbackRef(callback) {
   const callbackRef = reactExports.useRef(callback);
   reactExports.useEffect(() => {
@@ -49475,9 +49876,9 @@ function usePresence(subscribe = true) {
 }
 const isBrowser = typeof window !== "undefined";
 const useIsomorphicLayoutEffect = isBrowser ? reactExports.useLayoutEffect : reactExports.useEffect;
-const noop = /* @__NO_SIDE_EFFECTS__ */ (any) => any;
-let warning = noop;
-let invariant = noop;
+const noop$1 = /* @__NO_SIDE_EFFECTS__ */ (any) => any;
+let warning = noop$1;
+let invariant = noop$1;
 if (process.env.NODE_ENV !== "production") {
   warning = (check, message) => {
     if (!check && typeof console !== "undefined") {
@@ -49638,7 +50039,7 @@ function createRenderBatcher(scheduleNextBatch, allowKeepAlive) {
   };
   return { schedule, cancel, state, steps };
 }
-const { schedule: frame, cancel: cancelFrame, state: frameData, steps: frameSteps } = createRenderBatcher(typeof requestAnimationFrame !== "undefined" ? requestAnimationFrame : noop, true);
+const { schedule: frame, cancel: cancelFrame, state: frameData, steps: frameSteps } = createRenderBatcher(typeof requestAnimationFrame !== "undefined" ? requestAnimationFrame : noop$1, true);
 const LazyContext = reactExports.createContext({ strict: false });
 const featureProps = {
   animation: [
@@ -51341,7 +51742,7 @@ function binarySubdivide(x, lowerBound, upperBound, mX1, mX2) {
 }
 function cubicBezier(mX1, mY1, mX2, mY2) {
   if (mX1 === mY1 && mX2 === mY2)
-    return noop;
+    return noop$1;
   const getTForX = (aX) => binarySubdivide(aX, 0, 1, mX1, mX2);
   return (t) => t === 0 || t === 1 ? t : calcBezier(getTForX(t), mY1, mY2);
 }
@@ -52451,7 +52852,7 @@ const isEasingArray = (ease2) => {
   return Array.isArray(ease2) && typeof ease2[0] !== "number";
 };
 const easingLookup = {
-  linear: noop,
+  linear: noop$1,
   easeIn,
   easeInOut,
   easeOut,
@@ -52481,7 +52882,7 @@ function createMixers(output, ease2, customMixer) {
   for (let i = 0; i < numMixers; i++) {
     let mixer = mixerFactory(output[i], output[i + 1]);
     if (ease2) {
-      const easingFunction = Array.isArray(ease2) ? ease2[i] || noop : ease2;
+      const easingFunction = Array.isArray(ease2) ? ease2[i] || noop$1 : ease2;
       mixer = pipe(easingFunction, mixer);
     }
     mixers.push(mixer);
@@ -53002,11 +53403,11 @@ class AcceleratedAnimation extends BaseAnimation {
     } else {
       const { resolved } = this;
       if (!resolved)
-        return noop;
+        return noop$1;
       const { animation } = resolved;
       attachTimeline(animation, timeline);
     }
-    return noop;
+    return noop$1;
   }
   play() {
     if (this.isStopped)
@@ -54317,8 +54718,8 @@ function getCurrentDirection(offset, lockThreshold = 10) {
 class DragGesture extends Feature {
   constructor(node) {
     super(node);
-    this.removeGroupControls = noop;
-    this.removeListeners = noop;
+    this.removeGroupControls = noop$1;
+    this.removeListeners = noop$1;
     this.controls = new VisualElementDragControls(node);
   }
   mount() {
@@ -54326,7 +54727,7 @@ class DragGesture extends Feature {
     if (dragControls) {
       this.removeGroupControls = dragControls.subscribe(this.controls);
     }
-    this.removeListeners = this.controls.addListeners() || noop;
+    this.removeListeners = this.controls.addListeners() || noop$1;
   }
   unmount() {
     this.removeGroupControls();
@@ -54341,7 +54742,7 @@ const asyncHandler = (handler) => (event, info) => {
 class PanGesture extends Feature {
   constructor() {
     super(...arguments);
-    this.removePointerDownListener = noop;
+    this.removePointerDownListener = noop$1;
   }
   onPointerDown(pointerDownEvent) {
     this.session = new PanSession(pointerDownEvent, this.createPanHandlers(), {
@@ -54612,7 +55013,7 @@ function getRadius(values, radiusName) {
   return values[radiusName] !== void 0 ? values[radiusName] : values.borderRadius;
 }
 const easeCrossfadeIn = /* @__PURE__ */ compress(0, 0.5, circOut);
-const easeCrossfadeOut = /* @__PURE__ */ compress(0.5, 0.95, noop);
+const easeCrossfadeOut = /* @__PURE__ */ compress(0.5, 0.95, noop$1);
 function compress(min, max, easing) {
   return (p) => {
     if (p < min)
@@ -55849,7 +56250,7 @@ const defaultLayoutTransition = {
   ease: [0.4, 0, 0.1, 1]
 };
 const userAgentContains = (string) => typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().includes(string);
-const roundPoint = userAgentContains("applewebkit/") && !userAgentContains("chrome/") ? Math.round : noop;
+const roundPoint = userAgentContains("applewebkit/") && !userAgentContains("chrome/") ? Math.round : noop$1;
 function roundAxis(axis) {
   axis.min = roundPoint(axis.min);
   axis.max = roundPoint(axis.max);
@@ -56594,7 +56995,7 @@ const fadeIn = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 }
 };
-function DataTable({ data, onCallTool }) {
+function DataTable({ data, onCallTool, onUpdateModelContext }) {
   const { emitSelect } = useViewEvents();
   const {
     title,
@@ -56603,7 +57004,12 @@ function DataTable({ data, onCallTool }) {
     sortable = true,
     filterable = true,
     exportable = false,
-    actions
+    selectable = false,
+    actions,
+    paginationTool,
+    totalRows,
+    pageSize = 50,
+    currentPage = 1
   } = data;
   const [sortKey, setSortKey] = reactExports.useState(null);
   const [sortDir, setSortDir] = reactExports.useState("asc");
@@ -56611,6 +57017,8 @@ function DataTable({ data, onCallTool }) {
   const [panelId, setPanelId] = reactExports.useState(null);
   const [highlightedId, setHighlightedId] = reactExports.useState(null);
   const highlightRef = reactExports.useRef(null);
+  const [selectedRowIndices, setSelectedRowIndices] = reactExports.useState(/* @__PURE__ */ new Set());
+  const [paginationLoading, setPaginationLoading] = reactExports.useState(false);
   reactExports.useEffect(() => {
     function handleMessage(event) {
       const msg = event.data;
@@ -56692,10 +57100,70 @@ ${body}`;
     },
     [onCallTool]
   );
+  reactExports.useEffect(() => {
+    if (!onUpdateModelContext) return;
+    if (selectedRowIndices.size === 0) return;
+    const selectedRows = Array.from(selectedRowIndices).map((idx) => rows[idx]).filter(Boolean);
+    if (selectedRows.length > 0) {
+      onUpdateModelContext({
+        content: [{
+          type: "text",
+          text: `DataTable: ${selectedRows.length} row(s) selected`
+        }]
+      });
+    }
+  }, [selectedRowIndices, rows, onUpdateModelContext]);
+  const toggleRowSelection = reactExports.useCallback(
+    (rowIndex) => {
+      setSelectedRowIndices((prev) => {
+        const next = new Set(prev);
+        if (next.has(rowIndex)) {
+          next.delete(rowIndex);
+        } else {
+          next.add(rowIndex);
+        }
+        return next;
+      });
+    },
+    []
+  );
+  const toggleSelectAll = reactExports.useCallback(() => {
+    setSelectedRowIndices((prev) => {
+      const allVisibleIndices = sortedRows.map((_, i) => i);
+      const allSelected = allVisibleIndices.every((i) => prev.has(i));
+      if (allSelected) {
+        return /* @__PURE__ */ new Set();
+      }
+      return new Set(allVisibleIndices);
+    });
+  }, [sortedRows]);
+  const totalPages = paginationTool && totalRows != null ? Math.max(1, Math.ceil(totalRows / pageSize)) : null;
+  const handlePageChange = reactExports.useCallback(
+    async (newPage) => {
+      if (!paginationTool) return;
+      if (totalPages != null && (newPage < 1 || newPage > totalPages)) return;
+      setPaginationLoading(true);
+      try {
+        await onCallTool(paginationTool, { page: newPage, pageSize });
+      } finally {
+        setPaginationLoading(false);
+      }
+    },
+    [paginationTool, totalPages, pageSize, onCallTool]
+  );
+  reactExports.useEffect(() => {
+    setSelectedRowIndices(/* @__PURE__ */ new Set());
+  }, [rows]);
+  const colSpan = (selectable ? 1 : 0) + columns.length + (actions && actions.length > 0 ? 1 : 0);
+  const allVisibleSelected = sortedRows.length > 0 && sortedRows.every((_, i) => selectedRowIndices.has(i));
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col h-full font-sans text-foreground bg-background", children: [
     (title || filterable || exportable) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between px-4 py-3 border-b flex-wrap gap-2", children: [
       title && /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "m-0 text-base font-semibold", children: title }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+        selectable && selectedRowIndices.size > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-muted-foreground", children: [
+          selectedRowIndices.size,
+          " selected"
+        ] }),
         filterable && /* @__PURE__ */ jsxRuntimeExports.jsx(
           Input,
           {
@@ -56712,6 +57180,14 @@ ${body}`;
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(ScrollArea, { className: "flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx(motion.div, { variants: fadeIn, initial: "hidden", animate: "visible", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
+        selectable && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "sticky top-0 bg-muted w-10", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Checkbox,
+          {
+            checked: allVisibleSelected,
+            onCheckedChange: toggleSelectAll,
+            "aria-label": "Select all rows"
+          }
+        ) }),
         columns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
           TableHead,
           {
@@ -56734,13 +57210,14 @@ ${body}`;
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: sortedRows.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
         TableCell,
         {
-          colSpan: columns.length + (actions ? 1 : 0),
+          colSpan,
           className: "py-8 text-center text-muted-foreground",
           children: filter2 ? "No matching rows." : "No data."
         }
       ) }) : sortedRows.map((row, i) => {
         const rowId = String(row.nhle_id ?? row.id ?? "");
         const isHighlighted = rowId && rowId === highlightedId;
+        const isSelected = selectedRowIndices.has(i);
         return /* @__PURE__ */ jsxRuntimeExports.jsxs(
           TableRow,
           {
@@ -56748,6 +57225,7 @@ ${body}`;
             className: cn(
               "border-b transition-colors",
               isHighlighted && "bg-primary/15",
+              isSelected && "bg-primary/10",
               rowId && "cursor-pointer"
             ),
             onClick: () => {
@@ -56761,11 +57239,20 @@ ${body}`;
                     nhle_id: rowId,
                     properties: row
                   },
-                  "*"
+                  window.location.origin
                 );
               }
             },
             children: [
+              selectable && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "w-10", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Checkbox,
+                {
+                  checked: isSelected,
+                  onCheckedChange: () => toggleRowSelection(i),
+                  onClick: (e) => e.stopPropagation(),
+                  "aria-label": `Select row ${i + 1}`
+                }
+              ) }),
               columns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(
                 TableCell,
                 {
@@ -56783,7 +57270,10 @@ ${body}`;
                   variant: "ghost",
                   size: "sm",
                   className: "text-xs",
-                  onClick: () => handleAction(action, row),
+                  onClick: (e) => {
+                    e.stopPropagation();
+                    handleAction(action, row);
+                  },
                   children: action.label
                 },
                 ai
@@ -56794,14 +57284,71 @@ ${body}`;
         );
       }) })
     ] }) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-2 text-xs text-muted-foreground border-t", children: [
-      sortedRows.length,
-      " of ",
-      rows.length,
-      " rows",
-      filter2 && ` (filtered)`
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-2 text-xs text-muted-foreground border-t flex items-center justify-between gap-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+        paginationTool && totalRows != null ? `${rows.length} rows (${totalRows.toLocaleString()} total)` : `${sortedRows.length} of ${rows.length} rows`,
+        filter2 && ` (filtered)`
+      ] }),
+      paginationTool && totalPages != null && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            variant: "outline",
+            size: "sm",
+            className: "h-6 px-2 text-xs",
+            disabled: currentPage <= 1 || paginationLoading,
+            onClick: () => handlePageChange(currentPage - 1),
+            children: "Prev"
+          }
+        ),
+        generatePageNumbers(currentPage, totalPages).map(
+          (p, idx) => p === "..." ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "px-1", children: "…" }, `ellipsis-${idx}`) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              variant: p === currentPage ? "default" : "outline",
+              size: "sm",
+              className: "h-6 w-6 px-0 text-xs",
+              disabled: paginationLoading,
+              onClick: () => handlePageChange(p),
+              children: p
+            },
+            p
+          )
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            variant: "outline",
+            size: "sm",
+            className: "h-6 px-2 text-xs",
+            disabled: currentPage >= totalPages || paginationLoading,
+            onClick: () => handlePageChange(currentPage + 1),
+            children: "Next"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-1 text-muted-foreground", children: [
+          "Page ",
+          currentPage,
+          " of ",
+          totalPages
+        ] })
+      ] })
     ] })
   ] });
+}
+function generatePageNumbers(current, total) {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  const pages = [];
+  const left = Math.max(2, current - 1);
+  const right = Math.min(total - 1, current + 1);
+  pages.push(1);
+  if (left > 2) pages.push("...");
+  for (let i = left; i <= right; i++) pages.push(i);
+  if (right < total - 1) pages.push("...");
+  pages.push(total);
+  return pages;
 }
 function CellValue({ column, value }) {
   var _a;
@@ -56835,8 +57382,10 @@ function CellValue({ column, value }) {
       return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: String(value) });
   }
 }
+const noop = async () => {
+};
 function render(data) {
-  return server_nodeExports.renderToString(/* @__PURE__ */ jsxRuntimeExports.jsx(DataTable, { data }));
+  return server_nodeExports.renderToString(/* @__PURE__ */ jsxRuntimeExports.jsx(DataTable, { data, onCallTool: noop }));
 }
 export {
   render

@@ -91,7 +91,13 @@ Isometric projection: `x_screen = (x - z) * cos(30deg)`, `y_screen = (x + z) * s
 - **cone**: Apex point to base ellipse with triangular body
 - **torus**: Concentric ellipses with filled ring and highlight
 
-### 4.3 States
+### 4.3 Theme
+
+| CSS Variable                 | Usage                                           |
+|------------------------------|-------------------------------------------------|
+| `--chuk-color-background`    | Wireframe sphere fill background.               |
+
+### 4.4 States
 
 | State       | Behaviour                                                               |
 |-------------|-------------------------------------------------------------------------|
