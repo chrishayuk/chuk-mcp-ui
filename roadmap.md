@@ -702,39 +702,29 @@ A Python developer using `@chart_tool(mcp, "show_data", permissions={"camera": {
 **Goal:** Server-side rendering engine that dynamically composes Views
 from data descriptions. The "Next.js of MCP."
 
-### SSR Memory Consolidation (Critical)
+### SSR Memory Consolidation ✓
 
-**Problem:** The current SSR approach creates a separate `ssr-entry.tsx` +
-`vite.config.ssr.ts` + `dist-ssr/ssr-entry.js` for each of the 66 views.
-Each SSR module bundles its own copy of React and component code. On 256MB
-Fly.io instances, lazy-loading even a subset of these causes OOM crashes.
+**Status: Complete.** Single universal SSR module at `packages/ssr/`.
 
-**Proposed solution — single universal SSR module:**
+**Problem solved:** 65 per-view SSR bundles (101 MB total, each bundling its
+own React copy) caused OOM on 256MB Fly.io instances.
 
-Instead of 66 separate SSR bundles, build **one** SSR entry that:
+**Solution:** Single Vite SSR build importing all 57 SSR-safe renderers
+directly, with placeholder rendering for 8 browser-dependent views (Leaflet:
+map, minimap, layers; Chart.js: chart, profile, scatter, timeseries; pdf.js:
+pdf). React externalized — installed as runtime dep in Docker.
 
-1. Imports all 66 view components into a single bundle sharing one React runtime
-2. Accepts `{ view: "chart", data: {...} }` and renders the correct component
-3. Exposes a single `render(view, data)` function
-4. Dramatically reduces memory footprint (one React copy, not 66)
-5. Eliminates per-view SSR boilerplate (`ssr-entry.tsx`, `vite.config.ssr.ts`)
-6. Simplifies the Dockerfile (one `COPY dist-ssr` instead of 66)
-
-**Approach options:**
-
-| Option | Pros | Cons |
-|--------|------|------|
-| **A) Single Vite library build** | One bundle, shared React, simple | Larger initial bundle, all views loaded |
-| **B) Dynamic import in single runtime** | Lazy per-view loading, shared React | More complex, still separate chunks |
-| **C) Drop SSR entirely** | Simplest, no memory issue | Slower first paint, no SEO benefit |
-
-Option A is likely sufficient — the combined SSR bundle size is manageable
-since views are mostly lightweight React components. The server already
-pre-loads all 66 client HTML files into memory at startup.
+| Metric | Before | After |
+|--------|--------|-------|
+| SSR bundle size | 101 MB (65 bundles) | 2.2 MB (1 bundle) |
+| Docker image | 81 MB | 65 MB |
+| Memory at startup | OOM risk | ~5 MB for SSR |
+| Dockerfile COPY lines | 66 | 1 |
+| Views with full SSR | 65 | 57 (+ 8 placeholders) |
 
 ### Deliverables
 
-- [ ] **Single universal SSR module** (replaces 66 per-view SSR bundles)
+- [x] **Single universal SSR module** (replaces 65 per-view SSR bundles)
 - [ ] SSR engine that takes a layout description and renders composed Views
 - [ ] Data shape inference — GeoJSON -> map, tabular -> table, time-series -> chart
   (builds on Phase 5 `infer_view()` helper)
@@ -867,8 +857,8 @@ community-contributed Views.
 | `view-geostory` | 6 | ✅ Done |
 | AppRenderer compatibility | 7 | ✅ Done — 166 Playwright tests |
 | 66 Pydantic Content schemas (no fallbacks) | 7.5 | ✅ Done |
-| SSR per-view modules (66) | 8 | ⚠️ OOM on Fly.io — needs consolidation |
-| SSR universal module (single bundle) | 8 | Not started |
+| SSR per-view modules (65) | 8 | ✅ Replaced by universal module |
+| SSR universal module (single bundle) | 8 | ✅ Done — 2.2 MB, 65 views, deployed |
 | View catalogue | 9 | Not started |
 | 66 Views in catalogue | 3-6 | ✅ Done — all 66 shipped |
 | Discovery Channel demo | 4-6 | Pending |

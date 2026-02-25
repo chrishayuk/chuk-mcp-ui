@@ -46,26 +46,17 @@ for (const view of VIEWS) {
   }
 }
 
-// SSR modules loaded lazily on first request to avoid OOM at startup
-const ssrModules = {};
+// Universal SSR module — single bundle for all views (replaces 65 per-view bundles)
+let ssrModule = null;
 const ssrAvailable = new Set();
-for (const view of VIEWS) {
-  const ssrPath = resolve(__dirname, "apps", view, "dist-ssr", "ssr-entry.js");
-  if (existsSync(ssrPath)) ssrAvailable.add(view);
-}
-async function getSSRModule(view) {
-  if (ssrModules[view]) return ssrModules[view];
-  if (!ssrAvailable.has(view)) return null;
+const ssrModulePath = resolve(__dirname, "packages", "ssr", "dist", "ssr-entry.js");
+if (existsSync(ssrModulePath)) {
   try {
-    const ssrPath = resolve(__dirname, "apps", view, "dist-ssr", "ssr-entry.js");
-    const mod = await import(ssrPath);
-    ssrModules[view] = mod;
-    console.log(`SSR loaded: ${view}`);
-    return mod;
+    ssrModule = await import(ssrModulePath);
+    for (const v of ssrModule.views) ssrAvailable.add(v);
+    console.log(`SSR universal module loaded: ${ssrModule.views.length} views`);
   } catch (e) {
-    console.warn(`SSR warning: Could not load ${view}: ${e.message}`);
-    ssrAvailable.delete(view);
-    return null;
+    console.warn(`SSR warning: Could not load universal module: ${e.message}`);
   }
 }
 
@@ -153,12 +144,6 @@ const server = createServer((req, res) => {
         return;
       }
       readJsonBody(req).then(async (body) => {
-        const ssrMod = await getSSRModule(view);
-        if (!ssrMod) {
-          res.writeHead(500, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ error: `Failed to load SSR module for ${view}` }));
-          return;
-        }
         const data = body.data;
         if (!data) {
           res.writeHead(400, { "Content-Type": "application/json" });
@@ -166,7 +151,7 @@ const server = createServer((req, res) => {
           return;
         }
         try {
-          const rendered = ssrMod.render(data);
+          const rendered = ssrModule.render(view, data);
           // Embed SSR data for client hydration + pre-rendered DOM
           const ssrScript = `<script>window.__SSR_DATA__=${JSON.stringify(data).replace(/</g, "\\u003c")}</script>`;
           const html = parts.before + rendered + parts.after.replace("</body>", ssrScript + "</body>");
