@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "steps", "submitTool"],
+  "properties": {
+    "type": { "const": "wizard" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "fields"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "fields": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "required": ["type"],
+              "properties": {
+                "type": { "enum": ["string", "number", "integer", "boolean"] },
+                "title": { "type": "string" },
+                "description": { "type": "string" },
+                "default": {},
+                "enum": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      { "type": "string" },
+                      { "type": "number" }
+                    ]
+                  }
+                },
+                "enumLabels": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "minimum": { "type": "number" },
+                "maximum": { "type": "number" },
+                "minLength": { "type": "number" },
+                "maxLength": { "type": "number" },
+                "pattern": { "type": "string" },
+                "widget": {
+                  "enum": [
+                    "text",
+                    "textarea",
+                    "select",
+                    "radio",
+                    "checkbox",
+                    "slider",
+                    "date",
+                    "password",
+                    "number"
+                  ]
+                },
+                "placeholder": { "type": "string" },
+                "help": { "type": "string" }
+              }
+            }
+          },
+          "required": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "condition": {
+            "type": "object",
+            "required": ["field", "op", "value"],
+            "properties": {
+              "field": { "type": "string" },
+              "op": { "enum": ["eq", "neq", "in", "gt", "lt"] },
+              "value": {}
+            }
+          }
+        }
+      }
+    },
+    "initialValues": {
+      "type": "object"
+    },
+    "submitTool": { "type": "string" },
+    "submitLabel": { "type": "string" },
+    "allowNavigation": { "type": "boolean" }
+  }
+}

@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Split } from "./App";
+import { SplitRenderer } from "./App";
 import { ViewBusProvider } from "@chuk/view-shared";
 
 const meta = {
   title: "Views/Split",
-  component: Split,
+  component: SplitRenderer,
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },
   decorators: [(Story) => <ViewBusProvider><div style={{ height: "600px" }}><Story /></div></ViewBusProvider>],
-} satisfies Meta<typeof Split>;
+} satisfies Meta<typeof SplitRenderer>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

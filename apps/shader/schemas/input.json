@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["type", "version", "fragmentShader"],
+  "properties": {
+    "type": { "const": "shader" },
+    "version": { "const": "1.0" },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "fragmentShader": { "type": "string" },
+    "vertexShader": { "type": "string" },
+    "uniforms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "value"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "enum": ["float", "vec2", "vec3", "vec4", "int"] },
+          "value": {
+            "oneOf": [
+              { "type": "number" },
+              { "type": "array", "items": { "type": "number" } }
+            ]
+          },
+          "min": { "type": "number" },
+          "max": { "type": "number" },
+          "label": { "type": "string" }
+        }
+      }
+    },
+    "width": { "type": "number" },
+    "height": { "type": "number" },
+    "animate": { "type": "boolean" }
+  }
+}

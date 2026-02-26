@@ -26,13 +26,13 @@ import { CompareRenderer } from "@apps/compare/src/App";
 import { ConfirmRenderer } from "@apps/confirm/src/App";
 import { CounterRenderer } from "@apps/counter/src/App";
 import { CrosstabRenderer } from "@apps/crosstab/src/App";
-import { DataTable } from "@apps/datatable/src/App";
+import { DataTableRenderer } from "@apps/datatable/src/App";
 import { DetailRenderer } from "@apps/detail/src/App";
 import { DiffRenderer } from "@apps/diff/src/App";
 import { EmbedRenderer } from "@apps/embed/src/App";
 import { FilterRenderer } from "@apps/filter/src/App";
 import { FlowchartRenderer } from "@apps/flowchart/src/App";
-import { DynamicForm } from "@apps/form/src/App";
+import { FormRenderer } from "@apps/form/src/App";
 import { FunnelRenderer } from "@apps/funnel/src/App";
 import { GalleryRenderer } from "@apps/gallery/src/App";
 import { GanttRenderer } from "@apps/gantt/src/App";
@@ -59,12 +59,12 @@ import { SankeyRenderer } from "@apps/sankey/src/App";
 import { SettingsRenderer } from "@apps/settings/src/App";
 import { SlidesRenderer } from "@apps/slides/src/App";
 import { SpectrogramRenderer } from "@apps/spectrogram/src/App";
-import { Split } from "@apps/split/src/App";
+import { SplitRenderer } from "@apps/split/src/App";
 import { StatusRenderer } from "@apps/status/src/App";
 import { StepperRenderer } from "@apps/stepper/src/App";
 import { SunburstRenderer } from "@apps/sunburst/src/App";
 import { SwimlaneRenderer } from "@apps/swimlane/src/App";
-import { TabsInner } from "@apps/tabs/src/App";
+import { TabsRenderer } from "@apps/tabs/src/App";
 import { TerminalRenderer } from "@apps/terminal/src/App";
 import { ThreedRenderer } from "@apps/threed/src/App";
 import { TimelineRenderer } from "@apps/timeline/src/App";
@@ -118,13 +118,13 @@ const renderers: Record<string, RenderFn> = {
   confirm:       (d) => renderToString(<ConfirmRenderer data={d} />),
   counter:       (d) => renderToString(<CounterRenderer data={d} />),
   crosstab:      (d) => renderToString(<CrosstabRenderer data={d} />),
-  datatable:     (d) => renderToString(<DataTable data={d} onCallTool={noop} />),
+  datatable:     (d) => renderToString(<DataTableRenderer data={d} onCallTool={noop} />),
   detail:        (d) => renderToString(<DetailRenderer data={d} />),
   diff:          (d) => renderToString(<DiffRenderer data={d} />),
   embed:         (d) => renderToString(<EmbedRenderer data={d} />),
   filter:        (d) => renderToString(<FilterRenderer data={d} />),
   flowchart:     (d) => renderToString(<FlowchartRenderer data={d} />),
-  form:          (d) => renderToString(<DynamicForm data={d} />),
+  form:          (d) => renderToString(<FormRenderer data={d} />),
   funnel:        (d) => renderToString(<FunnelRenderer data={d} />),
   gallery:       (d) => renderToString(<GalleryRenderer data={d} />),
   gantt:         (d) => renderToString(<GanttRenderer data={d} />),
@@ -157,12 +157,12 @@ const renderers: Record<string, RenderFn> = {
   settings:      (d) => renderToString(<SettingsRenderer data={d} />),
   slides:        (d) => renderToString(<SlidesRenderer data={d} />),
   spectrogram:   (d) => renderToString(<SpectrogramRenderer data={d} />),
-  split:         (d) => renderToString(<Split data={d} />),
+  split:         (d) => renderToString(<SplitRenderer data={d} />),
   status:        (d) => renderToString(<StatusRenderer data={d} />),
   stepper:       (d) => renderToString(<StepperRenderer data={d} />),
   sunburst:      (d) => renderToString(<SunburstRenderer data={d} />),
   swimlane:      (d) => renderToString(<SwimlaneRenderer data={d} />),
-  tabs:          (d) => renderToString(<TabsInner data={d} />),
+  tabs:          (d) => renderToString(<TabsRenderer data={d} />),
   terminal:      (d) => renderToString(<TerminalRenderer data={d} />),
   threed:        (d) => renderToString(<ThreedRenderer data={d} />),
   timeline:      (d) => renderToString(<TimelineRenderer data={d} />),

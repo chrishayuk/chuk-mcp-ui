@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { DataTable } from "./App";
+import { DataTableRenderer } from "./App";
 import { mockCallTool } from "../../../.storybook/mock-call-tool";
 import type { DataTableContent } from "./schema";
 
 const meta = {
   title: "Views/DataTable",
-  component: DataTable,
+  component: DataTableRenderer,
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },
   decorators: [(Story) => <div style={{ height: "600px" }}><Story /></div>],
-} satisfies Meta<typeof DataTable>;
+} satisfies Meta<typeof DataTableRenderer>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

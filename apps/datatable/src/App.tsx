@@ -25,7 +25,7 @@ export function DataTableView() {
   if (!data) return null;
 
   return (
-    <DataTable
+    <DataTableRenderer
       data={data}
       onCallTool={callTool}
       onUpdateModelContext={updateModelContext}
@@ -44,7 +44,7 @@ export interface DataTableProps {
   onOpenLink?: (url: string) => Promise<void>;
 }
 
-export function DataTable({ data, onCallTool, onUpdateModelContext, onOpenLink }: DataTableProps) {
+export function DataTableRenderer({ data, onCallTool, onUpdateModelContext, onOpenLink }: DataTableProps) {
   const { emitSelect } = useViewEvents();
   const {
     title,

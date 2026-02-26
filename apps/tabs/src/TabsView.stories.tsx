@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { TabsInner } from "./App";
+import { TabsRenderer } from "./App";
 import { ViewBusProvider } from "@chuk/view-shared";
 
 const meta = {
   title: "Views/Tabs",
-  component: TabsInner,
+  component: TabsRenderer,
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },
   decorators: [(Story) => <ViewBusProvider><div style={{ height: "600px" }}><Story /></div></ViewBusProvider>],
-} satisfies Meta<typeof TabsInner>;
+} satisfies Meta<typeof TabsRenderer>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

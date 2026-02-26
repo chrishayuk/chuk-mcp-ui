@@ -11,12 +11,12 @@ export function TabsView() {
 
   return (
     <ViewBusProvider>
-      <TabsInner data={data} />
+      <TabsRenderer data={data} />
     </ViewBusProvider>
   );
 }
 
-export function TabsInner({ data }: { data: TabsContent }) {
+export function TabsRenderer({ data }: { data: TabsContent }) {
   const { tabs, activeTab } = data;
   const [active, setActive] = useState(activeTab ?? tabs[0]?.id ?? "");
 

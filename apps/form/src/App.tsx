@@ -25,7 +25,7 @@ export function FormView() {
 
   if (!data) return null;
 
-  return <DynamicForm data={data} onCallTool={callTool} onSendMessage={sendMessage} />;
+  return <FormRenderer data={data} onCallTool={callTool} onSendMessage={sendMessage} />;
 }
 
 export interface DynamicFormProps {
@@ -37,7 +37,7 @@ export interface DynamicFormProps {
   }) => Promise<void>;
 }
 
-export function DynamicForm({ data, onCallTool, onSendMessage }: DynamicFormProps) {
+export function FormRenderer({ data, onCallTool, onSendMessage }: DynamicFormProps) {
   const { emitSubmit } = useViewEvents();
   const { schema, uiSchema, initialValues, submitTool, submitLabel, title, description } = data;
   const [values, setValues] = useState<Record<string, unknown>>(

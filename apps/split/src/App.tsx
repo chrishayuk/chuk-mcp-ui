@@ -13,12 +13,12 @@ export function SplitView() {
 
   return (
     <ViewBusProvider>
-      <Split data={data} />
+      <SplitRenderer data={data} />
     </ViewBusProvider>
   );
 }
 
-export function Split({ data }: { data: SplitContent }) {
+export function SplitRenderer({ data }: { data: SplitContent }) {
   const { direction = "horizontal", ratio = "50:50", left, right } = data;
   const [leftRatio, rightRatio] = ratio.split(":").map(Number);
   const isHorizontal = direction === "horizontal";

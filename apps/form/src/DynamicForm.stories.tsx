@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { DynamicForm } from "./App";
+import { FormRenderer } from "./App";
 import { mockCallTool } from "../../../.storybook/mock-call-tool";
 import type { FormContent } from "./schema";
 
 const meta = {
   title: "Views/Form",
-  component: DynamicForm,
+  component: FormRenderer,
   tags: ["autodocs"],
   parameters: { layout: "fullscreen" },
   decorators: [(Story) => <div style={{ height: "600px" }}><Story /></div>],
-} satisfies Meta<typeof DynamicForm>;
+} satisfies Meta<typeof FormRenderer>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
