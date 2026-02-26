@@ -3,8 +3,19 @@ import ReactDOM from "react-dom/client";
 import "@chuk/view-ui/styles";
 import { LogView } from "./App";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <LogView />
-  </StrictMode>
-);
+const rootEl = document.getElementById("root")!;
+
+if (rootEl.hasChildNodes()) {
+  ReactDOM.hydrateRoot(
+    rootEl,
+    <StrictMode>
+      <LogView />
+    </StrictMode>
+  );
+} else {
+  ReactDOM.createRoot(rootEl).render(
+    <StrictMode>
+      <LogView />
+    </StrictMode>
+  );
+}

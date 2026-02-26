@@ -719,10 +719,13 @@ A Python developer using `@chart_tool(mcp, "show_data", permissions={"camera": {
 
 ---
 
-## Phase 8 — View Runtime (SSR)
+## Phase 8 — View Runtime (SSR) ✓
 
 **Goal:** Server-side rendering engine that dynamically composes Views
 from data descriptions. The "Next.js of MCP."
+
+**Status: Complete.** All deliverables shipped — universal SSR module, compose
+engine, server-side cross-view state, and client hydration.
 
 ### SSR Memory Consolidation ✓
 
@@ -744,22 +747,91 @@ pdf). React externalized — installed as runtime dep in Docker.
 | Dockerfile COPY lines | 66 | 1 |
 | Views with full SSR | 65 | 57 (+ 8 placeholders) |
 
+### SSR Compose Engine ✓
+
+**Status: Complete.** Implemented at `packages/ssr/src/compose.ts`.
+
+Two new server endpoints wire together the existing `render()`, `inferView()`,
+and `resolveLayout()` to compose multi-view pages server-side:
+
+- **`POST /compose/ssr`** — accepts `ComposeRequest` with sections (each with
+  optional explicit view or auto-infer), layout config, title, gap, theme.
+  Returns complete HTML page with CSS grid/flex layout.
+- **`POST /compose/infer`** — accepts `{ data: unknown[] }`, returns ranked
+  view suggestions for each data object.
+
+New files:
+- `packages/ssr/src/layout-css.ts` — converts `ResolvedLayout` to CSS strings
+- `packages/ssr/src/compose.ts` — core compose + infer engine (28 tests)
+
+Reuses: `resolveLayout()` from dashboard auto-layout, `inferView()` from
+Phase 5 (20+ matchers), `render()` from universal SSR module.
+
+### Server-Side Cross-View State ✓
+
+**Status: Complete.** Implemented at `packages/ssr/src/state-propagation.ts`.
+
+Pre-renders composed pages with cross-view state (selections, filters,
+highlights) propagated through `CrossViewLink` declarations — no
+iframe-to-iframe postMessage needed.
+
+- State propagation engine: seeds explicit state per panel, walks links
+  for selection/filter/highlight propagation (including bidirectional)
+- Augments view data with `_compose` overlay before SSR rendering
+- 13 tests covering all propagation scenarios
+
+### In-Memory ComposeBus ✓
+
+**Status: Complete.** Implemented at `packages/shared/src/bus/compose-bus.ts`.
+
+In-memory pub/sub bus replacing iframe postMessage for composed pages.
+Same `ViewMessage` types, same link filtering semantics.
+
+- `createComposeBus(filter?)` — per-panel typed handlers, `queueMicrotask()`
+  async dispatch, link filter support
+- `ComposeBusProvider` — React context wrapper for per-panel bus access
+- Dual-mode `useViewBus` — detects ComposeBusProvider and switches
+  between in-memory ComposeBus and postMessage transport. All downstream
+  hooks (`useViewSelection`, `useViewFilter`, etc.) automatically work
+  in compose mode.
+- 9 tests covering message delivery, filtering, unsubscribe, destroy
+
+### Client Hydration ✓
+
+**Status: Complete.** SSR-composed pages become interactive when JS loads.
+
+- All 69 `mcp-app.tsx` files updated: conditional `hydrateRoot()` when
+  SSR content is present, `createRoot()` for SPA mode (backward-compatible)
+- `compose-client.tsx` — client hydration entry point that reads
+  `window.__COMPOSE_STATE__`, creates ComposeBus with links, and
+  hydrates/mounts each panel (hydrateRoot for SSR panels, createRoot
+  for placeholder panels)
+- Browser-dependent views lazy-loaded via dynamic `import()` to avoid
+  bundling Leaflet/Chart.js when not needed
+- `data-ssr-placeholder` attribute on placeholder panels signals client
+  to use createRoot instead of hydrateRoot
+- Vite client build config (`vite.config.client.ts`) produces single
+  ES module bundle
+- Server serves client bundle at `GET /compose/client.js`
+
 ### Deliverables
 
 - [x] **Single universal SSR module** (replaces 65 per-view SSR bundles)
-- [ ] SSR engine that takes a layout description and renders composed Views
-- [ ] Data shape inference — GeoJSON -> map, tabular -> table, time-series -> chart
-  (builds on Phase 5 `infer_view()` helper)
-- [ ] Server-side cross-View state (no iframe-to-iframe postMessage)
-- [ ] Hydration for client-side interactivity
-- [ ] API: MCP server sends sections with data, runtime decides Views
+- [x] SSR compose engine — layout description + data → composed HTML page
+- [x] Data shape inference — GeoJSON → map, tabular → table, number → counter
+  (builds on Phase 5 `inferView()` helper, exposed via `/compose/infer`)
+- [x] API: MCP server sends sections with data, runtime decides Views
+- [x] Server-side cross-View state (no iframe-to-iframe postMessage)
+- [x] Hydration for client-side interactivity
 
 ### Success Criteria
 
 A Python MCP server returns raw data sections without specifying View
 types. The runtime infers the right visualisations, composes a dashboard,
 and returns a single rendered page. Zero UI decisions in the MCP server.
-SSR runs within 256MB memory on Fly.io without OOM.
+SSR runs within 256MB memory on Fly.io without OOM. Composed pages
+hydrate into fully interactive apps with cross-view communication via
+the in-memory ComposeBus.
 
 ---
 

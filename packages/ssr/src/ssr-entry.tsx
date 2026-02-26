@@ -186,3 +186,15 @@ export function render(view: string, data: unknown): string {
   if (!fn) throw new Error(`Unknown SSR view: "${view}"`);
   return fn(data);
 }
+
+// ── Compose engine ──────────────────────────────────────────────────
+export { compose, infer } from "./compose";
+export type {
+  ComposeRequest,
+  ComposeResult,
+  ComposeSection,
+  ComposeSectionResult,
+  ComposeInitialState,
+  PanelOverlay,
+  InferResult,
+} from "./compose";

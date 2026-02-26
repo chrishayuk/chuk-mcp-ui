@@ -3,8 +3,19 @@ import ReactDOM from "react-dom/client";
 import "@chuk/view-ui/styles";
 import { DataTableView } from "./App";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <DataTableView />
-  </StrictMode>
-);
+const rootEl = document.getElementById("root")!;
+
+if (rootEl.hasChildNodes()) {
+  ReactDOM.hydrateRoot(
+    rootEl,
+    <StrictMode>
+      <DataTableView />
+    </StrictMode>
+  );
+} else {
+  ReactDOM.createRoot(rootEl).render(
+    <StrictMode>
+      <DataTableView />
+    </StrictMode>
+  );
+}

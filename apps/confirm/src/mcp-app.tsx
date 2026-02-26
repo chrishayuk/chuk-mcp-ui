@@ -3,8 +3,19 @@ import ReactDOM from "react-dom/client";
 import "@chuk/view-ui/styles";
 import { ConfirmView } from "./App";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <ConfirmView />
-  </StrictMode>
-);
+const rootEl = document.getElementById("root")!;
+
+if (rootEl.hasChildNodes()) {
+  ReactDOM.hydrateRoot(
+    rootEl,
+    <StrictMode>
+      <ConfirmView />
+    </StrictMode>
+  );
+} else {
+  ReactDOM.createRoot(rootEl).render(
+    <StrictMode>
+      <ConfirmView />
+    </StrictMode>
+  );
+}

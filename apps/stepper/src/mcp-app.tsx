@@ -3,8 +3,19 @@ import ReactDOM from "react-dom/client";
 import "@chuk/view-ui/styles";
 import { StepperView } from "./App";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <StepperView />
-  </StrictMode>
-);
+const rootEl = document.getElementById("root")!;
+
+if (rootEl.hasChildNodes()) {
+  ReactDOM.hydrateRoot(
+    rootEl,
+    <StrictMode>
+      <StepperView />
+    </StrictMode>
+  );
+} else {
+  ReactDOM.createRoot(rootEl).render(
+    <StrictMode>
+      <StepperView />
+    </StrictMode>
+  );
+}

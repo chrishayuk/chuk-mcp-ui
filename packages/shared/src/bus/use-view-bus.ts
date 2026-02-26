@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback, useRef, useMemo } from "react";
 import type {
   ViewMessage,
   ViewMessageType,
@@ -7,6 +7,7 @@ import type {
   ViewBusEnvelope,
 } from "./types";
 import { BUS_VERSION } from "./constants";
+import { useComposeBus } from "./ComposeBusProvider";
 
 interface UseViewBusOptions {
   panelId?: string;
@@ -33,6 +34,12 @@ function isViewBusEnvelope(data: unknown): data is ViewBusEnvelope {
 }
 
 export function useViewBus(options: UseViewBusOptions = {}): ViewBus {
+  // ── Compose mode detection ──────────────────────────────────────
+  // Always call useComposeBus (hooks must be called unconditionally).
+  // Returns null when not inside a ComposeBusProvider.
+  const composeBusCtx = useComposeBus();
+
+  // ── PostMessage-based implementation (iframe mode) ──────────────
   const panelIdRef = useRef<string | null>(options.panelId ?? null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handlersRef = useRef<Map<string, Set<ViewBusHandler<any>>>>(new Map());
@@ -41,6 +48,9 @@ export function useViewBus(options: UseViewBusOptions = {}): ViewBus {
   >(new Set());
 
   useEffect(() => {
+    // Skip postMessage listener in compose mode
+    if (composeBusCtx) return;
+
     function handleMessage(event: MessageEvent) {
       const data = event.data;
       if (!data || typeof data !== "object") return;
@@ -72,9 +82,9 @@ export function useViewBus(options: UseViewBusOptions = {}): ViewBus {
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  }, [composeBusCtx]);
 
-  const send = useCallback(
+  const postMessageSend = useCallback(
     (messageWithoutSource: Omit<ViewMessage, "source">) => {
       const source = panelIdRef.current ?? "unknown";
       const message = { ...messageWithoutSource, source } as ViewMessage;
@@ -90,7 +100,7 @@ export function useViewBus(options: UseViewBusOptions = {}): ViewBus {
     []
   );
 
-  const subscribe = useCallback(
+  const postMessageSubscribe = useCallback(
     <T extends ViewMessageType>(
       type: T,
       handler: ViewBusHandler<T>
@@ -107,7 +117,7 @@ export function useViewBus(options: UseViewBusOptions = {}): ViewBus {
     []
   );
 
-  const subscribeAll = useCallback(
+  const postMessageSubscribeAll = useCallback(
     (
       handler: (message: ViewMessage, sourcePanelId?: string) => void
     ): ViewBusUnsubscribe => {
@@ -119,10 +129,60 @@ export function useViewBus(options: UseViewBusOptions = {}): ViewBus {
     []
   );
 
-  return {
-    send,
-    subscribe,
-    subscribeAll,
-    panelId: panelIdRef.current,
-  };
+  // ── Compose-mode adapter ────────────────────────────────────────
+  const composeSend = useCallback(
+    (message: Omit<ViewMessage, "source">) => {
+      if (composeBusCtx) {
+        composeBusCtx.bus.send(composeBusCtx.panelId, message);
+      }
+    },
+    [composeBusCtx]
+  );
+
+  const composeSubscribe = useCallback(
+    <T extends ViewMessageType>(
+      type: T,
+      handler: ViewBusHandler<T>
+    ): ViewBusUnsubscribe => {
+      if (composeBusCtx) {
+        return composeBusCtx.bus.subscribe(composeBusCtx.panelId, type, handler);
+      }
+      return () => {};
+    },
+    [composeBusCtx]
+  );
+
+  const composeSubscribeAll = useCallback(
+    (
+      handler: (message: ViewMessage, sourcePanelId?: string) => void
+    ): ViewBusUnsubscribe => {
+      if (composeBusCtx) {
+        return composeBusCtx.bus.subscribeAll(composeBusCtx.panelId, handler);
+      }
+      return () => {};
+    },
+    [composeBusCtx]
+  );
+
+  // ── Return the right implementation ─────────────────────────────
+  return useMemo(() => {
+    if (composeBusCtx) {
+      return {
+        send: composeSend,
+        subscribe: composeSubscribe,
+        subscribeAll: composeSubscribeAll,
+        panelId: composeBusCtx.panelId,
+      };
+    }
+    return {
+      send: postMessageSend,
+      subscribe: postMessageSubscribe,
+      subscribeAll: postMessageSubscribeAll,
+      panelId: panelIdRef.current,
+    };
+  }, [
+    composeBusCtx,
+    composeSend, composeSubscribe, composeSubscribeAll,
+    postMessageSend, postMessageSubscribe, postMessageSubscribeAll,
+  ]);
 }

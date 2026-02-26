@@ -8,6 +8,7 @@ COPY server.mjs .
 # Universal SSR module (single bundle replaces 65 per-view SSR bundles)
 # React is externalized from the bundle — install just react + react-dom
 COPY packages/ssr/dist                  packages/ssr/dist
+COPY packages/ssr/dist-client           packages/ssr/dist-client
 RUN npm install --no-save react@18 react-dom@18
 
 # 66 View apps (single-file HTML each)

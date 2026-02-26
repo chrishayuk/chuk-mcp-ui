@@ -3,8 +3,19 @@ import ReactDOM from "react-dom/client";
 import "@chuk/view-ui/styles";
 import { CarouselView } from "./App";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <CarouselView />
-  </StrictMode>
-);
+const rootEl = document.getElementById("root")!;
+
+if (rootEl.hasChildNodes()) {
+  ReactDOM.hydrateRoot(
+    rootEl,
+    <StrictMode>
+      <CarouselView />
+    </StrictMode>
+  );
+} else {
+  ReactDOM.createRoot(rootEl).render(
+    <StrictMode>
+      <CarouselView />
+    </StrictMode>
+  );
+}

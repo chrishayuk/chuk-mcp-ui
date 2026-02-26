@@ -7,6 +7,7 @@
     "paths": {
       "@apps/*": ["../../apps/*"],
       "@chuk/view-shared": ["../shared/src"],
+      "@chuk/view-shared/*": ["../shared/src/*"],
       "@chuk/view-ui": ["../ui/src"],
       "@chuk/view-ui/*": ["../ui/src/*"]
     }

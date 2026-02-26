@@ -111,6 +111,7 @@ const server = createServer((req, res) => {
       status: "ok",
       views: Object.keys(viewHtml),
       ssr: [...ssrAvailable],
+      compose: !!(ssrModule && ssrModule.compose),
     }));
     return;
   }
@@ -128,6 +129,85 @@ const server = createServer((req, res) => {
         ssr: ssrAvailable.has(v),
       })),
     }));
+    return;
+  }
+
+  // Compose endpoints: POST /compose/ssr and POST /compose/infer
+  if (path === "/compose/ssr" && req.method === "POST") {
+    if (!ssrModule || !ssrModule.compose) {
+      res.writeHead(503, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "SSR compose engine not available" }));
+      return;
+    }
+    readJsonBody(req).then((body) => {
+      if (!body.sections || !Array.isArray(body.sections) || body.sections.length === 0) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Request must have at least one section" }));
+        return;
+      }
+      try {
+        const result = ssrModule.compose(body);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(result));
+      } catch (e) {
+        console.error("Compose SSR error:", e);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    }).catch((e) => {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: e.message }));
+    });
+    return;
+  }
+
+  if (path === "/compose/infer" && req.method === "POST") {
+    if (!ssrModule || !ssrModule.infer) {
+      res.writeHead(503, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "SSR infer engine not available" }));
+      return;
+    }
+    readJsonBody(req).then((body) => {
+      if (!body.data || !Array.isArray(body.data)) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Request must have a 'data' array" }));
+        return;
+      }
+      try {
+        const results = ssrModule.infer(body.data);
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ results }));
+      } catch (e) {
+        console.error("Compose infer error:", e);
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    }).catch((e) => {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: e.message }));
+    });
+    return;
+  }
+
+  // Compose client bundle: GET /compose/client.js
+  if (path === "/compose/client.js" && req.method === "GET") {
+    const clientPath = resolve(__dirname, "packages", "ssr", "dist-client", "compose-client.js");
+    if (existsSync(clientPath)) {
+      try {
+        const content = readFileSync(clientPath);
+        res.writeHead(200, {
+          "Content-Type": "application/javascript; charset=utf-8",
+          "Cache-Control": "public, max-age=3600",
+        });
+        res.end(content);
+      } catch (e) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Failed to read compose client bundle" }));
+      }
+    } else {
+      res.writeHead(404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Compose client bundle not built. Run: pnpm --filter @chuk/ssr build:client" }));
+    }
     return;
   }
 
