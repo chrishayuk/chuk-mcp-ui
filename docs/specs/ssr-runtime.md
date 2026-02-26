@@ -1,236 +1,388 @@
-# SSR Runtime Spec (Phase 8)
+# SSR Runtime (Phase 8) ✓
 
 ## Overview
 
-A server-side composition engine that receives raw data, infers the best view types using `infer_view()` (Phase 5.7), and composes a dashboard `structuredContent` payload. The "Next.js of MCP" — a Python MCP server returns raw data sections without specifying view types, and the runtime decides the visualizations.
+A server-side composition engine implemented in TypeScript at `packages/ssr/`.
+Takes raw data sections, infers view types using `inferView()` (Phase 5.7),
+SSR-renders each panel, and assembles a complete HTML page with CSS grid/flex
+layout. Optionally includes cross-view state propagation and client hydration
+scripts for interactivity. The "Next.js of MCP."
+
+**Status: Complete.** 50 tests passing (41 SSR + 9 ComposeBus).
 
 ---
 
-## Dependencies
+## Architecture
 
-- **Phase 5.7** (`infer_view()`) — data shape inference engine
-- **Phase 7** (AppRenderer compat) — views verified across hosts
-- **Dashboard v2/v3 schema** — composition target format
-
----
-
-## API
-
-### `compose(sections: list[DataSection], layout: str = "auto") -> DashboardContent`
-
-The primary entry point. Takes a list of data sections and returns a dashboard `structuredContent` payload.
-
-```python
-from chuk_view_ssr import compose
-
-result = compose([
-    DataSection(label="Sites", data=geojson_data),
-    DataSection(label="Statistics", data={"value": 42, "delta": "+12%"}),
-    DataSection(label="Records", data=tabular_rows),
-])
-# Returns DashboardContent with 3 panels: map, counter, datatable
 ```
+packages/ssr/
+  src/
+    ssr-entry.tsx          # Universal SSR module — render() for all 69 views
+    compose.ts             # Compose engine — sections → HTML page
+    compose-client.tsx     # Client hydration entry point (browser)
+    layout-css.ts          # ResolvedLayout → CSS strings
+    state-propagation.ts   # Cross-view state through links
+    __tests__/
+      compose.test.ts      # 28 tests
+      state-propagation.test.ts  # 13 tests
+  vite.config.ts           # SSR build (Node.js, React externalized)
+  vite.config.client.ts    # Client hydration build (browser bundle)
+  vitest.config.ts         # Test config
 
-### `compose_single(data: dict, view: str | None = None) -> StructuredContent`
-
-Wraps a single data payload in the correct `structuredContent` envelope. If `view` is None, uses `infer_view()`.
-
-```python
-from chuk_view_ssr import compose_single
-
-result = compose_single(geojson_data)
-# Returns {"type": "map", "version": "1.0", "layers": [...], "center": {...}}
+packages/shared/src/bus/
+  compose-bus.ts           # In-memory pub/sub for composed pages
+  ComposeBusProvider.tsx   # React context for per-panel bus access
+  use-view-bus.ts          # Dual-mode: ComposeBus or postMessage
 ```
 
 ---
 
-## Data Model
+## Server Endpoints
 
-```python
-from dataclasses import dataclass, field
-from typing import Any
+### `POST /compose/ssr`
 
-@dataclass
-class DataSection:
-    """A single data payload to be rendered as one panel."""
-    label: str
-    data: Any
-    view: str | None = None      # Explicit view type (skips inference)
-    width: float | None = None   # Relative width hint (0-1)
-    position: str | None = None  # "top", "left", "right", "bottom", "main"
+Composes multiple views into a single SSR HTML page.
 
-@dataclass
-class ComposedPanel:
-    """A panel in the composed dashboard."""
-    id: str
-    label: str
-    viewType: str
-    structuredContent: dict
-    width: float
-    position: str
+**Request:** `ComposeRequest`
 
-@dataclass
-class DashboardContent:
-    """The output: a dashboard structuredContent payload."""
-    type: str = "dashboard"
-    version: str = "2.0"
-    layout: dict = field(default_factory=dict)
-    panels: list[dict] = field(default_factory=list)
-    links: list[dict] = field(default_factory=list)
-```
+```typescript
+interface ComposeRequest {
+  sections: ComposeSection[];     // Data sections to compose
+  layout?: LayoutConfig;          // "auto" | "grid" | "flex" | custom
+  title?: string;                 // Page title
+  gap?: string;                   // CSS gap (default "12px")
+  theme?: "light" | "dark";      // Theme (default "light")
+  links?: CrossViewLink[];        // Cross-view link declarations
+  initialState?: ComposeInitialState;  // Pre-rendered state
+  hydrate?: boolean;              // Include client JS (default false)
+}
 
----
-
-## Layout Strategies
-
-### `auto` (default)
-
-The runtime selects layout based on panel count and types:
-
-| Panel Count | Panel Types | Layout |
-|-------------|-------------|--------|
-| 1 | Any | Full width |
-| 2 | map + table | 60/40 split |
-| 2 | Any other | 50/50 split |
-| 3+ with counter | Any | KPI strip top + grid below |
-| 3+ with map | map + others | Map left (60%), stack right (40%) |
-| 3+ | All same type | Equal grid |
-
-### `grid`
-
-Equal-width columns, wrapping at the natural breakpoint.
-
-### `single`
-
-Tabbed layout — each section is a tab.
-
-### `split`
-
-Two columns: first section left, rest stacked right.
-
-### `report`
-
-Full-width vertical stack — each section is a full-width row.
-
----
-
-## Inference Integration
-
-The runtime calls `infer_view()` for each `DataSection` that doesn't have an explicit `view` type:
-
-```python
-for section in sections:
-    if section.view:
-        view_type = section.view
-    else:
-        suggestion = infer_view(section.data)
-        view_type = suggestion.view
-```
-
-### Schema Wrapping
-
-Once the view type is determined, the raw data must be wrapped in the view's expected `structuredContent` shape. The runtime maintains a registry of wrapper functions:
-
-```python
-WRAPPERS: dict[str, Callable[[Any, str], dict]] = {
-    "map": wrap_map,        # Wraps GeoJSON into MapContent
-    "datatable": wrap_table, # Wraps rows into DatatableContent
-    "chart": wrap_chart,     # Wraps series into ChartContent
-    "counter": wrap_counter, # Wraps value into CounterContent
-    ...
+interface ComposeSection {
+  id: string;                     // Unique panel identifier
+  view?: string;                  // Explicit view name (omit for auto-infer)
+  data: unknown;                  // View data
+  label?: string;                 // Panel label
+  priority?: number;              // Layout ordering priority
 }
 ```
 
-Each wrapper transforms raw data into the view's typed schema, adding required fields like `type`, `version`, and view-specific defaults.
+**Response:** `ComposeResult`
+
+```typescript
+interface ComposeResult {
+  html: string;                   // Complete HTML page
+  sections: ComposeSectionResult[];  // Metadata per section
+}
+
+interface ComposeSectionResult {
+  id: string;
+  view: string;                   // Resolved view name
+  inferred: boolean;              // Whether auto-inferred
+  confidence?: number;            // 0-1 (when inferred)
+  reason?: string;                // Inference explanation
+}
+```
+
+**Example:**
+
+```bash
+curl -X POST http://localhost:8000/compose/ssr \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Heritage Dashboard",
+    "sections": [
+      { "id": "map", "data": { "type": "FeatureCollection", "features": [...] } },
+      { "id": "stats", "data": 42 },
+      { "id": "table", "view": "datatable", "data": { "columns": [...], "rows": [...] } }
+    ],
+    "hydrate": true
+  }'
+```
+
+### `POST /compose/infer`
+
+Run view inference on data objects without composing.
+
+**Request:** `{ data: unknown[] }`
+
+**Response:** `{ results: InferResult[] }` where each result has `index` and ranked `suggestions`.
+
+### `GET /compose/client.js`
+
+Serves the client hydration bundle (ES module) for composed pages.
 
 ---
 
-## Cross-View Links
+## View Inference
 
-When the composed dashboard contains complementary views, the runtime auto-generates cross-view links:
+When a section omits `view`, the engine calls `inferView()` from Phase 5.7:
 
-| Source | Target | Link Type |
-|--------|--------|-----------|
-| map | datatable | selection (click marker → highlight row) |
-| datatable | map | selection (click row → highlight marker) |
-| datatable | chart | filter (filter table → update chart) |
-| filter | any | filter (broadcast filter to all panels) |
+- GeoJSON → `map` (0.95 confidence)
+- `{ columns, rows }` → `datatable` (0.95)
+- Bare number → `counter` (0.85)
+- Markdown string → `markdown` (0.80)
+- Fallback → `json` (0.0)
 
-Links are only generated when both panels share compatible data (same record IDs or field names).
+The compose engine uses the top suggestion. The `/compose/infer` endpoint
+exposes all ranked suggestions for client-side decision making.
 
 ---
 
-## Streaming Support
+## Layout
 
-The runtime supports progressive composition via `ontoolinputpartial`:
+Layout is resolved by `resolveLayout()` from `apps/dashboard/src/auto-layout.ts`:
 
-1. **First pass** — emit dashboard skeleton with panel placeholders (`set-loading: true`)
-2. **Per-section** — as each data section is processed, emit `add-panel` or `update-panel` patches
-3. **Final** — emit full `DashboardContent` as the tool result
+| Layout | Behavior |
+|--------|----------|
+| `"auto"` | Automatic based on panel count and types |
+| `"grid"` | CSS Grid with equal columns |
+| `"flex"` | Flexbox (row or column) |
+| Custom object | Explicit `gridTemplateColumns`, `gridTemplateRows`, `gridTemplateAreas` |
 
-This uses the dashboard's v3 `UIPatch` system for incremental updates.
+Layout output is converted to inline CSS by `layout-css.ts`:
+- `layoutToContainerStyle(layout, gap)` → container CSS string
+- `panelStyle(layout, panelId)` → per-panel CSS from `panelStyles` Map
 
-```python
-async def compose_streaming(sections, emit_patch):
-    # Emit skeleton
-    await emit_patch({"type": "ui_patch", "ops": [
-        {"op": "update-layout", "layout": inferred_layout},
-    ]})
+---
 
-    # Process sections progressively
-    for section in sections:
-        panel = process_section(section)
-        await emit_patch({"type": "ui_patch", "ops": [
-            {"op": "add-panel", "panel": panel},
-        ]})
+## Cross-View State Propagation
+
+**File:** `packages/ssr/src/state-propagation.ts`
+
+Pre-renders composed pages with cross-view state already applied. No
+JavaScript needed for initial state display.
+
+### Initial State
+
+```typescript
+interface ComposeInitialState {
+  selections?: Record<string, string[]>;       // panelId → selected IDs
+  filters?: Record<string, Record<string, unknown>>;  // panelId → { field: value }
+  highlights?: Record<string, string>;          // panelId → highlighted ID
+}
+```
+
+### Link-Based Propagation
+
+State flows through `CrossViewLink` declarations:
+
+```typescript
+interface CrossViewLink {
+  source: string;           // Source panel ID
+  target: string;           // Target panel ID
+  type: "selection" | "filter" | "highlight" | "navigate" | "update";
+  sourceField: string;
+  targetField: string;
+  bidirectional?: boolean;
+}
+```
+
+The engine:
+1. Seeds explicit state per panel from `initialState`
+2. Walks links: propagates selections, filter values, and highlights
+3. Handles bidirectional links (propagates both directions)
+4. Augments each panel's data with `_compose` overlay before rendering
+
+### Data Augmentation
+
+Renderers receive augmented data with `_compose`:
+
+```typescript
+{
+  ...originalData,
+  _compose: {
+    panelId: "table",
+    selectedIds: ["row-5"],
+    filters: { category: "heritage" },
+    highlightedId: "site-42"
+  }
+}
 ```
 
 ---
 
-## Location
+## Client Hydration
 
-**Package:** `chuk-view-ssr` (new Python package, or `chuk_view_schemas.ssr` submodule)
+When `hydrate: true`, the compose engine:
 
+1. Injects `<script>window.__COMPOSE_STATE__={...}</script>` with section
+   data, links, and initial state (with `<` escaped to `\u003c`)
+2. Adds `<script type="module" src="/compose/client.js"></script>`
+
+### Compose Client (`compose-client.tsx`)
+
+The client hydration entry point:
+
+1. Reads `window.__COMPOSE_STATE__`
+2. Creates a `ComposeBus` with link filtering via `buildLinkFilter()`
+3. Registers all panels on the bus
+4. For each `<div data-panel="id">`:
+   - **SSR-rendered panels** → `hydrateRoot()` (preserves DOM, attaches events)
+   - **Placeholder panels** (`data-ssr-placeholder`) → `createRoot()` (replaces placeholder)
+5. Wraps each panel in `<ComposeBusProvider bus={bus} panelId={id}>`
+
+### Browser-Dependent Views
+
+9 views use placeholder SSR (lightweight "Loading..." UI) and full client
+rendering:
+
+| View | Dependency | Lazy-loaded |
+|------|-----------|-------------|
+| chart | Chart.js (canvas) | Yes |
+| map | Leaflet (window) | Yes |
+| minimap | Leaflet (window) | Yes |
+| layers | Leaflet (window) | Yes |
+| profile | Chart.js (canvas) | Yes |
+| scatter | Chart.js (canvas) | Yes |
+| timeseries | Chart.js (canvas) | Yes |
+| pdf | pdf.js (window) | Yes |
+| shader | WebGL (canvas) | Placeholder only |
+
+These are identified by the `data-ssr-placeholder` attribute on their
+panel div. The client uses dynamic `import()` to lazy-load their full
+renderers only when needed.
+
+### SPA Backward Compatibility
+
+All 69 `apps/*/src/mcp-app.tsx` files use conditional hydration:
+
+```typescript
+const rootEl = document.getElementById("root")!;
+if (rootEl.hasChildNodes()) {
+  ReactDOM.hydrateRoot(rootEl, <StrictMode><XxxView /></StrictMode>);
+} else {
+  ReactDOM.createRoot(rootEl).render(<StrictMode><XxxView /></StrictMode>);
+}
 ```
-chuk-view-ssr/
-  chuk_view_ssr/
-    __init__.py        # compose(), compose_single()
-    layout.py          # Layout strategy selection
-    wrappers/          # Per-view data wrappers
-      __init__.py
-      map.py
-      chart.py
-      datatable.py
-      ...
-    links.py           # Auto-generated cross-view links
-    streaming.py       # Progressive composition
-  tests/
-    test_compose.py
-    test_layout.py
-    test_wrappers.py
+
+SPA mode (empty root) uses `createRoot()`. SSR pages use `hydrateRoot()`.
+
+---
+
+## In-Memory ComposeBus
+
+**File:** `packages/shared/src/bus/compose-bus.ts`
+
+Replaces iframe `postMessage` relay for composed pages where all panels
+share the same window.
+
+```typescript
+interface ComposeBus {
+  send(panelId: string, message: Omit<ViewMessage, "source">): void;
+  subscribe<T extends ViewMessageType>(
+    panelId: string, type: T, handler: ViewBusHandler<T>
+  ): ViewBusUnsubscribe;
+  subscribeAll(
+    panelId: string,
+    handler: (message: ViewMessage, sourcePanelId?: string) => void
+  ): ViewBusUnsubscribe;
+  registerPanel(panelId: string): void;
+  destroy(): void;
+}
+
+function createComposeBus(filter?: LinkFilter): ComposeBus
 ```
+
+Key behaviors:
+- Per-panel scoped subscriptions
+- Messages dispatched via `queueMicrotask()` (avoids sync re-render cascades)
+- Optional link filter for cross-view routing
+- Self-delivery prevention (sender doesn't receive own messages)
+
+### Dual-Mode `useViewBus`
+
+The `useViewBus()` hook auto-detects compose mode:
+
+- Inside `ComposeBusProvider` → uses in-memory ComposeBus
+- Outside (iframe mode) → uses postMessage transport
+
+All downstream hooks (`useViewSelection`, `useViewFilter`, `useViewNavigation`,
+`useViewDrag`) automatically work in both modes.
+
+---
+
+## Build
+
+### SSR Build (Node.js)
+
+```bash
+pnpm --filter @chuk/ssr build
+```
+
+- Output: `packages/ssr/dist/ssr-entry.js`
+- React externalized (runtime dep in Docker)
+- Size: ~2.2 MB
+
+### Client Hydration Build (Browser)
+
+```bash
+pnpm --filter @chuk/ssr build:client
+```
+
+- Output: `packages/ssr/dist-client/compose-client.js`
+- React bundled (browser needs it)
+- ES module, minified, tree-shaken
+
+### Tests
+
+```bash
+pnpm --filter @chuk/ssr test
+```
+
+50 tests: 28 compose + 13 state-propagation + 9 ComposeBus.
+
+---
+
+## Deployment
+
+The Dockerfile copies both build outputs:
+
+```dockerfile
+COPY packages/ssr/dist         packages/ssr/dist
+COPY packages/ssr/dist-client  packages/ssr/dist-client
+```
+
+The server serves the client bundle at `GET /compose/client.js`.
 
 ---
 
 ## Test Cases
 
-| ID | Input | Expected |
-|----|-------|----------|
-| SSR-01 | Single GeoJSON section | Full-width map panel |
-| SSR-02 | GeoJSON + tabular rows | 60/40 map + datatable with selection links |
-| SSR-03 | 3 sections: metric, table, chart | KPI strip + 2-column grid |
-| SSR-04 | Section with explicit `view="chart"` | Chart used (no inference) |
-| SSR-05 | `layout="report"` | Full-width vertical stack |
-| SSR-06 | `layout="single"` | Tabbed layout |
-| SSR-07 | Empty sections list | Empty dashboard |
-| SSR-08 | Section with unrecognized data shape | JSON tree fallback |
-| SSR-09 | `compose_single(geojson)` | MapContent with inferred center/layers |
-| SSR-10 | Streaming: 3 sections | 3 `add-panel` patches followed by full result |
-| SSR-11 | Map + datatable with shared IDs | Auto-generated bidirectional selection link |
-| SSR-12 | 5 counter sections | KPI strip layout |
+| ID | Scenario | Status |
+|----|----------|--------|
+| SSR-01 | Single section renders full-width | PASS |
+| SSR-02 | Multiple sections with grid layout | PASS |
+| SSR-03 | Auto-infer GeoJSON → map | PASS |
+| SSR-04 | Auto-infer bare number → counter | PASS |
+| SSR-05 | Explicit view name used without inference | PASS |
+| SSR-06 | Title included in HTML | PASS |
+| SSR-07 | Dark theme class applied | PASS |
+| SSR-08 | Panel labels rendered | PASS |
+| SSR-09 | HTML escaped in title and labels (XSS prevention) | PASS |
+| SSR-10 | Empty sections throws error | PASS |
+| SSR-11 | Custom gap applied | PASS |
+| SSR-12 | Cross-view state with links + initialState | PASS |
+| SSR-13 | `data-view` attribute on panels | PASS |
+| SSR-14 | `data-ssr-placeholder` on browser-dependent views | PASS |
+| SSR-15 | Hydration scripts included when `hydrate=true` | PASS |
+| SSR-16 | No hydration scripts by default | PASS |
+| SSR-17 | Links included in hydration state | PASS |
+| SSR-18 | `</script>` escaped in hydration JSON | PASS |
+| SSR-19 | Selection propagation through links | PASS |
+| SSR-20 | Filter propagation through links | PASS |
+| SSR-21 | Highlight propagation through links | PASS |
+| SSR-22 | Bidirectional link propagation | PASS |
+| SSR-23 | ComposeBus message delivery between panels | PASS |
+| SSR-24 | ComposeBus link filter blocking | PASS |
+| SSR-25 | ComposeBus destroy clears handlers | PASS |
 
 ---
 
 ## Success Criteria
 
-A Python MCP server returns raw data sections without specifying view types. The runtime infers the right visualizations, composes a dashboard, and returns a single rendered page. Zero UI decisions in the MCP server code.
+A Python MCP server returns raw data sections without specifying view
+types. The runtime infers the right visualizations, composes a dashboard,
+and returns a single rendered page. Zero UI decisions in the MCP server.
+SSR runs within 256MB memory on Fly.io without OOM. Composed pages
+hydrate into fully interactive apps with cross-view communication via
+the in-memory ComposeBus.
