@@ -72,4 +72,7 @@ export const VIEW_MANIFEST: ViewMeta[] = [
   { name: "tree", type: "tree", hasCallTool: true, category: "data" },
   { name: "treemap", type: "treemap", hasCallTool: false, category: "visualization" },
   { name: "video", type: "video", hasCallTool: false, category: "media" },
+  { name: "shader", type: "shader", hasCallTool: false, category: "canvas" },
+  { name: "transcript", type: "transcript", hasCallTool: false, category: "text" },
+  { name: "wizard", type: "wizard", hasCallTool: true, category: "interactive" },
 ];

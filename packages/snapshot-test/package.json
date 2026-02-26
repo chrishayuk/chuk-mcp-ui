@@ -1,0 +1,22 @@
+{
+  "name": "@chuk/view-test",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "chuk-view-test": "./dist/cli.js"
+  },
+  "main": "./dist/snapshot.js",
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "playwright": "^1.50.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^20.0.0"
+  }
+}

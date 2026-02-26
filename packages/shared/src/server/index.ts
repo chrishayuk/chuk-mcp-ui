@@ -75,6 +75,10 @@ const VIEW_PATHS: Record<string, string> = {
   slides: "/slides/v1",
   swimlane: "/swimlane/v1",
   threed: "/threed/v1",
+  // Phase 6 — Advanced (3)
+  shader: "/shader/v1",
+  transcript: "/transcript/v1",
+  wizard: "/wizard/v1",
 };
 
 export interface ViewToolResult {
@@ -136,3 +140,6 @@ export function wrapViewResult(
 }
 
 export { CDN_BASE, VIEW_PATHS };
+
+export { inferView } from "./infer";
+export type { ViewSuggestion } from "./infer";

@@ -194,11 +194,15 @@ STAC imagery comparison, multi-layer investigations).
 
 ---
 
-## Phase 5 — Developer Experience & Infrastructure (in progress)
+## Phase 5 — Developer Experience & Infrastructure ✓
 
 **Goal:** The tools and infrastructure that make chuk-mcp-ui sticky.
 Views win on capability; DX wins on adoption. This phase is what turns
 "useful library" into "the thing everyone reaches for."
+
+**Status: Complete.** All deliverables shipped. CLI scaffolder, 11 hooks with
+127 tests, message bus, server helpers, theme presets, live playground,
+inference helper (65 tests), and snapshot testing CLI.
 
 ### 5.1 `create-chuk-view` CLI Scaffolder ✓
 
@@ -311,7 +315,11 @@ data delivery to iframes, with postMessage for subsequent updates.
 The JSON editor where a Python developer pastes their data and sees it
 render instantly — that's the conversion moment.
 
-### 5.7 `structuredContent` Inference Helper
+### 5.7 `structuredContent` Inference Helper ✓
+
+**Status: TypeScript shipped.** Implemented at `packages/shared/src/server/infer.ts`.
+65 tests. Exported via `@chuk/view-shared/server`. Python implementation pending
+in `chuk-view-schemas` package.
 
 A Python/TypeScript utility that looks at data and suggests which View
 to use:
@@ -328,7 +336,10 @@ GeoJSON → map. Tabular with numeric columns → datatable + chart.
 Time-indexed → timeseries. This is the "zero decisions" path — the
 precursor to Phase 8 SSR runtime but available as a simple function today.
 
-### 5.8 Snapshot Testing CLI
+### 5.8 Snapshot Testing CLI ✓
+
+**Status: shipped.** Implemented at `packages/snapshot-test/`. CLI binary
+`chuk-view-test` with `snapshot()` API for programmatic use.
 
 ```bash
 npx chuk-view-test --view map --data sample.json --output screenshot.png
@@ -353,8 +364,8 @@ full host. Also powers Phase 9 catalogue thumbnails.
 - [x] TypeScript server helpers (`getViewUrl`, `buildViewMeta`, `wrapViewResult`)
 - [x] Theme presets (default, dark, ocean, forest, terminal, academic, discovery, ibm)
 - [x] Live playground MVP at `apps/playground/`
-- [ ] `infer_view()` inference helper (Python + TypeScript)
-- [ ] `chuk-view-test` snapshot testing CLI
+- [x] `inferView()` TypeScript inference helper (20+ matchers, 65 tests)
+- [x] `@chuk/view-test` snapshot testing CLI (Playwright headless Chromium)
 - [x] Publish Python schemas to PyPI (`chuk-view-schemas` v0.1.3)
 - [ ] Publish all to npm
 
