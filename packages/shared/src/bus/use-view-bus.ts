@@ -130,13 +130,18 @@ export function useViewBus(options: UseViewBusOptions = {}): ViewBus {
   );
 
   // ── Compose-mode adapter ────────────────────────────────────────
+  // Use a ref so unsubscribe closures always point to the current context.
+  const composeBusRef = useRef(composeBusCtx);
+  composeBusRef.current = composeBusCtx;
+
   const composeSend = useCallback(
     (message: Omit<ViewMessage, "source">) => {
-      if (composeBusCtx) {
-        composeBusCtx.bus.send(composeBusCtx.panelId, message);
+      const ctx = composeBusRef.current;
+      if (ctx) {
+        ctx.bus.send(ctx.panelId, message);
       }
     },
-    [composeBusCtx]
+    []
   );
 
   const composeSubscribe = useCallback(
@@ -144,24 +149,26 @@ export function useViewBus(options: UseViewBusOptions = {}): ViewBus {
       type: T,
       handler: ViewBusHandler<T>
     ): ViewBusUnsubscribe => {
-      if (composeBusCtx) {
-        return composeBusCtx.bus.subscribe(composeBusCtx.panelId, type, handler);
+      const ctx = composeBusRef.current;
+      if (ctx) {
+        return ctx.bus.subscribe(ctx.panelId, type, handler);
       }
       return () => {};
     },
-    [composeBusCtx]
+    []
   );
 
   const composeSubscribeAll = useCallback(
     (
       handler: (message: ViewMessage, sourcePanelId?: string) => void
     ): ViewBusUnsubscribe => {
-      if (composeBusCtx) {
-        return composeBusCtx.bus.subscribeAll(composeBusCtx.panelId, handler);
+      const ctx = composeBusRef.current;
+      if (ctx) {
+        return ctx.bus.subscribeAll(ctx.panelId, handler);
       }
       return () => {};
     },
-    [composeBusCtx]
+    []
   );
 
   // ── Return the right implementation ─────────────────────────────

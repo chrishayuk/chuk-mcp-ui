@@ -2,6 +2,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { createServer } from "node:http";
 import { resolve, dirname, extname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createHash } from "node:crypto";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -62,15 +63,25 @@ if (existsSync(ssrModulePath)) {
   }
 }
 
-/** Read full request body and parse as JSON */
-function readJsonBody(req) {
+/** Read full request body and parse as JSON (with timeout) */
+function readJsonBody(req, timeoutMs = 30000) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let size = 0;
     const MAX = 2 * 1024 * 1024; // 2 MB limit
+    let done = false;
+    const timer = setTimeout(() => {
+      if (!done) {
+        done = true;
+        req.destroy();
+        reject(new Error("Request timeout"));
+      }
+    }, timeoutMs);
     req.on("data", (chunk) => {
       size += chunk.length;
       if (size > MAX) {
+        done = true;
+        clearTimeout(timer);
         req.destroy();
         reject(new Error("Body too large"));
         return;
@@ -78,15 +89,34 @@ function readJsonBody(req) {
       chunks.push(chunk);
     });
     req.on("end", () => {
+      done = true;
+      clearTimeout(timer);
       try {
         resolve(JSON.parse(Buffer.concat(chunks).toString()));
       } catch (e) {
         reject(new Error("Invalid JSON"));
       }
     });
-    req.on("error", reject);
+    req.on("error", (err) => {
+      done = true;
+      clearTimeout(timer);
+      reject(err);
+    });
   });
 }
+
+/** Check that request has JSON content type */
+function requireJson(req, res) {
+  const ct = (req.headers["content-type"] || "").split(";")[0].trim();
+  if (ct !== "application/json") {
+    res.writeHead(415, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "Content-Type must be application/json" }));
+    return false;
+  }
+  return true;
+}
+
+const MAX_SECTIONS = 200;
 
 const PORT = parseInt(process.env.PORT || "8000", 10);
 
@@ -94,6 +124,7 @@ const server = createServer((req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("X-Content-Type-Options", "nosniff");
 
   if (req.method === "OPTIONS") {
     res.writeHead(204);
@@ -139,10 +170,16 @@ const server = createServer((req, res) => {
       res.end(JSON.stringify({ error: "SSR compose engine not available" }));
       return;
     }
+    if (!requireJson(req, res)) return;
     readJsonBody(req).then((body) => {
       if (!body.sections || !Array.isArray(body.sections) || body.sections.length === 0) {
         res.writeHead(400, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Request must have at least one section" }));
+        return;
+      }
+      if (body.sections.length > MAX_SECTIONS) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: `Max ${MAX_SECTIONS} sections allowed` }));
         return;
       }
       try {
@@ -152,11 +189,12 @@ const server = createServer((req, res) => {
       } catch (e) {
         console.error("Compose SSR error:", e);
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: e.message }));
+        res.end(JSON.stringify({ error: "Compose render failed" }));
       }
     }).catch((e) => {
+      const msg = e instanceof Error ? e.message : "Bad request";
       res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: e.message }));
+      res.end(JSON.stringify({ error: msg }));
     });
     return;
   }
@@ -167,10 +205,16 @@ const server = createServer((req, res) => {
       res.end(JSON.stringify({ error: "SSR infer engine not available" }));
       return;
     }
+    if (!requireJson(req, res)) return;
     readJsonBody(req).then((body) => {
       if (!body.data || !Array.isArray(body.data)) {
         res.writeHead(400, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Request must have a 'data' array" }));
+        return;
+      }
+      if (body.data.length > MAX_SECTIONS) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: `Max ${MAX_SECTIONS} data items allowed` }));
         return;
       }
       try {
@@ -180,11 +224,12 @@ const server = createServer((req, res) => {
       } catch (e) {
         console.error("Compose infer error:", e);
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: e.message }));
+        res.end(JSON.stringify({ error: "Inference failed" }));
       }
     }).catch((e) => {
+      const msg = e instanceof Error ? e.message : "Bad request";
       res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: e.message }));
+      res.end(JSON.stringify({ error: msg }));
     });
     return;
   }
@@ -195,12 +240,20 @@ const server = createServer((req, res) => {
     if (existsSync(clientPath)) {
       try {
         const content = readFileSync(clientPath);
+        const etag = `"${createHash("md5").update(content).digest("hex")}"`;
+        if (req.headers["if-none-match"] === etag) {
+          res.writeHead(304);
+          res.end();
+          return;
+        }
         res.writeHead(200, {
           "Content-Type": "application/javascript; charset=utf-8",
           "Cache-Control": "public, max-age=3600",
+          "ETag": etag,
         });
         res.end(content);
       } catch (e) {
+        console.error("Failed to read compose client bundle:", e);
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Failed to read compose client bundle" }));
       }
@@ -225,6 +278,7 @@ const server = createServer((req, res) => {
         res.end(JSON.stringify({ error: `SSR not available for ${view}` }));
         return;
       }
+      if (!requireJson(req, res)) return;
       readJsonBody(req).then(async (body) => {
         const data = body.data;
         if (!data) {
@@ -235,7 +289,13 @@ const server = createServer((req, res) => {
         try {
           const rendered = ssrModule.render(view, data);
           // Embed SSR data for client hydration + pre-rendered DOM
-          const ssrScript = `<script>window.__SSR_DATA__=${JSON.stringify(data).replace(/</g, "\\u003c")}</script>`;
+          let ssrScript = "";
+          try {
+            ssrScript = `<script>window.__SSR_DATA__=${JSON.stringify(data).replace(/</g, "\\u003c")}</script>`;
+          } catch {
+            // Skip hydration data if serialization fails (e.g., circular references)
+            console.warn(`SSR: Could not serialize data for ${view} hydration`);
+          }
           const html = parts.before + rendered + parts.after.replace("</body>", ssrScript + "</body>");
           res.writeHead(200, {
             "Content-Type": "text/html; charset=utf-8",
@@ -248,8 +308,9 @@ const server = createServer((req, res) => {
           res.end(JSON.stringify({ error: "SSR render failed" }));
         }
       }).catch((e) => {
+        const msg = e instanceof Error ? e.message : "Bad request";
         res.writeHead(400, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: e.message }));
+        res.end(JSON.stringify({ error: msg }));
       });
       return;
     }
@@ -284,7 +345,14 @@ const server = createServer((req, res) => {
       const subPath = path === prefix + "/"
         ? "/index.html"
         : path.replace(prefix, "");
-      const filePath = resolve(__dirname, dir, subPath.slice(1));
+      const baseDir = resolve(__dirname, dir);
+      const filePath = resolve(baseDir, subPath.slice(1));
+      // Prevent path traversal — resolved path must stay within baseDir
+      if (!filePath.startsWith(baseDir + "/") && filePath !== baseDir) {
+        res.writeHead(403, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Forbidden" }));
+        return true;
+      }
       if (existsSync(filePath)) {
         try {
           const content = readFileSync(filePath);
@@ -295,7 +363,9 @@ const server = createServer((req, res) => {
           });
           res.end(content);
           return true;
-        } catch { /* fall through */ }
+        } catch (e) {
+          console.warn(`Failed to read ${filePath}:`, e.message);
+        }
       }
     }
     return false;

@@ -5,11 +5,12 @@ WORKDIR /app
 # Copy only the server and built dist files
 COPY server.mjs .
 
+# React is externalized from the SSR bundle — install just react + react-dom
+RUN npm install --no-save react@18 react-dom@18
+
 # Universal SSR module (single bundle replaces 65 per-view SSR bundles)
-# React is externalized from the bundle — install just react + react-dom
 COPY packages/ssr/dist                  packages/ssr/dist
 COPY packages/ssr/dist-client           packages/ssr/dist-client
-RUN npm install --no-save react@18 react-dom@18
 
 # 66 View apps (single-file HTML each)
 # Phase 1-2 (original 27)
@@ -82,6 +83,10 @@ COPY apps/sankey/dist/mcp-app.html        apps/sankey/dist/mcp-app.html
 COPY apps/slides/dist/mcp-app.html        apps/slides/dist/mcp-app.html
 COPY apps/swimlane/dist/mcp-app.html      apps/swimlane/dist/mcp-app.html
 COPY apps/threed/dist/mcp-app.html        apps/threed/dist/mcp-app.html
+# Phase 6 Advanced (3 new)
+COPY apps/shader/dist/mcp-app.html       apps/shader/dist/mcp-app.html
+COPY apps/transcript/dist/mcp-app.html   apps/transcript/dist/mcp-app.html
+COPY apps/wizard/dist/mcp-app.html       apps/wizard/dist/mcp-app.html
 
 # Playground (multi-file SPA)
 COPY apps/playground/dist              apps/playground/dist
@@ -91,7 +96,7 @@ COPY storybook-static                  storybook-static
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=10s --timeout=2s --retries=3 \
+HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
   CMD wget -qO- http://localhost:8000/health || exit 1
 
 CMD ["node", "server.mjs"]

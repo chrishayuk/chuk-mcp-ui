@@ -195,6 +195,27 @@ declare global {
   }
 }
 
+// ── Error fallback element ──────────────────────────────────────────
+function errorFallback(view: string, message: string): React.ReactElement {
+  return createElement("div", {
+    style: { padding: "16px", color: "#ef4444", fontSize: "13px" },
+  }, `Failed to load ${view}: ${message}`);
+}
+
+// ── Cleanup tracking ────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const roots: Array<{ unmount: () => void }> = [];
+let activeBus: ReturnType<typeof createComposeBus> | null = null;
+
+function cleanup() {
+  for (const root of roots) {
+    try { root.unmount(); } catch { /* already unmounted */ }
+  }
+  roots.length = 0;
+  activeBus?.destroy();
+  activeBus = null;
+}
+
 // ── Hydration boot ──────────────────────────────────────────────────
 
 async function hydrate() {
@@ -204,10 +225,17 @@ async function hydrate() {
     return;
   }
 
+  // Validate state shape
+  if (!state.sections || !Array.isArray(state.sections)) {
+    console.error("[compose-client] Invalid __COMPOSE_STATE__: missing sections array.");
+    return;
+  }
+
   // Create the in-memory bus with link filtering
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const filter = buildLinkFilter(state.links as any);
   const bus = createComposeBus(filter);
+  activeBus = bus;
 
   // Register all panels
   for (const section of state.sections) {
@@ -236,13 +264,13 @@ async function hydrate() {
         element = makeEl(section.data);
       } catch (err) {
         console.error(`[compose-client] Failed to load ${section.view}:`, err);
-        continue;
+        element = errorFallback(section.view, err instanceof Error ? err.message : String(err));
       }
     } else if (renderers[section.view]) {
       element = renderers[section.view](section.data);
     } else {
       console.warn(`[compose-client] Unknown view: ${section.view}`);
-      continue;
+      element = errorFallback(section.view, "Unknown view type");
     }
 
     // Wrap with ComposeBusProvider + StrictMode
@@ -257,18 +285,23 @@ async function hydrate() {
 
     // Hydrate or mount
     if (isPlaceholder) {
-      // Replace placeholder entirely
-      panelEl.innerHTML = "";
+      // Replace placeholder with full interactive component
       const container = document.createElement("div");
       container.style.cssText = "display:contents";
-      panelEl.appendChild(container);
-      createRoot(container).render(wrapped);
+      panelEl.replaceChildren(container);
+      const root = createRoot(container);
+      root.render(wrapped);
+      roots.push(root);
     } else {
       // Hydrate existing SSR content
-      hydrateRoot(panelEl, wrapped);
+      const root = hydrateRoot(panelEl, wrapped);
+      roots.push(root);
     }
   }
 }
+
+// Cleanup on page unload
+window.addEventListener("pagehide", cleanup);
 
 // Boot
 hydrate().catch((err) => {

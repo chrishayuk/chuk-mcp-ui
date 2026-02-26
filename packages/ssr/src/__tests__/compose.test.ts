@@ -81,6 +81,55 @@ describe("layoutToContainerStyle", () => {
     expect(css).toContain("width:100%");
     expect(css).toContain("height:100%");
   });
+
+  // ── CSS sanitization tests ────────────────────────────────────
+
+  it("strips semicolons from gap to prevent CSS injection", () => {
+    const layout: ResolvedLayout = {
+      display: "flex",
+      panelStyles: new Map(),
+    };
+    const css = layoutToContainerStyle(layout, "12px;color:red");
+    // Semicolons and colons stripped — no additional CSS properties injected
+    expect(css).not.toMatch(/gap:[^;]*;color/);
+    expect(css).not.toContain(";color");
+  });
+
+  it("strips quotes from gap to prevent attribute breakout", () => {
+    const layout: ResolvedLayout = {
+      display: "flex",
+      panelStyles: new Map(),
+    };
+    const css = layoutToContainerStyle(layout, '12px" onclick="alert(1)');
+    // Quotes and = signs are stripped — can't break out of style attribute
+    expect(css).not.toContain('"');
+    expect(css).not.toContain("=");
+  });
+
+  it("strips angle brackets from grid columns", () => {
+    const layout: ResolvedLayout = {
+      display: "grid",
+      gridTemplateColumns: "1fr <script>alert(1)</script>",
+      panelStyles: new Map(),
+    };
+    const css = layoutToContainerStyle(layout);
+    expect(css).not.toContain("<");
+    expect(css).not.toContain(">");
+    expect(css).toContain("grid-template-columns:");
+  });
+
+  it("preserves valid CSS values through sanitizer", () => {
+    const layout: ResolvedLayout = {
+      display: "grid",
+      gridTemplateColumns: "repeat(3, 1fr)",
+      gridTemplateRows: "auto 200px minmax(100px, 1fr)",
+      panelStyles: new Map(),
+    };
+    const css = layoutToContainerStyle(layout, "16px");
+    expect(css).toContain("grid-template-columns:repeat(3, 1fr)");
+    expect(css).toContain("grid-template-rows:auto 200px minmax(100px, 1fr)");
+    expect(css).toContain("gap:16px");
+  });
 });
 
 // ── panelStyle ──────────────────────────────────────────────────────
@@ -121,6 +170,48 @@ describe("panelStyle", () => {
     const css = panelStyle(layout, "panel1");
     expect(css).toContain("flex:1");
     expect(css).toContain("min-width:0");
+  });
+
+  // ── panelStyle CSS sanitization tests ─────────────────────────
+
+  it("strips injection from gridRow value", () => {
+    const styles = new Map<string, React.CSSProperties>();
+    styles.set("p", { gridRow: "1 / -1;color:red" as unknown as string });
+    const layout: ResolvedLayout = {
+      display: "grid",
+      gridTemplateColumns: "1fr",
+      panelStyles: styles,
+    };
+    const css = panelStyle(layout, "p");
+    expect(css).not.toContain(";color");
+    expect(css).toContain("grid-row:");
+  });
+
+  it("strips injection from gridColumn value", () => {
+    const styles = new Map<string, React.CSSProperties>();
+    styles.set("p", { gridColumn: '1" onclick="alert(1)' as unknown as string });
+    const layout: ResolvedLayout = {
+      display: "grid",
+      gridTemplateColumns: "1fr",
+      panelStyles: styles,
+    };
+    const css = panelStyle(layout, "p");
+    // Quotes and = signs are stripped — can't break out of style attribute
+    expect(css).not.toContain('"');
+    expect(css).not.toContain("=");
+  });
+
+  it("preserves valid gridRow and gridColumn values through sanitizer", () => {
+    const styles = new Map<string, React.CSSProperties>();
+    styles.set("p", { gridRow: "1 / -1", gridColumn: "2 / span 3" });
+    const layout: ResolvedLayout = {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr 1fr",
+      panelStyles: styles,
+    };
+    const css = panelStyle(layout, "p");
+    expect(css).toContain("grid-row:1 / -1");
+    expect(css).toContain("grid-column:2 / span 3");
   });
 });
 
@@ -367,6 +458,53 @@ describe("compose", () => {
     const stateScript = result.html.match(/window\.__COMPOSE_STATE__=(.+?)<\/script>/)?.[1] ?? "";
     expect(stateScript).not.toContain("</script>");
     expect(stateScript).toContain("\\u003c");
+  });
+
+  // ── Edge case tests ──────────────────────────────────────────
+
+  it("throws on duplicate section IDs", () => {
+    expect(() => compose({
+      sections: [
+        { id: "a", view: "counter", data: {} },
+        { id: "a", view: "json", data: {} },
+      ],
+    })).toThrow("Duplicate section ID");
+  });
+
+  it("sanitizes CSS injection in gap parameter", () => {
+    // Attempt to inject a new CSS property via semicolon
+    const result = compose({
+      gap: '12px;color:red',
+      sections: [
+        { id: "a", view: "counter", data: {} },
+      ],
+    });
+
+    // Semicolons and colons are stripped from the value, preventing injection
+    expect(result.html).not.toContain('gap:12px;color');
+    // The sanitized value ends up as just the safe characters
+    expect(result.html).toContain("gap:");
+  });
+
+  it("escapes view name in render error fallback", async () => {
+    // Force a render error by mocking render to throw for one call
+    const { render: mockRender } = await import("../ssr-entry");
+    const original = (mockRender as ReturnType<typeof vi.fn>).getMockImplementation();
+    (mockRender as ReturnType<typeof vi.fn>).mockImplementationOnce(() => {
+      throw new Error("test error");
+    });
+
+    const result = compose({
+      sections: [
+        { id: "a", view: '<script>alert("xss")</script>', data: {} },
+      ],
+    });
+
+    expect(result.html).not.toContain('<script>alert');
+    expect(result.html).toContain("&lt;script&gt;");
+
+    // Restore original mock
+    if (original) (mockRender as ReturnType<typeof vi.fn>).mockImplementation(original);
   });
 });
 

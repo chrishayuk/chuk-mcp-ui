@@ -49,32 +49,33 @@ export function propagateState(
   const overlays = new Map<string, PanelOverlay>();
   const panelIds = new Set(sections.map((s) => s.id));
 
-  if (!initialState) return overlays;
+  // 1. Seed with explicit state (if provided)
+  if (initialState) {
+    for (const panelId of panelIds) {
+      const overlay: PanelOverlay = {};
+      let hasData = false;
 
-  // 1. Seed with explicit state
-  for (const panelId of panelIds) {
-    const overlay: PanelOverlay = {};
-    let hasData = false;
+      if (initialState.selections?.[panelId]) {
+        overlay.selectedIds = [...initialState.selections[panelId]];
+        hasData = true;
+      }
+      if (initialState.filters?.[panelId]) {
+        // Deep copy filter values to prevent shared references
+        overlay.filters = structuredClone(initialState.filters[panelId]);
+        hasData = true;
+      }
+      if (initialState.highlights?.[panelId]) {
+        overlay.highlightedId = initialState.highlights[panelId];
+        hasData = true;
+      }
 
-    if (initialState.selections?.[panelId]) {
-      overlay.selectedIds = initialState.selections[panelId];
-      hasData = true;
-    }
-    if (initialState.filters?.[panelId]) {
-      overlay.filters = { ...initialState.filters[panelId] };
-      hasData = true;
-    }
-    if (initialState.highlights?.[panelId]) {
-      overlay.highlightedId = initialState.highlights[panelId];
-      hasData = true;
-    }
-
-    if (hasData) {
-      overlays.set(panelId, overlay);
+      if (hasData) {
+        overlays.set(panelId, overlay);
+      }
     }
   }
 
-  // 2. Propagate through links
+  // 2. Propagate through links (works even without initialState)
   if (!links || links.length === 0) return overlays;
 
   for (const link of links) {
@@ -106,11 +107,10 @@ function propagateLink(
   const targetOverlay = overlays.get(target) ?? {};
 
   if (behaviour === "selection" && sourceOverlay.selectedIds) {
-    // Propagate selection IDs to target
-    targetOverlay.selectedIds = [
-      ...(targetOverlay.selectedIds ?? []),
-      ...sourceOverlay.selectedIds,
-    ];
+    // Propagate selection IDs to target, deduplicating
+    const existing = new Set(targetOverlay.selectedIds ?? []);
+    for (const id of sourceOverlay.selectedIds) existing.add(id);
+    targetOverlay.selectedIds = [...existing];
   }
 
   if (behaviour === "filter" && sourceOverlay.filters) {
@@ -120,7 +120,11 @@ function propagateLink(
     };
     const sourceVal = sourceOverlay.filters[link.sourceField];
     if (sourceVal !== undefined) {
-      targetOverlay.filters[link.targetField] = sourceVal;
+      // Deep copy to prevent shared references between panels
+      targetOverlay.filters[link.targetField] =
+        typeof sourceVal === "object" && sourceVal !== null
+          ? structuredClone(sourceVal)
+          : sourceVal;
     }
   }
 

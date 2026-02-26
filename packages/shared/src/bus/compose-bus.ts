@@ -70,8 +70,11 @@ export function createComposeBus(filter?: LinkFilter): ComposeBus {
       panels.add(panelId);
       const message = { ...messageWithoutSource, source: panelId } as ViewMessage;
 
+      // Snapshot current panels to avoid race with registrations during delivery
+      const targets = Array.from(panels);
+
       // Deliver to all other registered panels
-      for (const targetId of panels) {
+      for (const targetId of targets) {
         if (targetId === panelId) continue;
 
         // Apply link filter
@@ -79,19 +82,26 @@ export function createComposeBus(filter?: LinkFilter): ComposeBus {
 
         // Dispatch via microtask to avoid sync re-render cascades
         queueMicrotask(() => {
+          // Guard: bus may have been destroyed between queueing and execution
+          if (panels.size === 0) return;
+
           // Typed handlers
           const panelTyped = typedHandlers.get(targetId);
           if (panelTyped) {
             const typeSet = panelTyped.get(message.type);
             if (typeSet) {
-              for (const h of typeSet) h(message, panelId);
+              for (const h of typeSet) {
+                try { h(message, panelId); } catch (e) { console.error("[ComposeBus] Handler error:", e); }
+              }
             }
           }
 
           // All-handlers
           const panelAll = allHandlers.get(targetId);
           if (panelAll) {
-            for (const h of panelAll) h(message, panelId);
+            for (const h of panelAll) {
+              try { h(message, panelId); } catch (e) { console.error("[ComposeBus] Handler error:", e); }
+            }
           }
         });
       }

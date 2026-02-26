@@ -168,4 +168,79 @@ describe("createComposeBus", () => {
       expect(handlerC).toHaveBeenCalledOnce();
     });
   });
+
+  // ── Edge cases ──────────────────────────────────────────────────
+
+  it("subscribeAll handler errors do not prevent other handlers from firing", async () => {
+    bus.registerPanel("a");
+    bus.registerPanel("b");
+
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const badHandler = vi.fn(() => { throw new Error("boom"); });
+    const goodHandler = vi.fn();
+
+    bus.subscribeAll("b", badHandler);
+    bus.subscribeAll("b", goodHandler);
+
+    bus.send("a", { type: "select", ids: ["1"] } as SelectPayload);
+    await flush();
+
+    expect(badHandler).toHaveBeenCalledOnce();
+    expect(goodHandler).toHaveBeenCalledOnce();
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  it("typed subscribe handler errors do not prevent other handlers from firing", async () => {
+    bus.registerPanel("a");
+    bus.registerPanel("b");
+
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const badHandler = vi.fn(() => { throw new Error("typed boom"); });
+    const goodHandler = vi.fn();
+
+    bus.subscribe("b", "select", badHandler);
+    bus.subscribe("b", "select", goodHandler);
+
+    bus.send("a", { type: "select", ids: ["1"] } as SelectPayload);
+    await flush();
+
+    expect(badHandler).toHaveBeenCalledOnce();
+    expect(goodHandler).toHaveBeenCalledOnce();
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  it("microtask delivery is guarded after destroy", async () => {
+    bus.registerPanel("a");
+    bus.registerPanel("b");
+
+    const handler = vi.fn();
+    bus.subscribe("b", "select", handler);
+
+    // Send queues microtasks, then immediately destroy
+    bus.send("a", { type: "select", ids: ["1"] } as SelectPayload);
+    bus.destroy();
+    await flush();
+
+    // Microtasks should be guarded — handler should not fire
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it("handles rapid sequential sends in correct order", async () => {
+    bus.registerPanel("a");
+    bus.registerPanel("b");
+
+    const received: string[][] = [];
+    bus.subscribe("b", "select", (msg) => {
+      received.push((msg as SelectMessage).ids);
+    });
+
+    bus.send("a", { type: "select", ids: ["1"] } as SelectPayload);
+    bus.send("a", { type: "select", ids: ["2"] } as SelectPayload);
+    bus.send("a", { type: "select", ids: ["3"] } as SelectPayload);
+    await flush();
+
+    expect(received).toEqual([["1"], ["2"], ["3"]]);
+  });
 });

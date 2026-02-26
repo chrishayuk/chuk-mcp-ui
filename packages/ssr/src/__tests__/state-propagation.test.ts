@@ -189,4 +189,74 @@ describe("propagateState", () => {
     expect(result.get("map")?.selectedIds).toEqual(["row-1"]);
     expect(result.get("chart")?.filters).toEqual({ region: "FR" });
   });
+
+  // ── Edge case: guard assertions ───────────────────────────────
+
+  it("returns overlay entries for panels that have state", () => {
+    const result = propagateState(sections, undefined, {
+      selections: { table: ["row-1"] },
+    });
+    expect(result.has("table")).toBe(true);
+    expect(result.get("table")!.selectedIds).toEqual(["row-1"]);
+  });
+
+  it("deduplicates propagated selection IDs", () => {
+    const links: CrossViewLink[] = [
+      {
+        source: "table",
+        target: "map",
+        type: "selection",
+        sourceField: "id",
+        targetField: "feature_id",
+      },
+    ];
+    const result = propagateState(sections, links, {
+      selections: {
+        table: ["row-1", "row-2"],
+        map: ["row-1"], // row-1 already exists — should not duplicate
+      },
+    });
+    expect(result.get("map")?.selectedIds).toEqual(["row-1", "row-2"]);
+  });
+
+  it("handles self-referencing links gracefully", () => {
+    const links: CrossViewLink[] = [
+      {
+        source: "table",
+        target: "table",
+        type: "selection",
+        sourceField: "id",
+        targetField: "id",
+      },
+    ];
+    // Should not throw or infinite loop
+    const result = propagateState(sections, links, {
+      selections: { table: ["row-1"] },
+    });
+    expect(result.get("table")?.selectedIds).toEqual(["row-1"]);
+  });
+
+  it("works with links but no initialState", () => {
+    const links: CrossViewLink[] = [
+      {
+        source: "table",
+        target: "map",
+        type: "selection",
+        sourceField: "id",
+        targetField: "feature_id",
+      },
+    ];
+    // No initialState means no seed data — links have nothing to propagate
+    const result = propagateState(sections, links, undefined);
+    expect(result.size).toBe(0);
+  });
+
+  it("handles empty selection arrays", () => {
+    const result = propagateState(sections, undefined, {
+      selections: { table: [] },
+    });
+    // Empty array is truthy in JS, so overlay is created with empty selectedIds
+    expect(result.has("table")).toBe(true);
+    expect(result.get("table")!.selectedIds).toEqual([]);
+  });
 });

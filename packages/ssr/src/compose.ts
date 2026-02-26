@@ -106,6 +106,15 @@ export function compose(request: ComposeRequest): ComposeResult {
     throw new Error("ComposeRequest must have at least one section");
   }
 
+  // Validate unique section IDs
+  const seenIds = new Set<string>();
+  for (const section of sections) {
+    if (seenIds.has(section.id)) {
+      throw new Error(`Duplicate section ID: "${section.id}"`);
+    }
+    seenIds.add(section.id);
+  }
+
   // 1. Resolve view for each section
   const resolved: Array<{
     section: ComposeSection;
@@ -175,8 +184,9 @@ export function compose(request: ComposeRequest): ComposeResult {
     let inner: string;
     try {
       inner = render(r.view, renderData);
-    } catch {
-      inner = `<div style="padding:16px;color:#ef4444">Failed to render ${r.view} view</div>`;
+    } catch (e) {
+      console.error(`Compose: Failed to render ${r.view}:`, e);
+      inner = `<div style="padding:16px;color:#ef4444">Failed to render ${escapeHtml(r.view)} view</div>`;
     }
 
     const pCss = panelStyle(resolvedLayout, r.section.id);
@@ -211,10 +221,15 @@ export function compose(request: ComposeRequest): ComposeResult {
       links: links ?? [],
       initialState: initialState ?? {},
     };
-    const stateJson = JSON.stringify(composeState).replace(/</g, "\\u003c");
-    hydrationScripts = `
+    try {
+      const stateJson = JSON.stringify(composeState).replace(/</g, "\\u003c");
+      hydrationScripts = `
 <script>window.__COMPOSE_STATE__=${stateJson}</script>
 <script type="module" src="/compose/client.js"></script>`;
+    } catch (e) {
+      console.error("Compose: Failed to serialize hydration state:", e);
+      // Skip hydration if state can't be serialized (e.g., circular references)
+    }
   }
 
   const html = `<!DOCTYPE html>
