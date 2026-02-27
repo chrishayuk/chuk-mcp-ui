@@ -5,7 +5,7 @@
   "packageManager": "pnpm@9.15.4",
   "scripts": {
     "build": "turbo run build",
-    "build:ssr": "pnpm --filter @chuk/ssr build",
+    "build:ssr": "pnpm --filter @chuk/ssr build && pnpm --filter @chuk/ssr build:client",
     "dev": "turbo run dev",
     "type-check": "turbo run type-check",
     "test": "turbo run test",
