@@ -1,8 +1,8 @@
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, realpathSync, promises as fsp } from "node:fs";
 import { createServer } from "node:http";
-import { resolve, dirname, extname } from "node:path";
+import { resolve, dirname, extname, relative, isAbsolute } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -22,18 +22,21 @@ const VIEWS = [
   "annotation", "calendar", "flowchart", "funnel", "gantt", "geostory",
   "globe", "graph", "investigation", "neural", "notebook", "sankey",
   "slides", "swimlane", "threed",
-  // Phase 6 Advanced (3 new)
-  "shader", "transcript", "wizard",
+  // Phase 6 Advanced (4 new — font added)
+  "font", "shader", "transcript", "wizard",
 ];
 
 // Pre-load all HTML into memory at startup
 const viewHtml = {};
+// Pre-compute ETags for view HTML (Low #17)
+const viewEtag = {};
 // Pre-split HTML at <div id="root"></div> for SSR injection
 const viewHtmlParts = {};
 for (const view of VIEWS) {
   const filePath = resolve(__dirname, "apps", view, "dist", "mcp-app.html");
   try {
     viewHtml[view] = readFileSync(filePath, "utf-8");
+    viewEtag[view] = `"${createHash("md5").update(viewHtml[view]).digest("hex")}"`;
     console.log(`Loaded: ${view} (${(viewHtml[view].length / 1024).toFixed(0)} KB)`);
     // Split at root div for SSR: before + after
     const marker = '<div id="root"></div>';
@@ -116,15 +119,85 @@ function requireJson(req, res) {
   return true;
 }
 
+/**
+ * Safely encode data into a <script> tag without XSS risk.
+ * Escapes all characters that could break out of a script context.
+ * Critical #1 fix.
+ */
+function safeJsonForScript(data) {
+  return JSON.stringify(data)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/\//g, "\\u002f")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}
+
+// ── Rate Limiting (High #7) ────────────────────────────────────────
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 100; // 100 POST requests per minute per IP
+const rateLimitMap = new Map();
+
+// Clean up stale entries every 2 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of rateLimitMap) {
+    if (now > entry.resetTime) rateLimitMap.delete(ip);
+  }
+}, 120_000);
+
+function checkRateLimit(req, res) {
+  const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket.remoteAddress;
+  const now = Date.now();
+  let entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetTime) {
+    entry = { count: 0, resetTime: now + RATE_LIMIT_WINDOW_MS };
+    rateLimitMap.set(ip, entry);
+  }
+  entry.count++;
+  if (entry.count > RATE_LIMIT_MAX) {
+    res.writeHead(429, { "Content-Type": "application/json", "Retry-After": "60" });
+    res.end(JSON.stringify({ error: "Rate limit exceeded" }));
+    return false;
+  }
+  return true;
+}
+
+// ── CORS Trusted Origins (Critical #3) ─────────────────────────────
+const TRUSTED_ORIGINS = new Set([
+  "https://mcp-views.chukai.io",
+  "https://chuk-mcp-ui-views.fly.dev",
+  "http://localhost:8000",
+  "http://localhost:5173",
+]);
+
+function setCorsHeaders(req, res) {
+  const origin = req.headers.origin;
+  if (origin && TRUSTED_ORIGINS.has(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Vary", "Origin");
+  }
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+}
+
 const MAX_SECTIONS = 200;
 
 const PORT = parseInt(process.env.PORT || "8000", 10);
 
 const server = createServer((req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  // Request tracing (Low #18)
+  const reqId = randomUUID().slice(0, 8);
+  const startTime = Date.now();
+
+  // Security headers (High #6)
+  setCorsHeaders(req, res);
   res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  if (process.env.NODE_ENV === "production") {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
 
   if (req.method === "OPTIONS") {
     res.writeHead(204);
@@ -147,8 +220,40 @@ const server = createServer((req, res) => {
     return;
   }
 
-  // Service info
+  // Root: content-negotiate — JSON API info vs catalogue HTML
   if (path === "/") {
+    const accept = (req.headers["accept"] || "").toLowerCase();
+    // Serve JSON service info when client explicitly asks for JSON
+    if (accept.includes("application/json") && !accept.includes("text/html")) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({
+        service: "chuk-mcp-ui-views",
+        version: "1.0.0",
+        views: VIEWS.map((v) => ({
+          name: v,
+          url: `/${v}/v1`,
+          loaded: !!viewHtml[v],
+          ssr: ssrAvailable.has(v),
+        })),
+      }));
+      return;
+    }
+    // Otherwise serve catalogue HTML (playground built with base="/playground/")
+    const cataloguePath = resolve(__dirname, "apps", "playground", "dist", "index.html");
+    if (existsSync(cataloguePath)) {
+      try {
+        const html = readFileSync(cataloguePath, "utf-8");
+        res.writeHead(200, {
+          "Content-Type": "text/html; charset=utf-8",
+          "Cache-Control": "public, max-age=300",
+        });
+        res.end(html);
+        return;
+      } catch (e) {
+        console.warn(`[${reqId}] Failed to serve catalogue:`, e.message);
+      }
+    }
+    // Fallback to JSON if catalogue not built
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({
       service: "chuk-mcp-ui-views",
@@ -165,6 +270,7 @@ const server = createServer((req, res) => {
 
   // Compose endpoints: POST /compose/ssr and POST /compose/infer
   if (path === "/compose/ssr" && req.method === "POST") {
+    if (!checkRateLimit(req, res)) return;
     if (!ssrModule || !ssrModule.compose) {
       res.writeHead(503, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "SSR compose engine not available" }));
@@ -187,7 +293,7 @@ const server = createServer((req, res) => {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(result));
       } catch (e) {
-        console.error("Compose SSR error:", e);
+        console.error(`[${reqId}] Compose SSR error:`, e);
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Compose render failed" }));
       }
@@ -200,6 +306,7 @@ const server = createServer((req, res) => {
   }
 
   if (path === "/compose/infer" && req.method === "POST") {
+    if (!checkRateLimit(req, res)) return;
     if (!ssrModule || !ssrModule.infer) {
       res.writeHead(503, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: "SSR infer engine not available" }));
@@ -222,7 +329,7 @@ const server = createServer((req, res) => {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ results }));
       } catch (e) {
-        console.error("Compose infer error:", e);
+        console.error(`[${reqId}] Compose infer error:`, e);
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Inference failed" }));
       }
@@ -253,13 +360,17 @@ const server = createServer((req, res) => {
         });
         res.end(content);
       } catch (e) {
-        console.error("Failed to read compose client bundle:", e);
+        console.error(`[${reqId}] Failed to read compose client bundle:`, e);
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: "Failed to read compose client bundle" }));
+        res.end(JSON.stringify({ error: "Internal error" }));
       }
     } else {
       res.writeHead(404, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ error: "Compose client bundle not built. Run: pnpm --filter @chuk/ssr build:client" }));
+      // Medium #12: generic error in production
+      const msg = process.env.NODE_ENV === "production"
+        ? "Resource not available"
+        : "Compose client bundle not built. Run: pnpm --filter @chuk/ssr build:client";
+      res.end(JSON.stringify({ error: msg }));
     }
     return;
   }
@@ -272,6 +383,7 @@ const server = createServer((req, res) => {
 
     // POST /<view>/v1/ssr — server-side render with data
     if (isSsr && req.method === "POST") {
+      if (!checkRateLimit(req, res)) return;
       const parts = viewHtmlParts[view];
       if (!ssrAvailable.has(view) || !parts) {
         res.writeHead(404, { "Content-Type": "application/json" });
@@ -288,13 +400,13 @@ const server = createServer((req, res) => {
         }
         try {
           const rendered = ssrModule.render(view, data);
-          // Embed SSR data for client hydration + pre-rendered DOM
+          // Embed SSR data for client hydration + pre-rendered DOM (Critical #1: safe escaping)
           let ssrScript = "";
           try {
-            ssrScript = `<script>window.__SSR_DATA__=${JSON.stringify(data).replace(/</g, "\\u003c")}</script>`;
+            ssrScript = `<script>window.__SSR_DATA__=${safeJsonForScript(data)}</script>`;
           } catch {
             // Skip hydration data if serialization fails (e.g., circular references)
-            console.warn(`SSR: Could not serialize data for ${view} hydration`);
+            console.warn(`[${reqId}] SSR: Could not serialize data for ${view} hydration`);
           }
           const html = parts.before + rendered + parts.after.replace("</body>", ssrScript + "</body>");
           res.writeHead(200, {
@@ -303,7 +415,7 @@ const server = createServer((req, res) => {
           });
           res.end(html);
         } catch (e) {
-          console.error(`SSR render error for ${view}:`, e);
+          console.error(`[${reqId}] SSR render error for ${view}:`, e);
           res.writeHead(500, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ error: "SSR render failed" }));
         }
@@ -315,11 +427,18 @@ const server = createServer((req, res) => {
       return;
     }
 
-    // GET /<view>/v1 — serve static SPA HTML
+    // GET /<view>/v1 — serve static SPA HTML (Low #17: ETag support)
     if (!isSsr && viewHtml[view]) {
+      const etag = viewEtag[view];
+      if (etag && req.headers["if-none-match"] === etag) {
+        res.writeHead(304);
+        res.end();
+        return;
+      }
       res.writeHead(200, {
         "Content-Type": "text/html; charset=utf-8",
         "Cache-Control": "public, max-age=3600",
+        ...(etag ? { "ETag": etag } : {}),
       });
       res.end(viewHtml[view]);
       return;
@@ -334,7 +453,7 @@ const server = createServer((req, res) => {
     ".ttf": "font/ttf", ".map": "application/json", ".txt": "text/plain",
   };
 
-  function serveStatic(prefix, dir) {
+  async function serveStaticAsync(prefix, dir) {
     // Redirect /prefix to /prefix/ so relative paths resolve correctly
     if (path === prefix) {
       res.writeHead(301, { Location: prefix + "/" });
@@ -347,15 +466,28 @@ const server = createServer((req, res) => {
         : path.replace(prefix, "");
       const baseDir = resolve(__dirname, dir);
       const filePath = resolve(baseDir, subPath.slice(1));
-      // Prevent path traversal — resolved path must stay within baseDir
-      if (!filePath.startsWith(baseDir + "/") && filePath !== baseDir) {
+
+      // Path traversal fix (High #8): use relative path check + realpath for symlink safety
+      const rel = relative(baseDir, filePath);
+      if (rel.startsWith("..") || isAbsolute(rel)) {
         res.writeHead(403, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: "Forbidden" }));
         return true;
       }
+
       if (existsSync(filePath)) {
         try {
-          const content = readFileSync(filePath);
+          // Verify resolved symlinks stay within baseDir
+          const realFile = realpathSync(filePath);
+          const realBase = realpathSync(baseDir);
+          if (!realFile.startsWith(realBase + "/") && realFile !== realBase) {
+            res.writeHead(403, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Forbidden" }));
+            return true;
+          }
+
+          // Medium #13: async file read
+          const content = await fsp.readFile(filePath);
           const ext = extname(filePath);
           res.writeHead(200, {
             "Content-Type": MIME[ext] || "application/octet-stream",
@@ -364,22 +496,33 @@ const server = createServer((req, res) => {
           res.end(content);
           return true;
         } catch (e) {
-          console.warn(`Failed to read ${filePath}:`, e.message);
+          console.warn(`[${reqId}] Failed to read ${filePath}:`, e.message);
         }
       }
     }
     return false;
   }
 
-  // Playground: serve SPA from apps/playground/dist
-  if (serveStatic("/playground", "apps/playground/dist")) return;
+  // Use async handler for static routes
+  (async () => {
+    // Playground: serve SPA from apps/playground/dist
+    if (await serveStaticAsync("/playground", "apps/playground/dist")) return;
 
-  // Storybook: serve static build from storybook-static
-  if (serveStatic("/storybook", "storybook-static")) return;
+    // Storybook: serve static build from storybook-static
+    if (await serveStaticAsync("/storybook", "storybook-static")) return;
 
-  // 404
-  res.writeHead(404, { "Content-Type": "application/json" });
-  res.end(JSON.stringify({ error: "Not found" }));
+    // 404
+    res.writeHead(404, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: "Not found" }));
+
+    console.log(`[${reqId}] ${req.method} ${path} 404 ${Date.now() - startTime}ms`);
+  })().catch((e) => {
+    console.error(`[${reqId}] Unhandled error:`, e);
+    if (!res.headersSent) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "Internal error" }));
+    }
+  });
 });
 
 server.listen(PORT, "0.0.0.0", () => {

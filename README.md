@@ -1,6 +1,6 @@
 # chuk-mcp-ui
 
-A monorepo of **69 standalone MCP (Model Context Protocol) UI views**, each built as a single-file HTML app with Vite + vite-plugin-singlefile. Views communicate with LLMs through the MCP ext-apps protocol and with each other through the ViewBus cross-view message bus.
+A monorepo of **69 standalone MCP (Model Context Protocol) UI views**, each built as a single-file HTML app with Vite + vite-plugin-singlefile. Views communicate with LLMs through the MCP ext-apps protocol and with each other through the ViewBus cross-view message bus. Browse the full catalogue at [mcp-views.chukai.io](https://mcp-views.chukai.io/).
 
 ## Getting Started
 
@@ -27,18 +27,22 @@ pnpm type-check
 
 ```
 chuk-mcp-ui/
-├── apps/
-│   ├── dashboard/     # Composable dashboard + runtime engine
-│   ├── map/           # Leaflet map view
-│   ├── datatable/     # Data table view
-│   ├── chart/         # Chart.js chart view
-│   ├── form/          # Dynamic form view
-│   ├── ...            # 68 more view apps
-│   └── playground/    # Dev playground
+├── apps/                    # 69 view apps + playground
+│   ├── dashboard/           # Composable dashboard + runtime engine
+│   ├── map/                 # Leaflet map view
+│   ├── datatable/           # Data table view
+│   ├── chart/               # Chart.js chart view
+│   ├── form/                # Dynamic form view
+│   ├── ...                  # 64 more view apps
+│   └── playground/          # View catalogue & dev playground
 ├── packages/
-│   ├── shared/        # @chuk/view-shared — hooks, ViewBus, theme
-│   └── ui/            # @chuk/view-ui — design system components
-├── .storybook/        # Storybook v8.5 config
+│   ├── shared/              # @chuk/view-shared — hooks, ViewBus, theme
+│   ├── ui/                  # @chuk/view-ui — design system components
+│   ├── ssr/                 # Universal SSR module + compose engine
+│   └── create-chuk-view/    # View scaffolder CLI
+├── .storybook/              # Storybook v8.5 config
+├── server.mjs               # Production server
+├── Dockerfile               # Production container
 ├── turbo.json
 └── package.json
 ```
@@ -71,12 +75,24 @@ The dashboard view is a composable layout engine with three capability tiers:
 | **v2.0** | Composable panels with `viewType` resolution, auto layout, cross-view links, conditional panels |
 | **v3.0** | Conversation-driven UI runtime: UIStateStore, EventQueue, PatchEngine, StateEmitter |
 
+### Server-Side Rendering
+
+The universal SSR module at `packages/ssr/` renders all 69 views server-side from a single 2.2 MB bundle (replacing 65 per-view bundles totalling 101 MB).
+
+- **`POST /<view>/v1/ssr`** — render a single view with data
+- **`POST /compose/ssr`** — compose multiple views into a single HTML page with CSS grid layout, cross-view state propagation, and client hydration
+- **`POST /compose/infer`** — suggest the best view type for a data object (GeoJSON → map, tabular → datatable, etc.)
+
+9 browser-dependent views (Leaflet, Chart.js, pdf.js) use placeholder SSR with full client-side hydration.
+
 ### Packages
 
 | Package | npm Name | Description |
 |---------|----------|-------------|
 | `packages/shared` | `@chuk/view-shared` | `useView` hook, ViewBus, theme utilities |
 | `packages/ui` | `@chuk/view-ui` | Design system (button, badge, card, checkbox, input, label, radio-group, scroll-area, select, separator, slider, table, tabs, textarea, tooltip) built with Tailwind CSS v4 |
+| `packages/ssr` | — | Universal SSR module + compose engine |
+| `packages/create-chuk-view` | `create-chuk-view` | View scaffolder CLI with pattern templates |
 
 ## Available Views
 
@@ -183,12 +199,15 @@ https://mcp-views.chukai.io/{view-name}/v1
 
 Examples: `.../map/v1`, `.../chart/v1`, `.../dashboard/v1`
 
-The playground and Storybook are also hosted:
+The catalogue, playground, and Storybook are also hosted:
 
 ```
+https://mcp-views.chukai.io/              # View catalogue (grid + detail pages)
 https://mcp-views.chukai.io/playground/    # Live JSON editor + preview
 https://mcp-views.chukai.io/storybook/     # Component & view stories
 ```
+
+The root URL serves the **View Catalogue** — a searchable grid of all 69 views with live iframe thumbnails, category filtering, and detail pages with JSON editor, schema inspector, and integration snippets. The same URL serves JSON API info when requested with `Accept: application/json`.
 
 ## Hooks
 
@@ -208,6 +227,30 @@ https://mcp-views.chukai.io/storybook/     # Component & view stories
 | `useViewLiveData` | Polling and SSE live data subscriptions |
 | `useViewDrag` | Cross-view drag and drop via ViewBus |
 | `useViewEvents` | Typed event emission (`select`, `filter-change`, `submit`, `action`, `draw`) |
+
+## Creating a New View
+
+Use the scaffolder to generate all 17 boilerplate files including SSR support:
+
+```bash
+# Blank template
+npx create-chuk-view my-view
+
+# Pre-built patterns
+npx create-chuk-view my-view --template=list
+npx create-chuk-view my-view --template=detail
+npx create-chuk-view my-view --template=wizard
+```
+
+Move into the monorepo, install, and start developing:
+
+```bash
+mv my-view apps/my-view
+pnpm install
+pnpm --filter @chuk/view-my-view dev
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide.
 
 ## Compatibility Testing
 

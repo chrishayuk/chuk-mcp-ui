@@ -68,6 +68,7 @@ export const VIEW_TYPES = [
   "slides",
   "swimlane",
   "threed",
+  "font",
   "shader",
   "transcript",
   "wizard",
@@ -2158,6 +2159,20 @@ export const samples: Record<ViewType, object> = {
     showTimestamps: true,
   },
 
+  font: {
+    type: "font",
+    version: "1.0",
+    title: "Inter",
+    fontFamily: "Inter, sans-serif",
+    specimens: [
+      { text: "The quick brown fox jumps over the lazy dog", size: 32, weight: 700 },
+      { text: "ABCDEFGHIJKLMNOPQRSTUVWXYZ", size: 24, weight: 400 },
+      { text: "abcdefghijklmnopqrstuvwxyz 0123456789", size: 24, weight: 400 },
+      { text: "!@#$%^&*()_+-=[]{}|;':\",./<>?", size: 18, weight: 300 },
+    ],
+    weights: [100, 200, 300, 400, 500, 600, 700, 800, 900],
+  },
+
   shader: {
     type: "shader",
     version: "1.0",
@@ -2174,4 +2189,80 @@ void main() {
     height: 512,
     animate: false,
   },
+};
+
+/**
+ * Named sample datasets per view.
+ * The "Default" key maps to the existing single sample above.
+ * Additional named datasets can be added per view for the dataset switcher.
+ */
+export const namedSamples: Record<ViewType, Record<string, object>> =
+  Object.fromEntries(
+    VIEW_TYPES.map((v) => [v, { Default: samples[v] }]),
+  ) as unknown as Record<ViewType, Record<string, object>>;
+
+// Add extra named datasets for key demo views
+namedSamples.counter["Minimal"] = {
+  type: "counter",
+  version: "1.0",
+  value: 42,
+  label: "Active Users",
+};
+
+namedSamples.counter["Error State"] = {
+  type: "counter",
+  version: "1.0",
+  value: 3,
+  label: "Failed Jobs",
+  delta: { value: -200, label: "vs yesterday" },
+  color: "danger",
+};
+
+namedSamples.datatable["Empty Table"] = {
+  type: "datatable",
+  version: "1.0",
+  title: "No Results",
+  columns: [
+    { key: "name", label: "Name" },
+    { key: "status", label: "Status" },
+  ],
+  rows: [],
+};
+
+namedSamples.chart["Line Chart"] = {
+  type: "chart",
+  version: "1.0",
+  chartType: "line",
+  data: [
+    { label: "Jan", values: [10] },
+    { label: "Feb", values: [25] },
+    { label: "Mar", values: [18] },
+    { label: "Apr", values: [32] },
+    { label: "May", values: [28] },
+    { label: "Jun", values: [45] },
+  ],
+  datasets: [{ label: "Revenue ($k)" }],
+};
+
+namedSamples.chart["Pie Chart"] = {
+  type: "chart",
+  version: "1.0",
+  chartType: "pie",
+  data: [
+    { label: "Chrome", values: [65] },
+    { label: "Safari", values: [19] },
+    { label: "Firefox", values: [10] },
+    { label: "Other", values: [6] },
+  ],
+  datasets: [{ label: "Browser Share" }],
+};
+
+namedSamples.timeline["Minimal"] = {
+  type: "timeline",
+  version: "1.0",
+  events: [
+    { date: "2024-01-15", title: "Project Started" },
+    { date: "2024-06-01", title: "Beta Release" },
+    { date: "2024-12-01", title: "GA Launch" },
+  ],
 };

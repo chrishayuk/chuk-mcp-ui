@@ -474,6 +474,11 @@ def threed_tool(mcp: Any, name: str, **kwargs: Any) -> Callable[[F], F]:
     return _view_tool(mcp, name, "threed", **kwargs)
 
 
+def font_tool(mcp: Any, name: str, **kwargs: Any) -> Callable[[F], F]:
+    """Register an MCP tool that returns a font glyph View."""
+    return _view_tool(mcp, name, "font", **kwargs)
+
+
 def view_tool(mcp: Any, name: str, view_type: str, **kwargs: Any) -> Callable[[F], F]:
     """Generic decorator for any view type."""
     return _view_tool(mcp, name, view_type, **kwargs)

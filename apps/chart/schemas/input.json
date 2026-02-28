@@ -66,6 +66,17 @@
         }
       }
     },
-    "interactive": { "type": "boolean", "default": true }
+    "interactive": { "type": "boolean", "default": true },
+    "onClickTool": {
+      "type": "object",
+      "properties": {
+        "tool": { "type": "string" },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "required": ["tool"]
+    }
   }
 }

@@ -27,6 +27,11 @@ export const annotationSchema = z.object({
   color: z.string().optional(),
 });
 
+export const chartClickActionSchema = z.object({
+  tool: z.string(),
+  arguments: z.record(z.string(), z.string()).optional(),
+});
+
 export const chartSchema = z.object({
   type: z.literal("chart"),
   version: z.literal("1.0"),
@@ -41,6 +46,7 @@ export const chartSchema = z.object({
   }).optional(),
   annotations: z.array(annotationSchema).optional(),
   interactive: z.boolean().optional(),
+  onClickTool: chartClickActionSchema.optional(),
 });
 
 export type ChartContent = z.infer<typeof chartSchema>;

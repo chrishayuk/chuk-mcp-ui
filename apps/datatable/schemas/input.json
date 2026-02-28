@@ -36,6 +36,13 @@
     "sortable": { "type": "boolean", "default": true },
     "filterable": { "type": "boolean", "default": true },
     "exportable": { "type": "boolean", "default": false },
+    "selectable": { "type": "boolean" },
+    "paginationTool": { "type": "string" },
+    "totalRows": { "type": "number" },
+    "pageSize": { "type": "number" },
+    "currentPage": { "type": "number" },
+    "refreshTool": { "type": "string" },
+    "exportTool": { "type": "string" },
     "actions": {
       "type": "array",
       "items": {

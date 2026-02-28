@@ -1,23 +1,22 @@
 import { useRef, useCallback, useEffect } from "react";
-
-const BASE_URL = import.meta.env.DEV
-  ? "http://localhost:8000"
-  : "https://mcp-views.chukai.io";
+import { CDN_BASE as BASE_URL } from "../config";
 
 interface PreviewPaneProps {
   viewType: string;
   data: object | null;
+  theme?: "light" | "dark";
 }
 
-export function PreviewPane({ viewType, data }: PreviewPaneProps) {
+export function PreviewPane({ viewType, data, theme = "light" }: PreviewPaneProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Track initial data per viewType so we embed it in the hash.
   // Re-computes during render only when viewType changes — data edits
   // do NOT change the src (updates go via postMessage instead).
+  // Theme is included in the initial URL; live changes go via postMessage.
   const snapshotRef = useRef<{ viewType: string; src: string } | null>(null);
   if (!snapshotRef.current || snapshotRef.current.viewType !== viewType) {
-    const base = `${BASE_URL}/${viewType}/v1`;
+    const base = `${BASE_URL}/${viewType}/v1?theme=${theme}`;
     let src = base;
     if (data) {
       try {
@@ -37,31 +36,47 @@ export function PreviewPane({ viewType, data }: PreviewPaneProps) {
         content: [],
         structuredContent: data,
       },
-      "*"
+      BASE_URL
     );
   }, [data]);
 
-  // Also send via postMessage on load + retry
+  // Send theme to iframe via postMessage (on change and after load)
+  const sendTheme = useCallback(() => {
+    if (!iframeRef.current?.contentWindow) return;
+    iframeRef.current.contentWindow.postMessage(
+      { type: "mcp-app:theme-change", theme },
+      BASE_URL
+    );
+  }, [theme]);
+
+  // Also send data + theme via postMessage on load + retry
   const handleLoad = useCallback(() => {
     sendData();
-    setTimeout(sendData, 200);
-  }, [sendData]);
+    sendTheme();
+    setTimeout(() => { sendData(); sendTheme(); }, 200);
+  }, [sendData, sendTheme]);
 
   // Listen for "view-ready" signal from the iframe's useView hook
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
       if (event.data?.type === "mcp-app:view-ready") {
         sendData();
+        sendTheme();
       }
     }
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [sendData]);
+  }, [sendData, sendTheme]);
 
   // Re-send when data changes (user edits JSON)
   useEffect(() => {
     sendData();
   }, [sendData]);
+
+  // Re-send theme when it changes
+  useEffect(() => {
+    sendTheme();
+  }, [sendTheme]);
 
   return (
     <iframe

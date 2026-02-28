@@ -6,17 +6,20 @@ Technical architecture reference for **chuk-mcp-ui**.
 
 ## 1. Overview
 
-A monorepo of 66 MCP (Model Context Protocol) ext-apps views. Each view is a standalone HTML app that renders structured data from LLM tool calls via the `@modelcontextprotocol/ext-apps` SDK.
+A monorepo of 69 MCP (Model Context Protocol) ext-apps views. Each view is a standalone HTML app that renders structured data from LLM tool calls via the `@modelcontextprotocol/ext-apps` SDK. The root of `mcp-views.chukai.io` serves the View Catalogue — a searchable grid with live previews, JSON editor, schema inspector, and integration snippets.
 
 ```
 chuk-mcp-ui/
-  apps/              # 66 view apps (alert, chart, dashboard, map, ...)
+  apps/              # 69 view apps (alert, chart, dashboard, map, ...)
+    playground/      # View catalogue & dev playground
   packages/
     shared/          # @chuk/view-shared  -- hooks, bus, theme, actions
     ui/              # @chuk/view-ui      -- Tailwind CSS v4 component library
-    create-chuk-view/# scaffolding CLI
+    ssr/             # Universal SSR module + compose engine
+    create-chuk-view/# scaffolding CLI (blank, list, detail, wizard templates)
   types/             # shared TypeScript type declarations
-  chuk-view-schemas/ # JSON schema definitions for structured content
+  server.mjs         # Production server (content-negotiated root, views, SSR, compose)
+  Dockerfile         # Production container for Fly.io
 ```
 
 ---
@@ -303,7 +306,7 @@ Each view app uses **Vite** with `vite-plugin-singlefile` to produce a single se
 
 ### Monorepo Orchestration
 
-- **Turborepo** (`turbo.json`) orchestrates builds across all 66+ apps and shared packages with dependency-aware caching and parallel execution.
+- **Turborepo** (`turbo.json`) orchestrates builds across all 69 apps and shared packages with dependency-aware caching and parallel execution.
 - **pnpm workspaces** (`pnpm-workspace.yaml`) manage package resolution across the monorepo.
 
 ### TypeScript
@@ -314,9 +317,32 @@ A shared `tsconfig.base.json` at the root provides common compiler options. Indi
 
 A `server.mjs` at the root serves built view HTML files. Deployment is configured for Fly.io (`fly.toml`, `Dockerfile`). Views are accessible at `https://mcp-views.chukai.io/{view-name}/v{major}`.
 
-The server also hosts:
-- **Playground** at `/playground/` — live JSON editor + iframe preview for all 66 views
+The server hosts:
+- **View Catalogue** at `/` — searchable grid of all 69 views with live thumbnails, detail pages with JSON editor, schema inspector, and integration snippets. Content-negotiated: browsers get HTML, `Accept: application/json` gets JSON API info.
+- **Playground** at `/playground/` — live JSON editor + iframe preview (also accessible via catalogue)
 - **Storybook** at `/storybook/` — static build of all component, view, and hook stories
+- **SSR endpoints** at `/<view>/v1/ssr` — server-side rendering per view
+- **Compose endpoints** at `/compose/ssr`, `/compose/infer`, `/compose/client.js` — multi-view SSR composition
+
+### Universal SSR Module
+
+Source: `packages/ssr/`
+
+A single Vite SSR build (2.2 MB) imports all 69 view renderers and exports a unified `render(viewName, data)` function. React is externalized to avoid bundling 65 separate copies.
+
+9 browser-dependent views use placeholder SSR (loading states): map, minimap, layers (Leaflet), chart, profile, scatter, timeseries (Chart.js), pdf (pdf.js). These hydrate to full interactive views on the client.
+
+### SSR Compose Engine
+
+Source: `packages/ssr/src/compose.ts`
+
+Composes multiple views into a single HTML page with CSS grid/flex layout:
+
+- **`POST /compose/ssr`** — accepts sections with data (explicit view or auto-inferred), renders composed HTML page with cross-view state propagation
+- **`POST /compose/infer`** — accepts data objects, returns ranked view suggestions using 20+ matchers
+- **`GET /compose/client.js`** — serves hydration bundle that mounts interactive views with ComposeBus for cross-view communication
+
+Cross-view state (`packages/ssr/src/state-propagation.ts`) propagates selections, filters, and highlights through `CrossViewLink` declarations at SSR time. The ComposeBus (`packages/shared/src/bus/compose-bus.ts`) provides in-memory pub/sub for hydrated views, replacing iframe postMessage.
 
 ---
 
@@ -326,7 +352,7 @@ Source: `chuk-view-schemas/chuk_view_schemas/fastmcp.py`
 
 ### FastMCP Decorators
 
-17 per-view decorators wrap the `meta={"ui": {"resourceUri": ...}}` boilerplate:
+66 per-view decorators wrap the `meta={"ui": {"resourceUri": ...}}` boilerplate. Key examples:
 
 | Decorator | View Type |
 |-----------|-----------|

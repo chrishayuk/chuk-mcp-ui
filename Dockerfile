@@ -12,7 +12,7 @@ RUN npm install --no-save react@18 react-dom@18
 COPY packages/ssr/dist                  packages/ssr/dist
 COPY packages/ssr/dist-client           packages/ssr/dist-client
 
-# 66 View apps (single-file HTML each)
+# 69 View apps (single-file HTML each)
 # Phase 1-2 (original 27)
 COPY apps/chart/dist/mcp-app.html      apps/chart/dist/mcp-app.html
 COPY apps/chat/dist/mcp-app.html       apps/chat/dist/mcp-app.html

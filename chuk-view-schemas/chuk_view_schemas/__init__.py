@@ -74,6 +74,7 @@ from .tree import TreeContent, TreeNode
 from .progress import ProgressContent, ProgressTrack, OverallProgress
 from .confirm import ConfirmContent
 from .json_view import JsonContent
+from .font import FontContent, FontGlyph, FontContour
 
 __all__ = [
     "infer_view",
@@ -239,6 +240,9 @@ __all__ = [
     "OverallProgress",
     "ConfirmContent",
     "JsonContent",
+    "FontContent",
+    "FontGlyph",
+    "FontContour",
 ]
 
 # Server-side decorator helpers (optional — requires mcp package)
@@ -310,6 +314,7 @@ try:
         slides_tool,
         swimlane_tool,
         threed_tool,
+        font_tool,
         view_tool,
         CDN_BASE,
         VIEW_PATHS,

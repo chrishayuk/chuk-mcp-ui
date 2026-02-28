@@ -91,7 +91,7 @@ export function createComposeBus(filter?: LinkFilter): ComposeBus {
             const typeSet = panelTyped.get(message.type);
             if (typeSet) {
               for (const h of typeSet) {
-                try { h(message, panelId); } catch (e) { console.error("[ComposeBus] Handler error:", e); }
+                try { h(message, panelId); } catch (e) { console.error("[ComposeBus] Handler error:", e); if (typeof reportError === "function") reportError(e); }
               }
             }
           }
@@ -100,7 +100,7 @@ export function createComposeBus(filter?: LinkFilter): ComposeBus {
           const panelAll = allHandlers.get(targetId);
           if (panelAll) {
             for (const h of panelAll) {
-              try { h(message, panelId); } catch (e) { console.error("[ComposeBus] Handler error:", e); }
+              try { h(message, panelId); } catch (e) { console.error("[ComposeBus] Handler error:", e); if (typeof reportError === "function") reportError(e); }
             }
           }
         });

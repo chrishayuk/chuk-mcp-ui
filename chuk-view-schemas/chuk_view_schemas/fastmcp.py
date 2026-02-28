@@ -90,6 +90,8 @@ VIEW_PATHS: dict[str, str] = {
     "slides": "/slides/v1",
     "swimlane": "/swimlane/v1",
     "threed": "/threed/v1",
+    # Specialist views
+    "font": "/font/v1",
 }
 
 
@@ -499,6 +501,11 @@ def swimlane_tool(mcp: Any, name: str, **kwargs: Any) -> Callable[[F], F]:
 def threed_tool(mcp: Any, name: str, **kwargs: Any) -> Callable[[F], F]:
     """Register an MCP tool that returns a 3D View."""
     return _view_tool(mcp, name, "threed", **kwargs)
+
+
+def font_tool(mcp: Any, name: str, **kwargs: Any) -> Callable[[F], F]:
+    """Register an MCP tool that returns a font glyph View."""
+    return _view_tool(mcp, name, "font", **kwargs)
 
 
 def view_tool(mcp: Any, name: str, view_type: str, **kwargs: Any) -> Callable[[F], F]:

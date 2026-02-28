@@ -206,17 +206,23 @@ inference helper (65 tests), and snapshot testing CLI.
 
 ### 5.1 `create-chuk-view` CLI Scaffolder ✓
 
-**Sprint 2: shipped.** Implemented at `packages/create-chuk-view/`.
+**Sprint 2: shipped. Phase 10: SSR support + pattern templates added.**
+Implemented at `packages/create-chuk-view/`.
 
 ```bash
 npx create-chuk-view my-custom-view
+npx create-chuk-view my-custom-view --template=list
+npx create-chuk-view my-custom-view --template=detail
+npx create-chuk-view my-custom-view --template=wizard
 ```
 
-Generates full boilerplate: `COMPONENT.md` template, `vite.config.ts`,
-`mcp-app.html`, `App.tsx` with `useView` wired up, Storybook story, Zod
-schema, test stubs. A developer goes from zero to a working custom View
-in under a minute. This is what shadcn's `npx shadcn-ui add` did for
-adoption — remove the setup friction entirely.
+Generates 17 boilerplate files including SSR support (`ssr-entry.tsx`,
+`vite.config.ssr.ts`, conditional `hydrateRoot`/`createRoot`), schema
+validation (`schema.ts`, `zod.ts`, `schemas/input.json`), tests, and
+Storybook story. Pattern templates generate complete View + Renderer
+with schema, Zod validation, and JSON Schema for list, detail, and
+wizard patterns. A developer goes from zero to a working custom View
+in under a minute.
 
 ### 5.2 `useView` Hook Family ✓
 
@@ -305,15 +311,16 @@ Presets: `default`, `dark`, `discovery` (Discovery Channel branding),
 
 ### 5.6 Live Playground MVP ✓
 
-**Sprint 2: shipped.** Implemented at `apps/playground/`. Deployed at
-`mcp-views.chukai.io/playground/`. Storybook deployed at
-`mcp-views.chukai.io/storybook/`.
+**Sprint 2: shipped. Phase 9: evolved into full View Catalogue.**
+Implemented at `apps/playground/`. Deployed at
+`mcp-views.chukai.io/` (catalogue) and `mcp-views.chukai.io/playground/`.
+Storybook deployed at `mcp-views.chukai.io/storybook/`.
 
-A stripped-down early version of the Phase 9 catalogue: dropdown of all 66 Views
-+ JSON editor + live iframe preview. Uses URL hash for synchronous initial
-data delivery to iframes, with postMessage for subsequent updates.
-The JSON editor where a Python developer pastes their data and sees it
-render instantly — that's the conversion moment.
+Originally a stripped-down dropdown + JSON editor + live iframe preview.
+Phase 9 evolved it into the full View Catalogue with searchable grid,
+category filtering, detail pages, schema inspector, and integration
+snippets. Uses URL hash for synchronous initial data delivery to iframes,
+with postMessage for subsequent updates.
 
 ### 5.7 `structuredContent` Inference Helper ✓
 
@@ -835,12 +842,16 @@ the in-memory ComposeBus.
 
 ---
 
-## Phase 9 — View Catalogue & Viewer
+## Phase 9 — View Catalogue & Viewer ✓
 
 **Goal:** A purpose-built Storybook for MCP Views. The landing page at
 `mcp-views.chukai.io`, the development tool, the demo platform,
 and the test harness — all in one. Evolves from the Phase 5 live
 playground MVP.
+
+**Status: Complete.** Catalogue app built and deployed at `/`. Grid landing
+page with live iframe thumbnails, search/filter by 12 categories, detail
+pages with JSON editor, schema inspector, and integration snippets.
 
 ### URL Structure
 
@@ -852,27 +863,45 @@ mcp-views.chukai.io/chart/v1         -> The actual View
 ```
 
 The root is the viewer. Each View's versioned path serves the raw
-`mcp-app.html` to MCP hosts. Same domain, two purposes.
+`mcp-app.html` to MCP hosts. Same domain, two purposes. Content
+negotiation at `/`: browsers get the catalogue HTML, `Accept: application/json`
+gets a JSON API response listing all views.
 
 ### Deliverables
 
-- [ ] Catalogue app at `mcp-views.chukai.io/`
-  - Lists all Views with live preview thumbnails
-  - Each View rendered in an iframe exactly as a host would
-  - Feeds sample `structuredContent` from COMPONENT.md test cases
-- [ ] Theme toggling — light/dark, custom theme editor, presets from Phase 5
-- [ ] Dataset switcher per View — heritage data, restaurant data,
-  earthquake data, proving server-agnosticism
-- [ ] Live JSON editor — edit the `structuredContent` being passed in,
-  see the View update in real time
-- [ ] Schema inspector — JSON Schema and TypeScript types side by side
-- [ ] Integration snippets — "Copy for Python" / "Copy for TypeScript"
+- [x] Catalogue app at `mcp-views.chukai.io/`
+  - Lists all 69 Views with live iframe preview thumbnails (IntersectionObserver lazy loading, 4x scale)
+  - Searchable grid with responsive layout (3 cols desktop, 2 tablet, 1 mobile)
+  - 12-category sidebar filter with count badges
+  - Hash-based routing (`#/` = grid, `#/view/<name>` = detail)
+- [x] Theme toggling — light/dark toggle in header
+- [x] Dataset switcher per View — named samples with dropdown
+- [x] Live JSON editor — edit `structuredContent`, see preview update in real time
+- [x] Schema inspector — JSON Schema and TypeScript types side by side (all 69 views)
+- [x] Integration snippets — "Copy for Python" / "Copy for TypeScript" / "HTML Embed"
   buttons with ready-to-paste MCP server code
-- [ ] Metadata panel — bundle size, CSP requirements, accessibility status
+- [x] Metadata panel — SSR status, CDN URL, SSR URL, phase, tags
+- [x] Content negotiation — `curl -H "Accept: application/json" /` returns JSON API info
 - [ ] Playwright visual regression — runs against the viewer, screenshots
   each View with each sample dataset, compares against baselines
   (powered by Phase 5 snapshot testing CLI)
 - [ ] CI preview deploys — PRs for new Views deploy to the viewer
+
+### Architecture
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| `catalogue-registry.ts` | Registry | 69 view entries with categories, tags, SSR flags |
+| `CatalogueGrid.tsx` | Landing | Responsive grid of ViewCard components |
+| `ViewCard.tsx` | Card | Thumbnail + name + badge + description |
+| `ViewThumbnail.tsx` | Preview | IntersectionObserver lazy iframe at 4x scale |
+| `Sidebar.tsx` | Filter | Search input + category multi-select |
+| `useCatalogueFilter.ts` | Hook | Search ranking + category filtering |
+| `ViewDetailPage.tsx` | Detail | Preview + 4 tabs (Data, Schema, Snippets, Info) |
+| `DataTab.tsx` | Tab | Dataset switcher + JSON editor |
+| `SchemaTab.tsx` | Tab | JSON Schema + TypeScript source viewer |
+| `SnippetTab.tsx` | Tab | Python/TypeScript/HTML embed generators |
+| `MetadataTab.tsx` | Tab | SSR status, CDN URLs, phase, tags |
 
 ### What It Replaces
 
@@ -901,14 +930,23 @@ without installing anything locally.
 
 ---
 
-## Phase 10 — Ecosystem
+## Phase 10 — Ecosystem (Partial)
 
 **Goal:** Community adoption, registry, and ecosystem tools.
 
+**Status: Partially complete.** Contribution guidelines, scaffolder SSR support,
+and pattern templates shipped. External integrations (mcp-cli, ext-apps spec
+proposal, third-party submissions) pending.
+
 ### Deliverables
 
-- [ ] Community contribution guidelines
-- [ ] `create-chuk-view` templates for common patterns (list, detail, wizard)
+- [x] Community contribution guidelines (`CONTRIBUTING.md`)
+- [x] `create-chuk-view` scaffolder updated with SSR support (17 files including
+  `ssr-entry.tsx`, `vite.config.ssr.ts`, conditional `hydrateRoot`/`createRoot`)
+- [x] `create-chuk-view` templates for common patterns:
+  - `--template=list` — sortable table with status badges
+  - `--template=detail` — sections with fields and action buttons
+  - `--template=wizard` — multi-step form with step indicators
 - [ ] mcp-cli integration (auto-open browser for Views)
 - [ ] ext-apps spec proposal for hosted View discovery protocol
 - [ ] Third-party View submissions to the catalogue
@@ -953,7 +991,9 @@ community-contributed Views.
 | 66 Pydantic Content schemas (no fallbacks) | 7.5 | ✅ Done |
 | SSR per-view modules (65) | 8 | ✅ Replaced by universal module |
 | SSR universal module (single bundle) | 8 | ✅ Done — 2.2 MB, 65 views, deployed |
-| View catalogue | 9 | Not started |
+| View catalogue | 9 | ✅ Done — grid + detail pages at `/` |
+| Contribution guidelines | 10 | ✅ Done — `CONTRIBUTING.md` |
+| Scaffolder SSR + templates | 10 | ✅ Done — list, detail, wizard |
 | 66 Views in catalogue | 3-6 | ✅ Done — all 66 shipped |
 | Discovery Channel demo | 4-6 | Pending |
 | YouTube video | 1-2 | Pending |

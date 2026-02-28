@@ -1,82 +1,127 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { samples, type ViewType } from "./samples";
+import { Component, useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
+import { getView, getViewsByCategory, type Category } from "./catalogue-registry";
+import { useCatalogueFilter } from "./hooks/useCatalogueFilter";
 import { Header } from "./components/Header";
-import { ViewSelector } from "./components/ViewSelector";
-import { JsonEditor } from "./components/JsonEditor";
-import { PreviewPane } from "./components/PreviewPane";
-import { CopyButton } from "./components/CopyButton";
+import { Sidebar } from "./components/Sidebar";
+import { CatalogueGrid } from "./components/CatalogueGrid";
+import { ViewDetailPage } from "./components/ViewDetailPage";
+
+class ErrorBoundary extends Component<
+  { children: ReactNode },
+  { error: Error | null }
+> {
+  state: { error: Error | null } = { error: null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8 text-center">
+          <p className="text-lg font-semibold text-destructive">Something went wrong</p>
+          <p className="text-sm text-muted-foreground max-w-md">
+            {this.state.error.message}
+          </p>
+          <button
+            onClick={() => {
+              this.setState({ error: null });
+              window.location.hash = "#/";
+            }}
+            className="px-4 py-2 text-sm rounded bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            Back to catalogue
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+type Route =
+  | { page: "catalogue" }
+  | { page: "detail"; view: string };
+
+function parseHash(): Route {
+  const hash = window.location.hash;
+  const viewMatch = hash.match(/^#\/view\/([a-z][a-z0-9-]*)$/);
+  if (viewMatch) {
+    return { page: "detail", view: viewMatch[1] };
+  }
+  return { page: "catalogue" };
+}
 
 export function App() {
-  const [selectedView, setSelectedView] = useState<ViewType>("counter");
-  const [jsonText, setJsonText] = useState(
-    JSON.stringify(samples.counter, null, 2)
-  );
-  const [jsonError, setJsonError] = useState<string | null>(null);
-  const [parsedData, setParsedData] = useState<object | null>(samples.counter);
+  const [route, setRoute] = useState<Route>(parseHash);
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const filter = useCatalogueFilter();
 
-  // When view type changes, load the sample payload
-  const handleViewChange = useCallback((view: ViewType) => {
-    setSelectedView(view);
-    const sample = samples[view];
-    const text = JSON.stringify(sample, null, 2);
-    setJsonText(text);
-    setJsonError(null);
-    setParsedData(sample);
+  // Category counts (full registry, not filtered)
+  const categoryCounts = useMemo(() => {
+    const byCategory = getViewsByCategory();
+    const counts = new Map<Category, number>();
+    for (const [cat, views] of byCategory) {
+      counts.set(cat, views.length);
+    }
+    return counts;
   }, []);
 
-  // Debounced JSON parsing on text change
+  // Listen for hash changes
   useEffect(() => {
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
+    const onHashChange = () => setRoute(parseHash());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
-    debounceRef.current = setTimeout(() => {
-      try {
-        const parsed = JSON.parse(jsonText);
-        setJsonError(null);
-        setParsedData(parsed);
-      } catch (e) {
-        setJsonError(e instanceof Error ? e.message : "Invalid JSON");
-        setParsedData(null);
-      }
-    }, 300);
+  // Navigation
+  const navigateHome = useCallback(() => {
+    window.location.hash = "#/";
+  }, []);
 
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-    };
-  }, [jsonText]);
+  const navigateToView = useCallback((name: string) => {
+    window.location.hash = `#/view/${name}`;
+  }, []);
+
+  // Current view entry for header breadcrumb
+  const currentViewEntry = useMemo(
+    () => (route.page === "detail" ? getView(route.view) : null),
+    [route],
+  );
 
   return (
     <div className="h-screen flex flex-col bg-background text-foreground font-sans">
-      <Header theme={theme} onThemeToggle={setTheme} />
+      <Header
+        theme={theme}
+        onThemeToggle={setTheme}
+        viewName={currentViewEntry?.displayName ?? null}
+        onNavigateHome={navigateHome}
+      />
 
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left panel: View selector + JSON editor */}
-        <div className="w-1/2 flex flex-col border-r border-border">
-          <ViewSelector value={selectedView} onChange={handleViewChange} />
-          <div className="px-3 py-1.5 text-xs text-muted-foreground border-b border-border bg-muted/30">
-            structuredContent
+      <ErrorBoundary>
+        {route.page === "catalogue" && (
+          <div className="flex-1 flex overflow-hidden">
+            <Sidebar filter={filter} categoryCounts={categoryCounts} />
+            <div className="flex-1 overflow-auto">
+              <CatalogueGrid views={filter.filteredViews} onSelectView={navigateToView} theme={theme} />
+            </div>
           </div>
-          <JsonEditor
-            value={jsonText}
-            onChange={setJsonText}
-            error={jsonError}
-          />
-        </div>
+        )}
 
-        {/* Right panel: Preview */}
-        <div className="w-1/2 flex flex-col">
-          <div className="px-3 py-2 border-b border-border flex items-center justify-between bg-muted/30">
-            <span className="text-sm text-muted-foreground">Preview</span>
-            <CopyButton jsonText={jsonText} />
+        {route.page === "detail" && currentViewEntry && (
+          <ViewDetailPage key={currentViewEntry.name} entry={currentViewEntry} theme={theme} />
+        )}
+
+        {route.page === "detail" && !currentViewEntry && (
+          <div className="flex-1 flex items-center justify-center text-muted-foreground">
+            View not found.{" "}
+            <button onClick={navigateHome} className="text-primary hover:underline ml-1">
+              Back to catalogue
+            </button>
           </div>
-          <PreviewPane viewType={selectedView} data={parsedData} />
-        </div>
-      </div>
+        )}
+      </ErrorBoundary>
     </div>
   );
 }

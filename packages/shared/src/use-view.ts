@@ -73,7 +73,9 @@ export function useView<T>(
   // Both are synchronous — no timing issues with postMessage.
   const initialData = (() => {
     // SSR data takes priority
-    const ssrData = (window as any).__SSR_DATA__;
+    const ssrData = (window as unknown as Record<string, unknown>).__SSR_DATA__ as
+      | (Record<string, unknown> & { type?: string })
+      | undefined;
     if (ssrData && typeof ssrData === "object" && ssrData.type === expectedType) {
       return ssrData as T;
     }
@@ -158,12 +160,12 @@ export function useView<T>(
         applyTheme(mode);
         // Sync display mode, container dimensions, and safe area insets from host context
         if (ctx?.displayMode) setDisplayMode(ctx.displayMode as "inline" | "fullscreen" | "pip");
-        if (ctx?.containerDimensions) setContainerDimensions(ctx.containerDimensions as any);
-        if (ctx?.safeAreaInsets) setSafeAreaInsets(ctx.safeAreaInsets as any);
+        if (ctx?.containerDimensions) setContainerDimensions(ctx.containerDimensions as ViewState<T>["containerDimensions"]);
+        if (ctx?.safeAreaInsets) setSafeAreaInsets(ctx.safeAreaInsets as ViewState<T>["safeAreaInsets"]);
       };
 
-      // Graceful teardown — host calls this before unmounting the iframe
-      (createdApp as any).onteardown = async () => {
+      // Graceful teardown — host calls this before unmounting the iframe.
+      createdApp.onteardown = async () => {
         if (teardownRef.current) await teardownRef.current();
         return {};
       };
@@ -178,15 +180,23 @@ export function useView<T>(
     if (!app || !extAppsConnected) return;
     const ctx = app.getHostContext();
     if (ctx?.displayMode) setDisplayMode(ctx.displayMode as "inline" | "fullscreen" | "pip");
-    if (ctx?.containerDimensions) setContainerDimensions(ctx.containerDimensions as any);
-    if (ctx?.safeAreaInsets) setSafeAreaInsets(ctx.safeAreaInsets as any);
+    if (ctx?.containerDimensions) setContainerDimensions(ctx.containerDimensions as ViewState<T>["containerDimensions"]);
+    if (ctx?.safeAreaInsets) setSafeAreaInsets(ctx.safeAreaInsets as ViewState<T>["safeAreaInsets"]);
   }, [app, extAppsConnected]);
 
-  // Listen for messages from parent dashboard:
+  // Listen for messages from parent dashboard.
+  // These message types are mutually exclusive by design:
   // - "mcp-app:tool-result": initial data delivery when iframe loads
-  // - "update-structured-content": incremental updates from patch engine
+  // - "mcp-app:theme-change": theme-only updates from parent catalogue
+  // - "update-structured-content": incremental data patches from compose engine
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
+      // Origin validation: accept same-origin, or from the view CDN host
+      const ownOrigin = window.location.origin;
+      if (event.origin !== ownOrigin && event.origin !== "https://mcp-views.chukai.io") {
+        return;
+      }
+
       const msg = event.data;
       if (!msg || typeof msg !== "object") return;
 
@@ -200,6 +210,13 @@ export function useView<T>(
         if (msg.content) {
           setContent(msg.content as Array<{ type: string; text?: string }>);
         }
+        return;
+      }
+
+      // Parent catalogue/playground sends theme changes
+      if (msg.type === "mcp-app:theme-change") {
+        const mode = msg.theme === "dark" ? "dark" : "light";
+        applyTheme(mode);
         return;
       }
 
@@ -228,10 +245,15 @@ export function useView<T>(
     // Signal to parent (playground / dashboard) that our listener is ready.
     // Heavy views may finish mounting after the parent's onLoad has already
     // sent data, so the parent can re-send when it receives this signal.
+    // Try same-origin first; fall back to CDN origin for cross-origin embeds.
     try {
-      window.parent?.postMessage({ type: "mcp-app:view-ready" }, "*");
+      window.parent?.postMessage({ type: "mcp-app:view-ready" }, window.location.origin);
     } catch {
-      // Silently ignore if cross-origin parent blocks postMessage
+      try {
+        window.parent?.postMessage({ type: "mcp-app:view-ready" }, "https://mcp-views.chukai.io");
+      } catch {
+        // Silently ignore if cross-origin parent blocks postMessage
+      }
     }
 
     return () => window.removeEventListener("message", handleMessage);

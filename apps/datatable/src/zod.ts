@@ -29,7 +29,14 @@ export const dataTableSchema = z.object({
   sortable: z.boolean().optional(),
   filterable: z.boolean().optional(),
   exportable: z.boolean().optional(),
+  selectable: z.boolean().optional(),
   actions: z.array(rowActionSchema).optional(),
+  paginationTool: z.string().optional(),
+  totalRows: z.number().optional(),
+  pageSize: z.number().optional(),
+  currentPage: z.number().optional(),
+  refreshTool: z.string().optional(),
+  exportTool: z.string().optional(),
 });
 
 export type DataTableContent = z.infer<typeof dataTableSchema>;
