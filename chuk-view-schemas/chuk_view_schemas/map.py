@@ -36,12 +36,22 @@ class ClusterConfig(BaseModel):
 class MapLayer(BaseModel):
     id: str
     label: str
+    layer_type: Optional[Literal["geojson", "image", "tiles"]] = None
     visible: Optional[bool] = None
     opacity: Optional[float] = None
-    features: Dict[str, Any]  # GeoJSON FeatureCollection
+    # geojson layer fields
+    features: Optional[Dict[str, Any]] = None  # GeoJSON FeatureCollection
     style: Optional[LayerStyle] = None
     cluster: Optional[ClusterConfig] = None
     popup: Optional[PopupTemplate] = None
+    # image overlay fields
+    image_url: Optional[str] = None
+    image_bounds: Optional[List[List[float]]] = None  # [[south, west], [north, east]]
+    # tile layer fields
+    tile_url: Optional[str] = None
+    tile_attribution: Optional[str] = None
+    tile_min_zoom: Optional[int] = None
+    tile_max_zoom: Optional[int] = None
 
 
 class MapCenter(BaseModel):

@@ -44,7 +44,7 @@ export interface LeafletMapProps {
 export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDisplayMode, displayMode }: LeafletMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
-  const layerGroupsRef = useRef<Map<string, L.LayerGroup>>(new Map());
+  const layerGroupsRef = useRef<Map<string, L.Layer>>(new Map());
   const featureLayersRef = useRef<Map<string, L.Layer>>(new Map());
   const [panelId, setPanelId] = useState<string | null>(null);
   const { emitSelect } = useViewEvents();
@@ -154,13 +154,17 @@ export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDi
       }
 
       // Extend bounds
-      if (layer.features.features.length > 0) {
+      const lt = layer.layer_type ?? "geojson";
+      if (lt === "geojson" && layer.features?.features?.length) {
         const geojsonLayer = L.geoJSON(layer.features);
         const layerBounds = geojsonLayer.getBounds();
         if (layerBounds.isValid()) {
           allBounds.extend(layerBounds);
         }
+      } else if (lt === "image" && layer.image_bounds) {
+        allBounds.extend(layer.image_bounds as L.LatLngBoundsLiteral);
       }
+      // tile layers: no bounds extension
     }
 
     if (layerControl) {
@@ -234,7 +238,29 @@ function createLayerGroup(
   featureLayers: Map<string, L.Layer>,
   panelId: string | null,
   emitSelect: (ids: string[], field?: string) => void
-): L.LayerGroup {
+): L.Layer {
+  const layerType = layer.layer_type ?? "geojson";
+
+  // --- Image overlay ---
+  if (layerType === "image") {
+    if (!layer.image_url || !layer.image_bounds) return L.layerGroup();
+    return L.imageOverlay(layer.image_url, layer.image_bounds as L.LatLngBoundsLiteral, {
+      opacity: layer.opacity ?? 1.0,
+    });
+  }
+
+  // --- XYZ tile layer ---
+  if (layerType === "tiles") {
+    if (!layer.tile_url) return L.layerGroup();
+    return L.tileLayer(layer.tile_url, {
+      attribution: layer.tile_attribution ?? "",
+      minZoom: layer.tile_min_zoom ?? 0,
+      maxZoom: layer.tile_max_zoom ?? 22,
+      opacity: layer.opacity ?? 1.0,
+    });
+  }
+
+  // --- GeoJSON (default) ---
   const style = layer.style ?? {};
 
   function handleEachFeature(feature: GeoJSON.Feature, leafletLayer: L.Layer) {
@@ -287,12 +313,14 @@ function createLayerGroup(
     fillOpacity: style.fillOpacity ?? 0.3,
   });
 
+  const features = layer.features ?? { type: "FeatureCollection", features: [] };
+
   if (layer.cluster?.enabled) {
     const clusterGroup = L.markerClusterGroup({
       maxClusterRadius: layer.cluster.radius ?? 50,
     });
 
-    const geojson = L.geoJSON(layer.features, {
+    const geojson = L.geoJSON(features, {
       pointToLayer,
       style: layerStyle,
       onEachFeature: handleEachFeature,
@@ -302,7 +330,7 @@ function createLayerGroup(
     return clusterGroup;
   }
 
-  return L.geoJSON(layer.features, {
+  return L.geoJSON(features, {
     pointToLayer,
     style: layerStyle,
     onEachFeature: handleEachFeature,

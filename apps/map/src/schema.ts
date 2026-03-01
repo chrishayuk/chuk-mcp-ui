@@ -16,15 +16,27 @@ export interface MapContent {
   };
 }
 
+export type MapLayerType = "geojson" | "image" | "tiles";
+
 export interface MapLayer {
   id: string;
   label: string;
+  layer_type?: MapLayerType;
   visible?: boolean;
   opacity?: number;
-  features: FeatureCollection;
+  // geojson layer fields
+  features?: FeatureCollection;
   style?: LayerStyle;
   cluster?: { enabled: boolean; radius?: number };
   popup?: PopupTemplate;
+  // image overlay fields
+  image_url?: string;
+  image_bounds?: [[number, number], [number, number]]; // [[south_lat, west_lng], [north_lat, east_lng]]
+  // tile layer fields
+  tile_url?: string;
+  tile_attribution?: string;
+  tile_min_zoom?: number;
+  tile_max_zoom?: number;
 }
 
 export interface LayerStyle {

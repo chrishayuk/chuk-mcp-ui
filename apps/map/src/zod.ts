@@ -31,12 +31,22 @@ export const clusterConfigSchema = z.object({
 export const mapLayerSchema = z.object({
   id: z.string(),
   label: z.string(),
+  layer_type: z.enum(["geojson", "image", "tiles"]).optional(),
   visible: z.boolean().optional(),
   opacity: z.number().optional(),
-  features: z.record(z.string(), z.unknown()).describe("GeoJSON FeatureCollection"),
+  // geojson layer fields
+  features: z.record(z.string(), z.unknown()).describe("GeoJSON FeatureCollection").optional(),
   style: layerStyleSchema.optional(),
   cluster: clusterConfigSchema.optional(),
   popup: popupTemplateSchema.optional(),
+  // image overlay fields
+  image_url: z.string().optional(),
+  image_bounds: z.array(z.array(z.number())).optional(),
+  // tile layer fields
+  tile_url: z.string().optional(),
+  tile_attribution: z.string().optional(),
+  tile_min_zoom: z.number().optional(),
+  tile_max_zoom: z.number().optional(),
 });
 
 export const mapSchema = z.object({
