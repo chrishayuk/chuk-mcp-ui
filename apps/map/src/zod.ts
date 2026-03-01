@@ -34,6 +34,7 @@ export const mapLayerSchema = z.object({
   layer_type: z.enum(["geojson", "image", "tiles"]).optional(),
   visible: z.boolean().optional(),
   opacity: z.number().optional(),
+  group: z.string().optional(),
   // geojson layer fields
   features: z.record(z.string(), z.unknown()).describe("GeoJSON FeatureCollection").optional(),
   style: layerStyleSchema.optional(),
@@ -52,6 +53,7 @@ export const mapLayerSchema = z.object({
 export const mapSchema = z.object({
   type: z.literal("map"),
   version: z.literal("1.0"),
+  title: z.string().optional(),
   center: z.object({ lat: z.number(), lon: z.number() }).optional(),
   zoom: z.number().optional(),
   bounds: z.object({
@@ -64,7 +66,7 @@ export const mapSchema = z.object({
   layers: z.array(mapLayerSchema),
   controls: z.object({
     zoom: z.boolean().optional(),
-    layers: z.boolean().optional(),
+    layers: z.union([z.boolean(), z.enum(["leaflet", "panel", "none"])]).optional(),
     scale: z.boolean().optional(),
     fullscreen: z.boolean().optional(),
   }).optional(),

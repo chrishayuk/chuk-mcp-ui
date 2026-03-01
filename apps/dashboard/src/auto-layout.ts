@@ -10,7 +10,7 @@ export interface ResolvedLayout {
   panelStyles: Map<string, React.CSSProperties>;
 }
 
-const HERO_TYPES = new Set(["map", "layers", "minimap", "image", "compare"]);
+const HERO_TYPES = new Set(["map", "minimap", "image", "compare"]);
 const COMPACT_TYPES = new Set(["counter", "gauge", "status", "progress"]);
 
 /**

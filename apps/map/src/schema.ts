@@ -3,6 +3,7 @@ import type { FeatureCollection } from "geojson";
 export interface MapContent {
   type: "map";
   version: "1.0";
+  title?: string;
   center?: { lat: number; lon: number };
   zoom?: number;
   bounds?: { south: number; west: number; north: number; east: number };
@@ -10,7 +11,7 @@ export interface MapContent {
   layers: MapLayer[];
   controls?: {
     zoom?: boolean;
-    layers?: boolean;
+    layers?: boolean | "leaflet" | "panel" | "none";
     scale?: boolean;
     fullscreen?: boolean;
   };
@@ -24,6 +25,7 @@ export interface MapLayer {
   layer_type?: MapLayerType;
   visible?: boolean;
   opacity?: number;
+  group?: string;
   // geojson layer fields
   features?: FeatureCollection;
   style?: LayerStyle;

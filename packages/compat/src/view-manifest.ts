@@ -40,7 +40,6 @@ export const VIEW_MANIFEST: ViewMeta[] = [
   { name: "investigation", type: "investigation", hasCallTool: false, category: "data" },
   { name: "json", type: "json", hasCallTool: false, category: "text" },
   { name: "kanban", type: "kanban", hasCallTool: true, category: "data" },
-  { name: "layers", type: "layers", hasCallTool: false, category: "layout" },
   { name: "log", type: "log", hasCallTool: false, category: "text" },
   { name: "map", type: "map", hasCallTool: false, category: "compound" },
   { name: "markdown", type: "markdown", hasCallTool: false, category: "text" },

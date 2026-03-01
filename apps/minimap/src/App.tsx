@@ -2,33 +2,27 @@ import { useEffect, useRef, useCallback, useMemo } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useView } from "@chuk/view-shared";
+import {
+  BASEMAPS,
+  fixLeafletIcons,
+  injectLeafletThemeStyles,
+  createGeoJSONOptions,
+  buildPopupHtml,
+  computeLayerBounds,
+} from "@chuk/view-shared/leaflet";
 import { motion } from "framer-motion";
 import { fadeIn } from "@chuk/view-ui/animations";
 import type {
   MinimapContent,
   MinimapPanel,
   MinimapLayer,
-  MinimapPopup,
 } from "./schema";
 
-// Fix Leaflet default icon paths (broken when bundled)
-import iconUrl from "leaflet/dist/images/marker-icon.png";
-import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
-import shadowUrl from "leaflet/dist/images/marker-shadow.png";
-
-L.Icon.Default.mergeOptions({ iconUrl, iconRetinaUrl, shadowUrl });
+fixLeafletIcons();
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
-
-const BASEMAPS: Record<string, string> = {
-  osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  satellite:
-    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-  terrain: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-  dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-};
 
 const DEFAULT_CENTER: L.LatLngExpression = [51.505, -0.09];
 const DEFAULT_ZOOM = 10;
@@ -305,7 +299,7 @@ export function MinimapRenderer({ data }: MinimapRendererProps) {
 
 function renderPanelLayers(
   map: L.Map,
-  panel: MinimapPanel
+  panel: MinimapPanel,
 ): L.LayerGroup[] {
   const groups: L.LayerGroup[] = [];
 
@@ -321,102 +315,16 @@ function renderPanelLayers(
 }
 
 function createLayerGroup(layer: MinimapLayer): L.LayerGroup {
-  const style = layer.style ?? {};
-
-  const pointToLayer = (_feature: GeoJSON.Feature, latlng: L.LatLng) => {
-    if (style.radius) {
-      return L.circleMarker(latlng, {
-        radius: style.radius,
-        color: style.color ?? "#3388ff",
-        weight: style.weight ?? 2,
-        fillColor: style.fillColor ?? style.color ?? "#3388ff",
-        fillOpacity: style.fillOpacity ?? 0.3,
-      });
-    }
-    return L.marker(latlng);
-  };
-
-  const layerStyle = () => ({
-    color: style.color ?? "#3388ff",
-    weight: style.weight ?? 2,
-    fillColor: style.fillColor ?? style.color ?? "#3388ff",
-    fillOpacity: style.fillOpacity ?? 0.3,
-  });
+  const geoOptions = createGeoJSONOptions(layer.style ?? {});
 
   return L.geoJSON(layer.features as GeoJSON.GeoJsonObject, {
-    pointToLayer,
-    style: layerStyle,
+    pointToLayer: geoOptions.pointToLayer,
+    style: geoOptions.style,
     onEachFeature: (feature, leafletLayer) => {
-      bindPopup(leafletLayer, feature.properties ?? {}, layer.popup);
+      if (layer.popup) {
+        const html = buildPopupHtml(feature.properties ?? {}, layer.popup);
+        leafletLayer.bindPopup(html);
+      }
     },
   });
-}
-
-function bindPopup(
-  leafletLayer: L.Layer,
-  properties: Record<string, unknown>,
-  popup?: MinimapPopup
-) {
-  if (!popup) return;
-
-  let html = `<div style="min-width:120px"><strong>${escapeHtml(popup.title)}</strong>`;
-
-  if (popup.fields) {
-    for (const field of popup.fields) {
-      const val = properties[field];
-      if (val !== undefined && val !== null) {
-        html += `<div style="margin:2px 0;font-size:13px"><span class="popup-field-label">${escapeHtml(field)}:</span> ${escapeHtml(String(val))}</div>`;
-      }
-    }
-  }
-
-  html += "</div>";
-  leafletLayer.bindPopup(html);
-}
-
-function computeLayerBounds(layers: MinimapLayer[]): L.LatLngBounds | null {
-  const allBounds = L.latLngBounds([]);
-  for (const layer of layers) {
-    const features = layer.features as GeoJSON.GeoJsonObject;
-    try {
-      const geojsonLayer = L.geoJSON(features);
-      const layerBounds = geojsonLayer.getBounds();
-      if (layerBounds.isValid()) {
-        allBounds.extend(layerBounds);
-      }
-    } catch {
-      // skip invalid GeoJSON gracefully
-    }
-  }
-  return allBounds.isValid() ? allBounds : null;
-}
-
-function injectLeafletThemeStyles(container: HTMLElement) {
-  const id = "chuk-leaflet-theme";
-  if (container.querySelector(`#${id}`)) return;
-  const style = document.createElement("style");
-  style.id = id;
-  style.textContent = `
-    .leaflet-popup-content-wrapper {
-      background: var(--chuk-color-background, #fff);
-      color: var(--chuk-color-text, #1a1a1a);
-      border: 1px solid var(--chuk-color-border, #e0e0e0);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    .leaflet-popup-tip {
-      background: var(--chuk-color-background, #fff);
-    }
-    .popup-field-label {
-      color: var(--chuk-color-text-secondary, #888);
-    }
-  `;
-  container.appendChild(style);
-}
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }

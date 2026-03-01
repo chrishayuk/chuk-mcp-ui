@@ -85,7 +85,6 @@ import { TranscriptRenderer } from "@apps/transcript/src/App";
 const lazyChart = () => import("@apps/chart/src/App");
 const lazyMap = () => import("@apps/map/src/App");
 const lazyMinimap = () => import("@apps/minimap/src/App");
-const lazyLayers = () => import("@apps/layers/src/App");
 const lazyProfile = () => import("@apps/profile/src/App");
 const lazyScatter = () => import("@apps/scatter/src/App");
 const lazyTimeseries = () => import("@apps/timeseries/src/App");
@@ -164,9 +163,9 @@ const renderers: Record<string, RendererEntry> = {
 const lazyRenderers: Record<string, () => Promise<RendererEntry>> = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chart:      async () => { const m = await lazyChart();      return (d: any) => createElement(m.ChartRenderer, { data: d }); },
-  map:        async () => { const m = await lazyMap();        return (d: any) => createElement(m.LeafletMap, { data: d, app: null, onCallTool: noop }); },
+  map:        async () => { const m = await lazyMap();        return (d: any) => createElement(m.MapRenderer, { data: d }); },
   minimap:    async () => { const m = await lazyMinimap();    return (d: any) => createElement(m.MinimapRenderer, { data: d }); },
-  layers:     async () => { const m = await lazyLayers();     return (d: any) => createElement(m.LayersRenderer, { data: d }); },
+  layers:     async () => { const m = await lazyMap();        return (d: any) => createElement(m.MapRenderer, { data: d }); },
   profile:    async () => { const m = await lazyProfile();    return (d: any) => createElement(m.ProfileRenderer, { data: d }); },
   scatter:    async () => { const m = await lazyScatter();    return (d: any) => createElement(m.ScatterRenderer, { data: d }); },
   timeseries: async () => { const m = await lazyTimeseries(); return (d: any) => createElement(m.TimeseriesRenderer, { data: d }); },

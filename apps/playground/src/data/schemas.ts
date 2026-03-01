@@ -32,7 +32,6 @@ import image from "../../../image/schemas/input.json";
 import investigation from "../../../investigation/schemas/input.json";
 import json from "../../../json/schemas/input.json";
 import kanban from "../../../kanban/schemas/input.json";
-import layers from "../../../layers/schemas/input.json";
 import log from "../../../log/schemas/input.json";
 import map from "../../../map/schemas/input.json";
 import markdown from "../../../markdown/schemas/input.json";
@@ -103,7 +102,6 @@ export const schemas: Record<string, object> = {
   investigation,
   json,
   kanban,
-  layers,
   log,
   map,
   markdown,

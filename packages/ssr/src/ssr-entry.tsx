@@ -75,7 +75,7 @@ import { WizardRenderer } from "@apps/wizard/src/App";
 import { TranscriptRenderer } from "@apps/transcript/src/App";
 // ShaderRenderer not imported — WebGL needs canvas, uses placeholder below
 
-// ── Browser-dependent views: chart (Chart.js), map/minimap/layers
+// ── Browser-dependent views: chart (Chart.js), map/minimap
 //    (Leaflet), profile/scatter/timeseries (Chart.js), pdf (pdf.js)
 //    These render lightweight placeholders — client hydrates fully.
 // ────────────────────────────────────────────────────────────────────
@@ -138,7 +138,6 @@ const renderers: Record<string, RenderFn> = {
   investigation: (d) => renderToString(<InvestigationRenderer data={d} />),
   json:          (d) => renderToString(<JsonRenderer data={d} />),
   kanban:        (d) => renderToString(<KanbanRenderer data={d} />),
-  layers:        placeholder("map layers"),      // Leaflet needs window
   log:           (d) => renderToString(<LogRenderer data={d} />),
   map:           placeholder("map"),             // Leaflet needs window
   markdown:      (d) => renderToString(<MarkdownRenderer data={d} />),

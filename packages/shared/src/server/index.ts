@@ -33,7 +33,7 @@ const VIEW_PATHS: Record<string, string> = {
   image: "/image/v1",
   json: "/json/v1",
   kanban: "/kanban/v1",
-  layers: "/layers/v1",
+  layers: "/map/v1",  // Alias: merged into unified map view
   log: "/log/v1",
   map: "/map/v1",
   markdown: "/markdown/v1",

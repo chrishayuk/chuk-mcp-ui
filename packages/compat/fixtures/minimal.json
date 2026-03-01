@@ -208,11 +208,6 @@
     "version": "1.0",
     "columns": []
   },
-  "layers": {
-    "type": "layers",
-    "version": "1.0",
-    "layers": []
-  },
   "log": {
     "type": "log",
     "version": "1.0",

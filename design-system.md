@@ -472,7 +472,6 @@ Use this to verify a View works correctly in both themes. Toggle the Storybook t
 |------|------------|-------------------|
 | code | 1,560 KB | Yes |
 | timeseries | 905 KB | No |
-| layers | 879 KB | No |
 | profile | 839 KB | No |
 | minimap | 832 KB | No |
 | scatter | 828 KB | No |

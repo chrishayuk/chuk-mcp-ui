@@ -5,6 +5,7 @@
   "properties": {
     "type": { "const": "map" },
     "version": { "const": "1.0" },
+    "title": { "type": "string" },
     "center": {
       "type": "object",
       "properties": {
@@ -39,6 +40,7 @@
           },
           "visible": { "type": "boolean", "default": true },
           "opacity": { "type": "number", "minimum": 0, "maximum": 1 },
+          "group": { "type": "string", "description": "Optional group name for organizing layers in the panel control." },
           "features": {
             "type": "object",
             "description": "GeoJSON FeatureCollection. Required when layer_type is 'geojson' (or omitted)."
@@ -130,7 +132,14 @@
       "type": "object",
       "properties": {
         "zoom": { "type": "boolean", "default": true },
-        "layers": { "type": "boolean", "default": true },
+        "layers": {
+          "oneOf": [
+            { "type": "boolean" },
+            { "enum": ["leaflet", "panel", "none"] }
+          ],
+          "default": true,
+          "description": "Layer control mode. true/'leaflet' = built-in Leaflet control, 'panel' = React sidebar with toggles and opacity sliders, false/'none' = disabled."
+        },
         "scale": { "type": "boolean", "default": true },
         "fullscreen": { "type": "boolean", "default": false }
       }

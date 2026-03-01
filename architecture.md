@@ -328,9 +328,9 @@ The server hosts:
 
 Source: `packages/ssr/`
 
-A single Vite SSR build (2.2 MB) imports all 69 view renderers and exports a unified `render(viewName, data)` function. React is externalized to avoid bundling 65 separate copies.
+A single Vite SSR build (2.2 MB) imports all 68 view renderers and exports a unified `render(viewName, data)` function. React is externalized to avoid bundling 65 separate copies.
 
-9 browser-dependent views use placeholder SSR (loading states): map, minimap, layers (Leaflet), chart, profile, scatter, timeseries (Chart.js), pdf (pdf.js). These hydrate to full interactive views on the client.
+8 browser-dependent views use placeholder SSR (loading states): map, minimap (Leaflet), chart, profile, scatter, timeseries (Chart.js), pdf (pdf.js), shader (WebGL). These hydrate to full interactive views on the client.
 
 ### SSR Compose Engine
 

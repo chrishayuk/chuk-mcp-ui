@@ -57,7 +57,6 @@ COPY apps/crosstab/dist/mcp-app.html    apps/crosstab/dist/mcp-app.html
 COPY apps/gauge/dist/mcp-app.html       apps/gauge/dist/mcp-app.html
 COPY apps/gis-legend/dist/mcp-app.html  apps/gis-legend/dist/mcp-app.html
 COPY apps/heatmap/dist/mcp-app.html     apps/heatmap/dist/mcp-app.html
-COPY apps/layers/dist/mcp-app.html      apps/layers/dist/mcp-app.html
 COPY apps/minimap/dist/mcp-app.html     apps/minimap/dist/mcp-app.html
 COPY apps/pivot/dist/mcp-app.html       apps/pivot/dist/mcp-app.html
 COPY apps/profile/dist/mcp-app.html     apps/profile/dist/mcp-app.html

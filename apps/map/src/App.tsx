@@ -1,36 +1,85 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { useView, resolveTemplates, useViewEvents } from "@chuk/view-shared";
+import {
+  BASEMAPS,
+  fixLeafletIcons,
+  injectLeafletThemeStyles,
+  createGeoJSONOptions,
+  buildPopupHtml,
+} from "@chuk/view-shared/leaflet";
+import { Card, CardContent, ScrollArea, cn } from "@chuk/view-ui";
 import type { MapContent, MapLayer, PopupAction } from "./schema";
 
-// Fix Leaflet default icon paths (broken when bundled)
-import iconUrl from "leaflet/dist/images/marker-icon.png";
-import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
-import shadowUrl from "leaflet/dist/images/marker-shadow.png";
+fixLeafletIcons();
 
-L.Icon.Default.mergeOptions({ iconUrl, iconRetinaUrl, shadowUrl });
+/* ------------------------------------------------------------------ */
+/*  Layer control mode                                                 */
+/* ------------------------------------------------------------------ */
 
-const BASEMAPS: Record<string, string> = {
-  osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  satellite:
-    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-  terrain:
-    "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-  dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-};
+type LayerControlMode = "leaflet" | "panel" | "none";
+
+function resolveLayerMode(
+  controlsLayers: boolean | "leaflet" | "panel" | "none" | undefined,
+  layerCount: number,
+): LayerControlMode {
+  if (controlsLayers === "panel") return "panel";
+  if (controlsLayers === "none" || controlsLayers === false) return "none";
+  if (controlsLayers === "leaflet" || controlsLayers === true) return "leaflet";
+  return layerCount > 1 ? "leaflet" : "none";
+}
+
+/* ------------------------------------------------------------------ */
+/*  Layer visibility state (panel mode)                                */
+/* ------------------------------------------------------------------ */
+
+interface LayerVisibility {
+  visible: boolean;
+  opacity: number;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Top-level View component                                           */
+/* ------------------------------------------------------------------ */
 
 export function MapView() {
   const { data, app, callTool, updateModelContext, requestDisplayMode, displayMode } =
     useView<MapContent>("map", "1.0");
 
-  if (!data) return null;
+  // Backward compat: accept type:"layers" data and treat as panel mode
+  const normalizedData = useMemo(() => {
+    if (!data) return null;
+    if ((data as unknown as Record<string, unknown>).type === "layers") {
+      return {
+        ...data,
+        type: "map" as const,
+        controls: { ...data.controls, layers: "panel" as const },
+      };
+    }
+    return data;
+  }, [data]);
 
-  return <LeafletMap data={data} app={app} onCallTool={callTool} onUpdateModelContext={updateModelContext} onRequestDisplayMode={requestDisplayMode} displayMode={displayMode} />;
+  if (!normalizedData) return null;
+
+  return (
+    <LeafletMap
+      data={normalizedData}
+      app={app}
+      onCallTool={callTool}
+      onUpdateModelContext={updateModelContext}
+      onRequestDisplayMode={requestDisplayMode}
+      displayMode={displayMode}
+    />
+  );
 }
+
+/* ------------------------------------------------------------------ */
+/*  Main component                                                     */
+/* ------------------------------------------------------------------ */
 
 export interface LeafletMapProps {
   data: MapContent;
@@ -49,27 +98,78 @@ export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDi
   const [panelId, setPanelId] = useState<string | null>(null);
   const { emitSelect } = useViewEvents();
 
+  const controlMode = resolveLayerMode(data.controls?.layers, data.layers.length);
+
+  // --- Panel mode state ---
+  const [layerState, setLayerState] = useState<Record<string, LayerVisibility>>(() => {
+    const initial: Record<string, LayerVisibility> = {};
+    for (const layer of data.layers) {
+      initial[layer.id] = {
+        visible: layer.visible !== false,
+        opacity: layer.opacity ?? 1,
+      };
+    }
+    return initial;
+  });
+
+  // Recompute layer state when data changes
+  useEffect(() => {
+    const next: Record<string, LayerVisibility> = {};
+    for (const layer of data.layers) {
+      next[layer.id] = {
+        visible: layer.visible !== false,
+        opacity: layer.opacity ?? 1,
+      };
+    }
+    setLayerState(next);
+  }, [data]);
+
+  const groupedLayers = useMemo(() => {
+    const groups = new Map<string, MapLayer[]>();
+    for (const layer of data.layers) {
+      const groupName = layer.group ?? "";
+      if (!groups.has(groupName)) {
+        groups.set(groupName, []);
+      }
+      groups.get(groupName)!.push(layer);
+    }
+    return groups;
+  }, [data.layers]);
+
+  const toggleVisibility = useCallback((id: string) => {
+    setLayerState((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], visible: !prev[id]?.visible },
+    }));
+  }, []);
+
+  const setOpacity = useCallback((id: string, opacity: number) => {
+    setLayerState((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], opacity },
+    }));
+  }, []);
+
+  // --- Popup actions ---
   const handleAction = useCallback(
     async (action: PopupAction, properties: Record<string, unknown>) => {
       if (action.confirm && !window.confirm(action.confirm)) return;
       const resolved = resolveTemplates(action.arguments, { properties });
       await onCallTool(action.tool, resolved);
     },
-    [onCallTool]
+    [onCallTool],
   );
 
-  // Cross-View messaging: listen for row-click from other panels
+  // --- Cross-View messaging ---
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
       const msg = event.data;
       if (!msg || typeof msg !== "object") return;
 
-      // Capture panel ID from dashboard's initial postMessage
       if (msg.__chuk_panel_id && !panelId) {
         setPanelId(msg.__chuk_panel_id);
       }
 
-      // Handle row-click from datatable
       if (msg.__chuk_event === "row-click" || msg.__chuk_event === "feature-click") {
         const id = String(msg.nhle_id ?? msg.id ?? "");
         if (!id) return;
@@ -88,6 +188,7 @@ export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDi
     return () => window.removeEventListener("message", handleMessage);
   }, [panelId]);
 
+  // --- Initialize map ---
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
@@ -121,7 +222,7 @@ export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDi
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Update layers when data changes
+  // --- Update layers when data changes ---
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -133,24 +234,23 @@ export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDi
     layerGroupsRef.current.clear();
 
     const allBounds = L.latLngBounds([]);
-    const layerControl =
-      data.layers.length > 1 && data.controls?.layers !== false
-        ? L.control.layers()
-        : null;
+    const useLeafletControl = controlMode === "leaflet" && data.layers.length > 1;
+    const leafletControl = useLeafletControl ? L.control.layers() : null;
 
     featureLayersRef.current.clear();
 
     for (const layer of data.layers) {
       const group = createLayerGroup(layer, handleAction, featureLayersRef.current, panelId, emitSelect);
 
-      if (layer.visible !== false) {
+      // In panel mode, don't auto-add layers — the sync effect handles it
+      if (controlMode !== "panel" && layer.visible !== false) {
         group.addTo(map);
       }
 
       layerGroupsRef.current.set(layer.id, group);
 
-      if (layerControl) {
-        layerControl.addOverlay(group, layer.label);
+      if (leafletControl) {
+        leafletControl.addOverlay(group, layer.label);
       }
 
       // Extend bounds
@@ -164,11 +264,10 @@ export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDi
       } else if (lt === "image" && layer.image_bounds) {
         allBounds.extend(layer.image_bounds as L.LatLngBoundsLiteral);
       }
-      // tile layers: no bounds extension
     }
 
-    if (layerControl) {
-      layerControl.addTo(map);
+    if (leafletControl) {
+      leafletControl.addTo(map);
     }
 
     // Fit map to data
@@ -182,9 +281,45 @@ export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDi
     } else if (data.center) {
       map.setView([data.center.lat, data.center.lon], data.zoom ?? 10);
     }
-  }, [data, handleAction, panelId, emitSelect]);
+  }, [data, handleAction, panelId, emitSelect, controlMode]);
 
-  // Push map state to LLM model context
+  // --- Panel mode: sync visibility and opacity ---
+  useEffect(() => {
+    if (controlMode !== "panel") return;
+    const map = mapRef.current;
+    if (!map) return;
+
+    for (const [id, group] of layerGroupsRef.current.entries()) {
+      const state = layerState[id];
+      if (!state) continue;
+
+      if (state.visible) {
+        if (!map.hasLayer(group)) {
+          (group as L.LayerGroup).addTo(map);
+        }
+        // Apply opacity to sublayers
+        if ("eachLayer" in group) {
+          (group as L.LayerGroup).eachLayer((sublayer) => {
+            if ("setOpacity" in sublayer && typeof (sublayer as L.Marker).setOpacity === "function") {
+              (sublayer as L.Marker).setOpacity(state.opacity);
+            }
+            if ("setStyle" in sublayer && typeof (sublayer as L.Path).setStyle === "function") {
+              (sublayer as L.Path).setStyle({
+                opacity: state.opacity,
+                fillOpacity: state.opacity * getLayerFillOpacity(data.layers, id),
+              });
+            }
+          });
+        }
+      } else {
+        if (map.hasLayer(group)) {
+          map.removeLayer(group);
+        }
+      }
+    }
+  }, [layerState, data.layers, controlMode]);
+
+  // --- Push map state to LLM model context ---
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !onUpdateModelContext) return;
@@ -199,14 +334,13 @@ export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDi
         onUpdateModelContext({
           content: [{
             type: "text",
-            text: `Map view: center ${center.lat.toFixed(4)},${center.lng.toFixed(4)} zoom ${zoom} bounds ${bounds.getSouth().toFixed(4)},${bounds.getWest().toFixed(4)} to ${bounds.getNorth().toFixed(4)},${bounds.getEast().toFixed(4)}`
+            text: `Map view: center ${center.lat.toFixed(4)},${center.lng.toFixed(4)} zoom ${zoom} bounds ${bounds.getSouth().toFixed(4)},${bounds.getWest().toFixed(4)} to ${bounds.getNorth().toFixed(4)},${bounds.getEast().toFixed(4)}`,
           }],
         });
       }, 500);
     };
 
     map.on("moveend", handleMoveEnd);
-    // Push initial state
     handleMoveEnd();
 
     return () => {
@@ -217,11 +351,58 @@ export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDi
 
   return (
     <div className="relative w-full h-full font-sans">
-      <div ref={containerRef} className="w-full h-full" />
+      <div ref={containerRef} className="absolute inset-0" />
+
+      {/* Title bar */}
+      {data.title && (
+        <div className="absolute top-3 left-3 z-[1000] px-3 py-1.5 rounded-md bg-background/90 backdrop-blur-sm border border-border shadow-sm">
+          <h2 className="text-sm font-semibold text-foreground truncate">{data.title}</h2>
+        </div>
+      )}
+
+      {/* Panel layer control */}
+      {controlMode === "panel" && data.layers.length > 0 && (
+        <div className="absolute top-3 right-3 z-[1000]">
+          <Card className="w-64 max-h-[calc(100vh-24px)] shadow-lg bg-background/95 backdrop-blur-sm">
+            <CardContent className="p-3">
+              <ScrollArea className="max-h-80">
+                <div className="space-y-1">
+                  {Array.from(groupedLayers.entries()).map(([groupName, layers]) => (
+                    <div key={groupName}>
+                      {groupName && (
+                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-2 mb-1 px-1">
+                          {groupName}
+                        </div>
+                      )}
+                      {layers.map((layer) => {
+                        const state = layerState[layer.id];
+                        if (!state) return null;
+                        return (
+                          <LayerControl
+                            key={layer.id}
+                            layer={layer}
+                            visible={state.visible}
+                            opacity={state.opacity}
+                            onToggle={() => toggleVisibility(layer.id)}
+                            onOpacityChange={(val) => setOpacity(layer.id, val)}
+                          />
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Fullscreen toggle */}
       {onRequestDisplayMode && (
         <button
           onClick={() => onRequestDisplayMode(displayMode === "fullscreen" ? "inline" : "fullscreen")}
           className="absolute top-2 right-2 z-[1000] px-2 py-1 text-xs rounded bg-background/80 border border-border hover:bg-muted backdrop-blur-sm"
+          style={controlMode === "panel" ? { right: "auto", left: "8px", top: data.title ? "48px" : "8px" } : undefined}
           title={displayMode === "fullscreen" ? "Exit fullscreen" : "Fullscreen"}
           aria-label={displayMode === "fullscreen" ? "Exit fullscreen" : "Enter fullscreen"}
         >
@@ -232,12 +413,105 @@ export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDi
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  MapRenderer (SSR / compose)                                        */
+/* ------------------------------------------------------------------ */
+
+export interface MapRendererProps {
+  data: MapContent;
+}
+
+export function MapRenderer({ data }: MapRendererProps) {
+  return <LeafletMap data={data} app={null} onCallTool={async () => {}} />;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Layer control item (panel mode)                                    */
+/* ------------------------------------------------------------------ */
+
+interface LayerControlProps {
+  layer: MapLayer;
+  visible: boolean;
+  opacity: number;
+  onToggle: () => void;
+  onOpacityChange: (value: number) => void;
+}
+
+function LayerControl({ layer, visible, opacity, onToggle, onOpacityChange }: LayerControlProps) {
+  const [showSlider, setShowSlider] = useState(false);
+
+  return (
+    <div className="rounded-md px-2 py-1.5 hover:bg-muted/50 transition-colors">
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          id={`layer-toggle-${layer.id}`}
+          checked={visible}
+          onChange={onToggle}
+          className="h-3.5 w-3.5 rounded border-border accent-primary cursor-pointer"
+          aria-label={`Toggle ${layer.label}`}
+        />
+        <label
+          htmlFor={`layer-toggle-${layer.id}`}
+          className={cn(
+            "flex-1 text-xs cursor-pointer select-none truncate",
+            visible ? "text-foreground" : "text-muted-foreground",
+          )}
+        >
+          {layer.label}
+        </label>
+        {layer.style?.color && (
+          <span
+            className="inline-block h-2.5 w-2.5 rounded-sm flex-shrink-0"
+            style={{ backgroundColor: layer.style.color }}
+          />
+        )}
+        <button
+          type="button"
+          onClick={() => setShowSlider((prev) => !prev)}
+          className="text-muted-foreground hover:text-foreground text-xs leading-none flex-shrink-0"
+          aria-label={`Opacity for ${layer.label}`}
+          title="Adjust opacity"
+        >
+          {"\u25CE"}
+        </button>
+      </div>
+      {showSlider && (
+        <div className="mt-1.5 pl-6 pr-1">
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.05}
+            value={opacity}
+            onChange={(e) => onOpacityChange(parseFloat(e.target.value))}
+            className="w-full h-1 accent-primary cursor-pointer"
+            aria-label={`Opacity slider for ${layer.label}`}
+          />
+          <div className="text-[10px] text-muted-foreground text-right">
+            {Math.round(opacity * 100)}%
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+function getLayerFillOpacity(layers: MapLayer[], id: string): number {
+  const layer = layers.find((l) => l.id === id);
+  return layer?.style?.fillOpacity ?? 0.3;
+}
+
 function createLayerGroup(
   layer: MapLayer,
   onAction: (action: PopupAction, properties: Record<string, unknown>) => void,
   featureLayers: Map<string, L.Layer>,
   panelId: string | null,
-  emitSelect: (ids: string[], field?: string) => void
+  emitSelect: (ids: string[], field?: string) => void,
 ): L.Layer {
   const layerType = layer.layer_type ?? "geojson";
 
@@ -262,6 +536,7 @@ function createLayerGroup(
 
   // --- GeoJSON (default) ---
   const style = layer.style ?? {};
+  const geoOptions = createGeoJSONOptions(style);
 
   function handleEachFeature(feature: GeoJSON.Feature, leafletLayer: L.Layer) {
     const props = feature.properties ?? {};
@@ -272,12 +547,9 @@ function createLayerGroup(
     if (featureId) {
       featureLayers.set(featureId, leafletLayer);
 
-      // Emit feature-click for cross-View communication
       leafletLayer.on("click", () => {
-        // Typed event via ViewBus (new pattern)
         emitSelect([featureId], "feature_id");
 
-        // Legacy postMessage fallback for panels not yet migrated
         if (panelId) {
           window.parent.postMessage(
             {
@@ -286,32 +558,12 @@ function createLayerGroup(
               nhle_id: featureId,
               properties: props,
             },
-            window.location.origin
+            window.location.origin,
           );
         }
       });
     }
   }
-
-  const pointToLayer = (_feature: GeoJSON.Feature, latlng: L.LatLng) => {
-    if (style.radius) {
-      return L.circleMarker(latlng, {
-        radius: style.radius,
-        color: style.color ?? "#3388ff",
-        weight: style.weight ?? 2,
-        fillColor: style.fillColor ?? style.color ?? "#3388ff",
-        fillOpacity: style.fillOpacity ?? 0.3,
-      });
-    }
-    return L.marker(latlng);
-  };
-
-  const layerStyle = () => ({
-    color: style.color ?? "#3388ff",
-    weight: style.weight ?? 2,
-    fillColor: style.fillColor ?? style.color ?? "#3388ff",
-    fillOpacity: style.fillOpacity ?? 0.3,
-  });
 
   const features = layer.features ?? { type: "FeatureCollection", features: [] };
 
@@ -321,8 +573,8 @@ function createLayerGroup(
     });
 
     const geojson = L.geoJSON(features, {
-      pointToLayer,
-      style: layerStyle,
+      pointToLayer: geoOptions.pointToLayer,
+      style: geoOptions.style,
       onEachFeature: handleEachFeature,
     });
 
@@ -331,8 +583,8 @@ function createLayerGroup(
   }
 
   return L.geoJSON(features, {
-    pointToLayer,
-    style: layerStyle,
+    pointToLayer: geoOptions.pointToLayer,
+    style: geoOptions.style,
     onEachFeature: handleEachFeature,
   });
 }
@@ -341,37 +593,11 @@ function bindPopup(
   leafletLayer: L.Layer,
   properties: Record<string, unknown>,
   popup: MapLayer["popup"],
-  onAction: (action: PopupAction, properties: Record<string, unknown>) => void
+  onAction: (action: PopupAction, properties: Record<string, unknown>) => void,
 ) {
   if (!popup) return;
 
-  const titleText = resolveTemplates({ t: popup.title }, properties).t;
-  let html = `<div style="min-width:150px"><strong>${escapeHtml(titleText)}</strong>`;
-
-  if (popup.body) {
-    const bodyText = resolveTemplates({ b: popup.body }, properties).b;
-    html += `<p style="margin:4px 0">${escapeHtml(bodyText)}</p>`;
-  }
-
-  if (popup.fields) {
-    for (const field of popup.fields) {
-      const val = properties[field];
-      if (val !== undefined && val !== null) {
-        html += `<div style="margin:2px 0;font-size:13px"><span class="popup-field-label">${escapeHtml(field)}:</span> ${escapeHtml(String(val))}</div>`;
-      }
-    }
-  }
-
-  if (popup.actions && popup.actions.length > 0) {
-    html += '<div style="margin-top:8px;display:flex;gap:4px">';
-    popup.actions.forEach((action, i) => {
-      html += `<button class="popup-action" data-action-index="${i}">${escapeHtml(action.label)}</button>`;
-    });
-    html += "</div>";
-  }
-
-  html += "</div>";
-
+  const html = buildPopupHtml(properties, popup);
   leafletLayer.bindPopup(html);
 
   if (popup.actions && popup.actions.length > 0) {
@@ -388,47 +614,4 @@ function bindPopup(
       });
     });
   }
-}
-
-function injectLeafletThemeStyles(container: HTMLElement) {
-  const id = "chuk-leaflet-theme";
-  if (container.querySelector(`#${id}`)) return;
-  const style = document.createElement("style");
-  style.id = id;
-  style.textContent = `
-    .leaflet-popup-content-wrapper {
-      background: var(--chuk-color-background, #fff);
-      color: var(--chuk-color-text, #1a1a1a);
-      border: 1px solid var(--chuk-color-border, #e0e0e0);
-      box-shadow: 0 2px 8px var(--chuk-color-shadow, rgba(0,0,0,0.15));
-    }
-    .leaflet-popup-tip {
-      background: var(--chuk-color-background, #fff);
-    }
-    .popup-field-label {
-      color: var(--chuk-color-text-secondary, #888);
-    }
-    .popup-action {
-      padding: 4px 8px;
-      border: 1px solid var(--chuk-color-border, #ccc);
-      border-radius: 4px;
-      background: var(--chuk-color-surface, #f5f5f5);
-      color: var(--chuk-color-text, #1a1a1a);
-      cursor: pointer;
-      font-size: 12px;
-    }
-    .popup-action:hover {
-      background: var(--chuk-color-primary, #3388ff);
-      color: var(--chuk-color-primary-foreground, #fff);
-    }
-  `;
-  container.appendChild(style);
-}
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }

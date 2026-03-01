@@ -16,7 +16,7 @@ const VIEWS = [
   "alert", "diff", "embed", "filter", "kanban", "settings", "stepper",
   // Phase 4 (17 new)
   "audio", "boxplot", "carousel", "crosstab", "gauge", "gis-legend",
-  "heatmap", "layers", "minimap", "pivot", "profile", "scatter",
+  "heatmap", "minimap", "pivot", "profile", "scatter",
   "spectrogram", "sunburst", "terminal", "timeseries", "treemap",
   // Phase 6 Compound (15 new)
   "annotation", "calendar", "flowchart", "funnel", "gantt", "geostory",
@@ -220,6 +220,13 @@ const server = createServer((req, res) => {
     return;
   }
 
+  // Backward compat: redirect /layers/v1 to /map/v1 (layers merged into map)
+  if (path === "/layers/v1" || path === "/layers/v1/") {
+    res.writeHead(301, { Location: "/map/v1" });
+    res.end();
+    return;
+  }
+
   // Root: content-negotiate — JSON API info vs catalogue HTML
   if (path === "/") {
     const accept = (req.headers["accept"] || "").toLowerCase();
@@ -378,7 +385,8 @@ const server = createServer((req, res) => {
   // View routes: /<view>/v1 (GET) and /<view>/v1/ssr (POST)
   const match = path.match(/^\/([a-z][a-z0-9-]*)\/v1(\/ssr)?$/);
   if (match) {
-    const view = match[1];
+    const rawView = match[1];
+    const view = rawView === "layers" ? "map" : rawView; // layers merged into map
     const isSsr = match[2] === "/ssr";
 
     // POST /<view>/v1/ssr — server-side render with data

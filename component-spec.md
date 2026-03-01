@@ -349,7 +349,7 @@ interface MapContent {
   layers: MapLayer[];
   controls?: {
     zoom?: boolean;
-    layers?: boolean;
+    layers?: boolean | "leaflet" | "panel" | "none";
     scale?: boolean;
     fullscreen?: boolean;
   };
@@ -398,7 +398,7 @@ interface PopupAction {
 | zoom | `10` |
 | basemap | `"osm"` |
 | controls.zoom | `true` |
-| controls.layers | `true` (if >1 layer) |
+| controls.layers | `true` / `"leaflet"` (if >1 layer). Use `"panel"` for sidebar with opacity sliders and grouping. |
 | controls.scale | `true` |
 | controls.fullscreen | `false` |
 | layer.visible | `true` |
@@ -559,7 +559,7 @@ When embedded in a `view-dashboard` or `view-split`:
 ### As Parent
 
 Not applicable. `view-map` does not embed other Views.
-Use `view-layers` for the extended multi-basemap version.
+Use `controls.layers: "panel"` for the extended layer-control sidebar with opacity sliders and grouping.
 Use `view-dashboard` to compose map with other Views.
 
 ### Cross-View Events

@@ -35,7 +35,6 @@ export const CONTENT_CLASS: Record<string, string> = {
   investigation: "InvestigationContent",
   json: "JsonContent",
   kanban: "KanbanContent",
-  layers: "LayersContent",
   log: "LogContent",
   map: "MapContent",
   markdown: "MarkdownContent",

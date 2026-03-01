@@ -32,7 +32,6 @@ import image from "../../../image/src/schema.ts?raw";
 import investigation from "../../../investigation/src/schema.ts?raw";
 import json from "../../../json/src/schema.ts?raw";
 import kanban from "../../../kanban/src/schema.ts?raw";
-import layers from "../../../layers/src/schema.ts?raw";
 import log from "../../../log/src/schema.ts?raw";
 import map from "../../../map/src/schema.ts?raw";
 import markdown from "../../../markdown/src/schema.ts?raw";
@@ -103,7 +102,6 @@ export const typeSources: Record<string, string> = {
   investigation,
   json,
   kanban,
-  layers,
   log,
   map,
   markdown,

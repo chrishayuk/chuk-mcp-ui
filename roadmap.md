@@ -166,14 +166,13 @@ package covers all published Views.
 
 ### Geo-Specialist
 
-- [x] `view-layers` — multi-layer map with legend, temporal filtering
 - [x] `view-timeseries` — time-axis optimised chart with zoom/pan
 - [x] `view-profile` — elevation/cross-section line chart
 - [x] `view-minimap` — small overview map + detail map linked together.
   Large-area heritage surveys — overview of Essex coast with detail panel
   for specific sites.
 - [x] `view-gis-legend` — standalone cartographic legend with symbology.
-  Paired with view-layers for proper cartographic output.
+  Paired with view-map (`controls.layers: "panel"`) for proper cartographic output.
 
 ### Specialist
 
@@ -742,8 +741,8 @@ engine, server-side cross-view state, and client hydration.
 own React copy) caused OOM on 256MB Fly.io instances.
 
 **Solution:** Single Vite SSR build importing all 57 SSR-safe renderers
-directly, with placeholder rendering for 8 browser-dependent views (Leaflet:
-map, minimap, layers; Chart.js: chart, profile, scatter, timeseries; pdf.js:
+directly, with placeholder rendering for 7 browser-dependent views (Leaflet:
+map, minimap; Chart.js: chart, profile, scatter, timeseries; pdf.js:
 pdf). React externalized — installed as runtime dep in Docker.
 
 | Metric | Before | After |
@@ -1067,8 +1066,7 @@ The goal is "whatever your MCP tool returns, there's a View for it."
 45. ~~**view-kanban**~~ ✓ — card board with drag-and-drop
 46. ~~**view-treemap**~~ ✓ — nested rectangles
 47. ~~**view-sunburst**~~ ✓ — radial hierarchical chart
-48. ~~**view-layers**~~ ✓ — multi-layer map with controls
-49. ~~**view-minimap**~~ ✓ — overview + detail map
+48. ~~**view-minimap**~~ ✓ — overview + detail map
 50. ~~**view-pivot**~~ ✓ — pivot table with aggregation
 51. ~~**view-spectrogram**~~ ✓ — audio frequency visualization
 52. ~~**view-annotation**~~ ✓ — overlay annotations on child views
@@ -1184,7 +1182,7 @@ The pitch: "Whatever your MCP tool returns, there's a View for it."
 | Returns distribution stats | `view-boxplot` | ✅ Shipped |
 | Returns pivot/aggregation | `view-pivot` | ✅ Shipped |
 | Returns time-series data | `view-timeseries` | ✅ Shipped |
-| Returns multi-layer spatial | `view-layers` / `view-minimap` | ✅ Shipped |
+| Returns multi-layer spatial | `view-map` (panel mode) / `view-minimap` | ✅ Shipped |
 | Returns elevation profile | `view-profile` | ✅ Shipped |
 | Returns cartographic legend | `view-gis-legend` | ✅ Shipped |
 | Returns frequency data | `view-spectrogram` | ✅ Shipped |
@@ -1232,7 +1230,7 @@ Total Views: **69 shipped**
 | **Interactive Input** (3) | filter, settings, embed | 3 | ✅ Shipped |
 | **Media** (2) | audio, carousel | 4 | ✅ Shipped |
 | **Data-Dense** (8) | heatmap, gauge, treemap, sunburst, scatter, boxplot, pivot, crosstab | 4 | ✅ Shipped |
-| **Geo-Specialist** (5) | layers, timeseries, profile, minimap, gis-legend | 4 | ✅ Shipped |
+| **Geo-Specialist** (4) | timeseries, profile, minimap, gis-legend | 4 | ✅ Shipped |
 | **Specialist** (2) | terminal, spectrogram | 4 | ✅ Shipped |
 | **Novel Compound** (4) | notebook, investigation, annotation, chat | 6 | ✅ Shipped |
 | **Flow & Process** (5) | sankey, funnel, gantt, swimlane, flowchart | 6 | ✅ Shipped |

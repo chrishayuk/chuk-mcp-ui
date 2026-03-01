@@ -100,7 +100,7 @@ function categorize(name: string): string {
       "form", "confirm", "alert", "poll", "quiz", "chat", "settings", "filter",
       "annotation", "playground",
     ],
-    layout: ["dashboard", "split", "tabs", "layers", "minimap", "slides"],
+    layout: ["dashboard", "split", "tabs", "minimap", "slides"],
     data: [
       "datatable", "crosstab", "pivot", "ranked", "kanban", "tree", "calendar",
       "timeline", "stepper", "investigation",

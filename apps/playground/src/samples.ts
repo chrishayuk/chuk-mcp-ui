@@ -42,7 +42,6 @@ export const VIEW_TYPES = [
   "gauge",
   "gis-legend",
   "heatmap",
-  "layers",
   "minimap",
   "pivot",
   "profile",
@@ -1272,76 +1271,6 @@ export const samples: Record<ViewType, object> = {
     minColor: "#dbeafe",
     maxColor: "#dc2626",
     showValues: false,
-  },
-
-  layers: {
-    type: "layers",
-    version: "1.0",
-    title: "London Infrastructure",
-    center: { lat: 51.505, lon: -0.12 },
-    zoom: 13,
-    basemap: "osm",
-    layers: [
-      {
-        id: "roads",
-        label: "Roads",
-        group: "Transport",
-        features: {
-          type: "FeatureCollection",
-          features: [
-            {
-              type: "Feature",
-              geometry: { type: "LineString", coordinates: [[-0.14, 51.51], [-0.12, 51.515], [-0.1, 51.512]] },
-              properties: { name: "Oxford Street", type: "A Road", lanes: 4 },
-            },
-            {
-              type: "Feature",
-              geometry: { type: "LineString", coordinates: [[-0.13, 51.505], [-0.11, 51.508], [-0.09, 51.506]] },
-              properties: { name: "The Strand", type: "A Road", lanes: 3 },
-            },
-          ],
-        },
-        style: { color: "#e67e22", weight: 4, fillOpacity: 0.6 },
-        popup: { title: "{properties.name}", fields: ["type", "lanes"] },
-      },
-      {
-        id: "buildings",
-        label: "Key Buildings",
-        group: "Structures",
-        features: {
-          type: "FeatureCollection",
-          features: [
-            {
-              type: "Feature",
-              geometry: { type: "Point", coordinates: [-0.1246, 51.5007] },
-              properties: { name: "Palace of Westminster", use: "Government", floors: 5 },
-            },
-          ],
-        },
-        style: { color: "#2c3e50", fillColor: "#95a5a6", weight: 2, fillOpacity: 0.5 },
-        popup: { title: "{properties.name}", fields: ["use", "floors"] },
-      },
-      {
-        id: "parks",
-        label: "Parks",
-        group: "Green Space",
-        features: {
-          type: "FeatureCollection",
-          features: [
-            {
-              type: "Feature",
-              geometry: {
-                type: "Polygon",
-                coordinates: [[[-0.155, 51.507], [-0.155, 51.512], [-0.145, 51.512], [-0.145, 51.507], [-0.155, 51.507]]],
-              },
-              properties: { name: "Hyde Park", area_ha: 142 },
-            },
-          ],
-        },
-        style: { color: "#27ae60", fillColor: "#2ecc71", weight: 2, fillOpacity: 0.4 },
-        popup: { title: "{properties.name}", fields: ["area_ha"] },
-      },
-    ],
   },
 
   minimap: {

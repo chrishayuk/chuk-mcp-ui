@@ -1,6 +1,6 @@
 # chuk-mcp-ui
 
-A monorepo of **69 standalone MCP (Model Context Protocol) UI views**, each built as a single-file HTML app with Vite + vite-plugin-singlefile. Views communicate with LLMs through the MCP ext-apps protocol and with each other through the ViewBus cross-view message bus. Browse the full catalogue at [mcp-views.chukai.io](https://mcp-views.chukai.io/).
+A monorepo of **68 standalone MCP (Model Context Protocol) UI views**, each built as a single-file HTML app with Vite + vite-plugin-singlefile. Views communicate with LLMs through the MCP ext-apps protocol and with each other through the ViewBus cross-view message bus. Browse the full catalogue at [mcp-views.chukai.io](https://mcp-views.chukai.io/).
 
 ## Getting Started
 
@@ -27,7 +27,7 @@ pnpm type-check
 
 ```
 chuk-mcp-ui/
-├── apps/                    # 69 view apps + playground
+├── apps/                    # 68 view apps + playground
 │   ├── dashboard/           # Composable dashboard + runtime engine
 │   ├── map/                 # Leaflet map view
 │   ├── datatable/           # Data table view
@@ -77,7 +77,7 @@ The dashboard view is a composable layout engine with three capability tiers:
 
 ### Server-Side Rendering
 
-The universal SSR module at `packages/ssr/` renders all 69 views server-side from a single 2.2 MB bundle (replacing 65 per-view bundles totalling 101 MB).
+The universal SSR module at `packages/ssr/` renders all 68 views server-side from a single 2.2 MB bundle (replacing 65 per-view bundles totalling 101 MB).
 
 - **`POST /<view>/v1/ssr`** — render a single view with data
 - **`POST /compose/ssr`** — compose multiple views into a single HTML page with CSS grid layout, cross-view state propagation, and client hydration
@@ -108,8 +108,8 @@ The universal SSR module at `packages/ssr/` renders all 69 views server-side fro
 ### Data Visualization (10)
 `gauge` `heatmap` `crosstab` `scatter` `boxplot` `timeseries` `treemap` `sunburst` `pivot` `profile`
 
-### Specialist (7)
-`audio` `carousel` `terminal` `gis-legend` `layers` `minimap` `spectrogram`
+### Specialist (6)
+`audio` `carousel` `terminal` `gis-legend` `minimap` `spectrogram`
 
 ### Compound (15)
 `annotation` `calendar` `flowchart` `funnel` `gantt` `geostory` `globe` `graph` `investigation` `neural` `notebook` `sankey` `slides` `swimlane` `threed`
@@ -207,7 +207,7 @@ https://mcp-views.chukai.io/playground/    # Live JSON editor + preview
 https://mcp-views.chukai.io/storybook/     # Component & view stories
 ```
 
-The root URL serves the **View Catalogue** — a searchable grid of all 69 views with live iframe thumbnails, category filtering, and detail pages with JSON editor, schema inspector, and integration snippets. The same URL serves JSON API info when requested with `Accept: application/json`.
+The root URL serves the **View Catalogue** — a searchable grid of all 68 views with live iframe thumbnails, category filtering, and detail pages with JSON editor, schema inspector, and integration snippets. The same URL serves JSON API info when requested with `Accept: application/json`.
 
 ## Hooks
 

@@ -32,7 +32,7 @@ export type ViewType =
   | "alert" | "diff" | "embed" | "filter" | "kanban" | "settings" | "stepper"
   | "gauge" | "heatmap" | "crosstab" | "scatter" | "boxplot"
   | "timeseries" | "treemap" | "sunburst" | "pivot" | "profile"
-  | "audio" | "carousel" | "terminal" | "gis-legend" | "layers" | "minimap" | "spectrogram"
+  | "audio" | "carousel" | "terminal" | "gis-legend" | "minimap" | "spectrogram"
   | (string & {}); // allow custom viewTypes
 
 export interface GridLayout {

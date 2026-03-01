@@ -19,7 +19,7 @@ import {
 
 // ── Browser-dependent views (use placeholder SSR) ───────────────────
 const PLACEHOLDER_VIEWS = new Set([
-  "chart", "map", "minimap", "layers",
+  "chart", "map", "minimap",
   "profile", "scatter", "timeseries",
   "pdf", "shader",
 ]);

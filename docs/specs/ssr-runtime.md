@@ -223,7 +223,7 @@ The client hydration entry point:
 
 ### Browser-Dependent Views
 
-9 views use placeholder SSR (lightweight "Loading..." UI) and full client
+8 views use placeholder SSR (lightweight "Loading..." UI) and full client
 rendering:
 
 | View | Dependency | Lazy-loaded |
@@ -231,7 +231,6 @@ rendering:
 | chart | Chart.js (canvas) | Yes |
 | map | Leaflet (window) | Yes |
 | minimap | Leaflet (window) | Yes |
-| layers | Leaflet (window) | Yes |
 | profile | Chart.js (canvas) | Yes |
 | scatter | Chart.js (canvas) | Yes |
 | timeseries | Chart.js (canvas) | Yes |

@@ -53,7 +53,7 @@ export interface ViewEntry {
 
 /** Views that use placeholder SSR (browser-dependent) */
 const PLACEHOLDER_SSR = new Set([
-  "map", "minimap", "layers", "chart", "profile",
+  "map", "minimap", "chart", "profile",
   "scatter", "timeseries", "pdf", "shader",
 ]);
 
@@ -140,7 +140,6 @@ export const REGISTRY: ViewEntry[] = [
   entry("crosstab", "Matrix with conditional formatting — heatmap, bars, percentages", "Data-Dense", 4, ["matrix", "formatting", "confusion", "correlation"]),
 
   // ── Geo-Specialist (5) ─────────────────────────────────────────────
-  entry("layers", "Multi-layer map with layer controls and choropleth styling", "Geo-Specialist", 4, ["leaflet", "choropleth", "toggle", "spatial"]),
   entry("timeseries", "Time-axis chart — line, bar, area on time scale", "Geo-Specialist", 4, ["time", "trend", "zoom", "date-axis"]),
   entry("profile", "Elevation/cross-section line chart with fill and markers", "Geo-Specialist", 4, ["elevation", "cross-section", "terrain", "line"]),
   entry("minimap", "Overview-detail dual map with extent rectangle", "Geo-Specialist", 4, ["overview", "detail", "linked", "extent"]),
