@@ -15,7 +15,6 @@
     "dev": "vite",
     "build": "vite build",
     "type-check": "tsc --noEmit",
-    "test": "vitest run",
     "clean": "rm -rf dist"
   },
   "dependencies": {

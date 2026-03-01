@@ -21,6 +21,7 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
       - run: pnpm build
       - run: pnpm turbo run test --filter='!@chuk/compat-harness'
       - run: pnpm type-check

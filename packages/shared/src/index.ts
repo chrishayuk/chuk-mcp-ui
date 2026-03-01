@@ -1,4 +1,14 @@
 export { useView } from "./use-view";
+export {
+  ALL_VIEWS,
+  VIEWS_CORE,
+  VIEWS_BROWSER_DEPENDENT,
+  VIEWS_PLACEHOLDER_ONLY,
+  VIEW_ALIASES,
+  ALL_VIEWS_SET,
+  BROWSER_DEPENDENT_SET,
+} from "./manifest";
+export type { ViewName } from "./manifest";
 export type { ViewState } from "./use-view";
 export { resolveTemplates } from "./actions";
 export {

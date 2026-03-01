@@ -6,6 +6,7 @@ import {
 } from "@modelcontextprotocol/ext-apps/react";
 import type { App } from "@modelcontextprotocol/ext-apps";
 import { applyTheme, applyPreset } from "./theme";
+import { CDN_ORIGIN } from "./constants";
 
 export interface ViewState<T> {
   app: App | null;
@@ -193,7 +194,7 @@ export function useView<T>(
     function handleMessage(event: MessageEvent) {
       // Origin validation: accept same-origin, or from the view CDN host
       const ownOrigin = window.location.origin;
-      if (event.origin !== ownOrigin && event.origin !== "https://mcp-views.chukai.io") {
+      if (event.origin !== ownOrigin && event.origin !== CDN_ORIGIN) {
         return;
       }
 
@@ -250,7 +251,7 @@ export function useView<T>(
       window.parent?.postMessage({ type: "mcp-app:view-ready" }, window.location.origin);
     } catch {
       try {
-        window.parent?.postMessage({ type: "mcp-app:view-ready" }, "https://mcp-views.chukai.io");
+        window.parent?.postMessage({ type: "mcp-app:view-ready" }, CDN_ORIGIN);
       } catch {
         // Silently ignore if cross-origin parent blocks postMessage
       }

@@ -18,11 +18,7 @@ import {
 } from "./state-propagation";
 
 // ── Browser-dependent views (use placeholder SSR) ───────────────────
-const PLACEHOLDER_VIEWS = new Set([
-  "chart", "map", "minimap",
-  "profile", "scatter", "timeseries",
-  "pdf", "shader",
-]);
+import { BROWSER_DEPENDENT_SET as PLACEHOLDER_VIEWS } from "@chuk/view-shared/manifest";
 
 // ── Public types ────────────────────────────────────────────────────
 
@@ -185,8 +181,9 @@ export function compose(request: ComposeRequest): ComposeResult {
     try {
       inner = render(r.view, renderData);
     } catch (e) {
-      console.error(`Compose: Failed to render ${r.view}:`, e);
-      inner = `<div style="padding:16px;color:#ef4444">Failed to render ${escapeHtml(r.view)} view</div>`;
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error(`Compose: Failed to render panel "${r.section.id}" (view: ${r.view}):`, e);
+      inner = `<div style="padding:16px;color:#ef4444"><strong>Failed to render &ldquo;${escapeHtml(r.view)}&rdquo; view</strong><p style="font-size:12px;margin-top:4px;opacity:0.8">${escapeHtml(msg)}</p></div>`;
     }
 
     const pCss = panelStyle(resolvedLayout, r.section.id);
@@ -227,7 +224,8 @@ export function compose(request: ComposeRequest): ComposeResult {
 <script>window.__COMPOSE_STATE__=${stateJson}</script>
 <script type="module" src="/compose/client.js"></script>`;
     } catch (e) {
-      console.error("Compose: Failed to serialize hydration state:", e);
+      const panelIds = resolved.map((r) => r.section.id).join(", ");
+      console.error(`Compose: Failed to serialize hydration state for panels [${panelIds}]:`, e);
       // Skip hydration if state can't be serialized (e.g., circular references)
     }
   }

@@ -22,22 +22,13 @@ export interface ViewSuggestion {
 }
 
 // ---------------------------------------------------------------------------
-// Known view names (used for structuredContent type matching)
+// Known view names — derived from the shared manifest
 // ---------------------------------------------------------------------------
 
-const KNOWN_VIEWS = new Set([
-  "alert", "annotation", "audio", "boxplot", "calendar", "carousel",
-  "chart", "chat", "code", "compare", "confirm", "counter", "crosstab",
-  "dashboard", "datatable", "detail", "diff", "embed", "filter",
-  "flowchart", "form", "funnel", "gallery", "gantt", "gauge", "geostory",
-  "gis-legend", "globe", "graph", "heatmap", "image", "investigation",
-  "json", "kanban", "log", "map", "markdown", "minimap",
-  "neural", "notebook", "pdf", "pivot", "poll", "profile", "progress",
-  "quiz", "ranked", "sankey", "scatter", "settings", "shader", "slides",
-  "spectrogram", "split", "status", "stepper", "sunburst", "swimlane",
-  "tabs", "terminal", "threed", "timeline", "timeseries", "transcript",
-  "tree", "treemap", "video", "wizard",
-]);
+import {
+  ALL_VIEWS_SET as KNOWN_VIEWS,
+  VIEW_ALIASES,
+} from "../manifest";
 
 // ---------------------------------------------------------------------------
 // Type guards & helpers
@@ -157,11 +148,6 @@ export function isNumericHeavy(rows: Record<string, unknown>[]): boolean {
 type Matcher = (data: unknown) => ViewSuggestion[];
 
 /** Structured content: data already declares its own view type. */
-// Deprecated view types that have been merged into other views.
-const VIEW_ALIASES: Record<string, string> = {
-  layers: "map",  // layers merged into unified map view (controls.layers: "panel")
-};
-
 const matchStructuredContent: Matcher = (data) => {
   if (!isPlainObject(data)) return [];
   if (isStr(data.type) && data.version !== undefined) {

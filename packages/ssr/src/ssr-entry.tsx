@@ -32,6 +32,7 @@ import { DiffRenderer } from "@apps/diff/src/App";
 import { EmbedRenderer } from "@apps/embed/src/App";
 import { FilterRenderer } from "@apps/filter/src/App";
 import { FlowchartRenderer } from "@apps/flowchart/src/App";
+import { FontRenderer } from "@apps/font/src/App";
 import { FormRenderer } from "@apps/form/src/App";
 import { FunnelRenderer } from "@apps/funnel/src/App";
 import { GalleryRenderer } from "@apps/gallery/src/App";
@@ -124,6 +125,7 @@ const renderers: Record<string, RenderFn> = {
   embed:         (d) => renderToString(<EmbedRenderer data={d} />),
   filter:        (d) => renderToString(<FilterRenderer data={d} />),
   flowchart:     (d) => renderToString(<FlowchartRenderer data={d} />),
+  font:          (d) => renderToString(<FontRenderer data={d} />),
   form:          (d) => renderToString(<FormRenderer data={d} />),
   funnel:        (d) => renderToString(<FunnelRenderer data={d} />),
   gallery:       (d) => renderToString(<GalleryRenderer data={d} />),

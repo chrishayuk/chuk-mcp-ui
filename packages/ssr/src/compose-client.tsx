@@ -36,6 +36,7 @@ import { DiffRenderer } from "@apps/diff/src/App";
 import { EmbedRenderer } from "@apps/embed/src/App";
 import { FilterRenderer } from "@apps/filter/src/App";
 import { FlowchartRenderer } from "@apps/flowchart/src/App";
+import { FontRenderer } from "@apps/font/src/App";
 import { FormRenderer } from "@apps/form/src/App";
 import { FunnelRenderer } from "@apps/funnel/src/App";
 import { GalleryRenderer } from "@apps/gallery/src/App";
@@ -116,6 +117,7 @@ const renderers: Record<string, RendererEntry> = {
   embed:         (d) => createElement(EmbedRenderer, { data: d }),
   filter:        (d) => createElement(FilterRenderer, { data: d }),
   flowchart:     (d) => createElement(FlowchartRenderer, { data: d }),
+  font:          (d) => createElement(FontRenderer, { data: d }),
   form:          (d) => createElement(FormRenderer, { data: d }),
   funnel:        (d) => createElement(FunnelRenderer, { data: d }),
   gallery:       (d) => createElement(GalleryRenderer, { data: d }),

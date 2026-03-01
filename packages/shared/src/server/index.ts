@@ -5,81 +5,16 @@
  * point that does NOT get bundled into client-side View code.
  */
 
-const CDN_BASE = "https://mcp-views.chukai.io";
+import { CDN_ORIGIN } from "../constants";
+import { ALL_VIEWS, VIEW_ALIASES } from "../manifest";
 
-const VIEW_PATHS: Record<string, string> = {
-  alert: "/alert/v1",
-  audio: "/audio/v1",
-  boxplot: "/boxplot/v1",
-  carousel: "/carousel/v1",
-  chart: "/chart/v1",
-  chat: "/chat/v1",
-  code: "/code/v1",
-  compare: "/compare/v1",
-  confirm: "/confirm/v1",
-  counter: "/counter/v1",
-  crosstab: "/crosstab/v1",
-  dashboard: "/dashboard/v1",
-  datatable: "/datatable/v1",
-  detail: "/detail/v1",
-  diff: "/diff/v1",
-  embed: "/embed/v1",
-  filter: "/filter/v1",
-  form: "/form/v1",
-  gallery: "/gallery/v1",
-  gauge: "/gauge/v1",
-  "gis-legend": "/gis-legend/v1",
-  heatmap: "/heatmap/v1",
-  image: "/image/v1",
-  json: "/json/v1",
-  kanban: "/kanban/v1",
-  layers: "/map/v1",  // Alias: merged into unified map view
-  log: "/log/v1",
-  map: "/map/v1",
-  markdown: "/markdown/v1",
-  minimap: "/minimap/v1",
-  pdf: "/pdf/v1",
-  pivot: "/pivot/v1",
-  poll: "/poll/v1",
-  profile: "/profile/v1",
-  progress: "/progress/v1",
-  quiz: "/quiz/v1",
-  ranked: "/ranked/v1",
-  scatter: "/scatter/v1",
-  settings: "/settings/v1",
-  spectrogram: "/spectrogram/v1",
-  split: "/split/v1",
-  status: "/status/v1",
-  stepper: "/stepper/v1",
-  sunburst: "/sunburst/v1",
-  tabs: "/tabs/v1",
-  terminal: "/terminal/v1",
-  timeline: "/timeline/v1",
-  timeseries: "/timeseries/v1",
-  tree: "/tree/v1",
-  treemap: "/treemap/v1",
-  video: "/video/v1",
-  // Phase 6 — Novel Compound (15)
-  annotation: "/annotation/v1",
-  calendar: "/calendar/v1",
-  flowchart: "/flowchart/v1",
-  funnel: "/funnel/v1",
-  gantt: "/gantt/v1",
-  geostory: "/geostory/v1",
-  globe: "/globe/v1",
-  graph: "/graph/v1",
-  investigation: "/investigation/v1",
-  neural: "/neural/v1",
-  notebook: "/notebook/v1",
-  sankey: "/sankey/v1",
-  slides: "/slides/v1",
-  swimlane: "/swimlane/v1",
-  threed: "/threed/v1",
-  // Phase 6 — Advanced (3)
-  shader: "/shader/v1",
-  transcript: "/transcript/v1",
-  wizard: "/wizard/v1",
-};
+const CDN_BASE = CDN_ORIGIN;
+
+// Generate VIEW_PATHS from the shared manifest + aliases
+const VIEW_PATHS: Record<string, string> = Object.fromEntries([
+  ...ALL_VIEWS.map((v) => [v, `/${v}/v1`]),
+  ...Object.entries(VIEW_ALIASES).map(([alias, target]) => [alias, `/${target}/v1`]),
+]);
 
 export interface ViewToolResult {
   structuredContent: Record<string, unknown>;
