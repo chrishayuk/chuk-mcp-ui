@@ -50,6 +50,7 @@ describe("map schema validation", () => {
             weight: 3,
             fillColor: "#ff000033",
             fillOpacity: 0.5,
+            icon: "https://example.com/marker.png",
             radius: 8,
           },
           cluster: { enabled: true, radius: 60 },
@@ -128,13 +129,13 @@ describe("map schema validation", () => {
     expect(validate(data)).toBe(false);
   });
 
-  it("rejects layer missing features", () => {
+  it("accepts layer without features (image/tile layers omit features)", () => {
     const data = {
       type: "map",
       version: "1.0",
       layers: [{ id: "l", label: "L" }],
     };
-    expect(validate(data)).toBe(false);
+    expect(validate(data)).toBe(true);
   });
 
   it("accepts empty layers array", () => {

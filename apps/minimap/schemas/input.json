@@ -48,6 +48,7 @@
             "weight": { "type": "number" },
             "fillColor": { "type": "string" },
             "fillOpacity": { "type": "number" },
+            "icon": { "type": "string" },
             "radius": { "type": "number" }
           }
         },

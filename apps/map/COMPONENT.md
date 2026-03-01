@@ -421,6 +421,15 @@ Each geometry type renders with the correct Leaflet representation.
 **Expected:** Marker renders at the correct lat/lon. Default Leaflet icon
 is used (no `style.radius` set).
 
+### TC-MAP-007b: Rendering -- Custom Icon Marker
+
+**Input:** One layer, one Point feature with
+`style: { icon: "https://example.com/weather/cloudy.png" }`.
+
+**Expected:** Marker renders with the custom icon image instead of the
+default blue pin. Icon is 25x41px, anchored at bottom-centre. Popup
+anchor is above the icon.
+
 ### TC-MAP-008: Rendering -- Circle Marker
 
 **Input:** One layer, one Point feature with `style.radius: 8`.

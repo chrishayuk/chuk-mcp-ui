@@ -113,6 +113,41 @@ export const Clustered: Story = {
 };
 
 /**
+ * Custom marker icons via `style.icon`.
+ *
+ * Each marker uses a custom PNG icon URL instead of the default blue pin.
+ * Useful for weather maps, category markers, or any themed visualisation.
+ */
+export const CustomIcons: Story = {
+  args: {
+    data: {
+      type: "map",
+      version: "1.0",
+      center: { lat: 51.505, lon: -0.1 },
+      zoom: 13,
+      basemap: "osm",
+      layers: [
+        {
+          id: "landmarks",
+          label: "London Landmarks",
+          features: sampleFeatures,
+          style: {
+            icon: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+          },
+          popup: {
+            title: "{properties.name}",
+            fields: ["category"],
+          },
+        },
+      ],
+      controls: { zoom: true, layers: true, scale: true },
+    } satisfies MapContent,
+    app: null,
+    onCallTool: mockCallTool,
+  },
+};
+
+/**
  * Image overlay layer (layer_type: "image").
  *
  * A Sentinel-2 L2A thumbnail stretched over its scene bounding box on a

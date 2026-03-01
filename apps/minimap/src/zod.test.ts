@@ -54,6 +54,7 @@ describe("minimap zod schema validation", () => {
               weight: 3,
               fillColor: "#ff000033",
               fillOpacity: 0.5,
+              icon: "https://example.com/marker.png",
               radius: 8,
             },
             popup: {

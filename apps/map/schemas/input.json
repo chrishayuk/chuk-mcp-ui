@@ -90,7 +90,6 @@
           },
           "image_url": {
             "type": "string",
-            "format": "uri",
             "description": "Image URL for layer_type 'image'. The image is stretched to cover image_bounds."
           },
           "image_bounds": {

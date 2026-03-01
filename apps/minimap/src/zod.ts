@@ -5,6 +5,7 @@ export const minimapLayerStyleSchema = z.object({
   weight: z.number().optional(),
   fillColor: z.string().optional(),
   fillOpacity: z.number().optional(),
+  icon: z.string().optional(),
   radius: z.number().optional(),
 });
 

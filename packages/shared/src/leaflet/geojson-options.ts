@@ -25,6 +25,15 @@ export function createGeoJSONOptions(style: LeafletLayerStyle = {}): {
         fillOpacity: style.fillOpacity ?? DEFAULTS.fillOpacity,
       });
     }
+    if (style.icon) {
+      const customIcon = L.icon({
+        iconUrl: style.icon,
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+      });
+      return L.marker(latlng, { icon: customIcon });
+    }
     return L.marker(latlng);
   };
 

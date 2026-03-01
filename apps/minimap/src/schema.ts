@@ -30,6 +30,7 @@ export interface MinimapLayerStyle {
   weight?: number;
   fillColor?: string;
   fillOpacity?: number;
+  icon?: string;
   radius?: number;
 }
 
