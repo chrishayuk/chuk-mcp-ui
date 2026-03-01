@@ -29,13 +29,20 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "label", "features"],
+        "required": ["id", "label"],
         "properties": {
           "id": { "type": "string" },
           "label": { "type": "string" },
+          "layer_type": {
+            "enum": ["geojson", "image", "tiles"],
+            "description": "Layer renderer. Omit or set to 'geojson' for GeoJSON feature layers (default). Use 'image' for raster image overlays. Use 'tiles' for XYZ tile layers."
+          },
           "visible": { "type": "boolean", "default": true },
           "opacity": { "type": "number", "minimum": 0, "maximum": 1 },
-          "features": { "type": "object" },
+          "features": {
+            "type": "object",
+            "description": "GeoJSON FeatureCollection. Required when layer_type is 'geojson' (or omitted)."
+          },
           "style": {
             "type": "object",
             "properties": {
@@ -78,6 +85,43 @@
                 }
               }
             }
+          },
+          "image_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Image URL for layer_type 'image'. The image is stretched to cover image_bounds."
+          },
+          "image_bounds": {
+            "type": "array",
+            "description": "Geographic bounds for image overlay: [[south_lat, west_lng], [north_lat, east_lng]].",
+            "items": {
+              "type": "array",
+              "items": { "type": "number" },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "tile_url": {
+            "type": "string",
+            "description": "XYZ tile URL template for layer_type 'tiles', e.g. 'https://example.com/tiles/{z}/{x}/{y}.png'."
+          },
+          "tile_attribution": {
+            "type": "string",
+            "description": "Attribution string shown in the map attribution control."
+          },
+          "tile_min_zoom": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 22,
+            "description": "Minimum zoom level at which tiles are loaded."
+          },
+          "tile_max_zoom": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 22,
+            "description": "Maximum zoom level at which tiles are loaded."
           }
         }
       }

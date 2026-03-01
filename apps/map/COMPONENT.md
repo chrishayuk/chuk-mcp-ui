@@ -6,7 +6,7 @@
 - **Type:** map
 - **Version:** 1.0
 - **Category:** Tier 1 -- Universal
-- **Description:** Interactive map rendering GeoJSON features with markers, polygons, clustering, popups, and action templates.
+- **Description:** Interactive map rendering GeoJSON features, raster image overlays, and custom tile layers, with markers, polygons, clustering, popups, and action templates.
 
 ## Dependencies
 
@@ -42,15 +42,27 @@ interface MapContent {
   };
 }
 
+type MapLayerType = "geojson" | "image" | "tiles";
+
 interface MapLayer {
   id: string;
   label: string;
+  layer_type?: MapLayerType;   // default: "geojson"
   visible?: boolean;
   opacity?: number;
-  features: FeatureCollection;
+  // geojson layer fields (layer_type: "geojson" or omitted)
+  features?: FeatureCollection;
   style?: LayerStyle;
   cluster?: { enabled: boolean; radius?: number };
   popup?: PopupTemplate;
+  // image overlay fields (layer_type: "image")
+  image_url?: string;
+  image_bounds?: [[number, number], [number, number]]; // [[south_lat, west_lng], [north_lat, east_lng]]
+  // tile layer fields (layer_type: "tiles")
+  tile_url?: string;
+  tile_attribution?: string;
+  tile_min_zoom?: number;
+  tile_max_zoom?: number;
 }
 
 interface LayerStyle {
@@ -95,6 +107,68 @@ interface PopupAction {
 | style.color | `"#3388ff"` |
 | style.weight | `2` |
 | style.fillOpacity | `0.3` |
+
+## Layer Types
+
+### `"geojson"` (default)
+
+GeoJSON `FeatureCollection`. Rendered via `L.geoJSON()`. Supports Points
+(markers or circle markers), Polygons, and LineStrings. The `style`, `cluster`,
+and `popup` fields are only used for this type.
+
+```json
+{
+  "id": "footprints",
+  "label": "Scene Footprints",
+  "layer_type": "geojson",
+  "features": { "type": "FeatureCollection", "features": [...] },
+  "style": { "color": "#1565c0", "fillColor": "#42a5f5", "fillOpacity": 0.3 }
+}
+```
+
+### `"image"` — Raster Image Overlay
+
+A single image file (`image_url`) stretched over a geographic bounding box
+(`image_bounds`). Rendered via `L.imageOverlay()`. Useful for satellite
+thumbnails, scanned maps, or any raster at known bounds.
+
+`image_bounds` format: `[[south_lat, west_lng], [north_lat, east_lng]]`
+
+```json
+{
+  "id": "thumb_s2b_nov",
+  "label": "2024-11-26",
+  "layer_type": "image",
+  "image_url": "https://example.com/sentinel/thumbnail.jpg",
+  "image_bounds": [[51.85, 0.85], [51.93, 0.95]],
+  "opacity": 0.9,
+  "visible": false
+}
+```
+
+### `"tiles"` — XYZ Tile Layer
+
+An XYZ / slippy-map tile endpoint (`tile_url`) rendered via `L.tileLayer()`.
+Useful for adding custom tile overlays (e.g. USGS topo, WMS-backed XYZ,
+historical map services) on top of the basemap.
+
+```json
+{
+  "id": "usgs_topo",
+  "label": "USGS Topo",
+  "layer_type": "tiles",
+  "tile_url": "https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}",
+  "tile_attribution": "USGS The National Map",
+  "tile_max_zoom": 16,
+  "opacity": 0.6,
+  "visible": false
+}
+```
+
+### Mixed layers
+
+All three types can coexist in a single `MapContent.layers` array. Each
+becomes a separately toggleable entry in the layer control.
 
 ## Rendering
 
@@ -261,6 +335,14 @@ Use `view-dashboard` to compose map with other Views.
     "https://server.arcgisonline.com",
     "https://*.tile.opentopomap.org",
     "https://*.basemaps.cartocdn.com"
+  ],
+  "img-src (image overlay layers)": [
+    "Add the origin of any image_url values used in 'image' layers.",
+    "Example: 'https://*.s3.amazonaws.com' for Sentinel-2 thumbnails from Earth Search."
+  ],
+  "connect-src (tile layers)": [
+    "Add the origin of any tile_url values used in 'tiles' layers.",
+    "Example: 'https://basemap.nationalmap.gov' for USGS National Map tiles."
   ]
 }
 ```
@@ -614,6 +696,67 @@ undefined). No rendering error.
 **Expected:** Map renders within 2 seconds. Panning and zooming remain
 smooth. Clusters form and split correctly.
 
+### TC-MAP-046: Rendering -- Image Overlay Layer
+
+**Input:** Layer with `layer_type: "image"`, a valid `image_url`, and
+`image_bounds: [[51.85, 0.85], [51.93, 0.95]]`.
+
+**Expected:** Image renders stretched over the specified bounds on the
+satellite basemap. No GeoJSON features required. Layer appears in the
+layer control and can be toggled.
+
+### TC-MAP-047: Rendering -- Image Overlay Bounds Extension
+
+**Input:** MapContent with no explicit `center` or `zoom`. One image
+overlay layer with `image_bounds`.
+
+**Expected:** Map viewport fits to the image bounds automatically, the
+same way it fits to GeoJSON feature bounds.
+
+### TC-MAP-048: Rendering -- Image Overlay Missing Fields
+
+**Input:** Layer with `layer_type: "image"` but no `image_url` or
+`image_bounds`.
+
+**Expected:** An empty layer group is rendered. No crash. Layer appears
+in the control but is effectively invisible.
+
+### TC-MAP-049: Rendering -- Tile Layer
+
+**Input:** Layer with `layer_type: "tiles"`, a valid `tile_url` template,
+`tile_attribution`, and `opacity: 0.6`.
+
+**Expected:** Tile layer renders at 60% opacity on top of the basemap.
+Attribution appears in the map attribution control.
+
+### TC-MAP-050: Rendering -- Tile Layer Missing URL
+
+**Input:** Layer with `layer_type: "tiles"` but no `tile_url`.
+
+**Expected:** Empty layer group rendered. No crash.
+
+### TC-MAP-051: Rendering -- Mixed Layer Types
+
+**Input:** MapContent with three layers: one `"geojson"`, one `"image"`,
+one `"tiles"`.
+
+**Expected:** All three layers render. Layer control shows all three as
+separately toggleable entries. Each type renders with the correct Leaflet
+implementation.
+
+### TC-MAP-052: Rendering -- Image Layer Opacity
+
+**Input:** Image overlay layer with `opacity: 0.5`.
+
+**Expected:** Image renders at 50% opacity. GeoJSON layers on other
+layers are not affected.
+
+### TC-MAP-053: Rendering -- Tile Layer Zoom Limits
+
+**Input:** Tile layer with `tile_min_zoom: 10`, `tile_max_zoom: 15`.
+
+**Expected:** Tiles only load when map zoom is between 10 and 15 inclusive.
+
 ## Storybook Stories
 
 Story file: `apps/map/src/MapView.stories.tsx`
@@ -622,3 +765,6 @@ Story file: `apps/map/src/MapView.stories.tsx`
 |-------|-------------|
 | SingleLayer | Three London landmarks on OSM basemap with popups |
 | Clustered | Same data with marker clustering enabled |
+| ImageOverlay | Sentinel-2 thumbnail overlaid on its scene bbox on satellite basemap, alongside a GeoJSON footprint layer |
+| TileLayer | USGS Topo XYZ tile overlay (hidden by default) alongside a GeoJSON marker layer |
+| MixedLayers | GeoJSON footprint layer + image overlay (hidden) — mirrors stac_map output pattern |
