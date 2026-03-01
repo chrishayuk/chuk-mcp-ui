@@ -23,6 +23,7 @@ chuk_view_schemas/embed.py
 chuk_view_schemas/fastmcp.py
 chuk_view_schemas/filter.py
 chuk_view_schemas/flowchart.py
+chuk_view_schemas/font.py
 chuk_view_schemas/form.py
 chuk_view_schemas/funnel.py
 chuk_view_schemas/gallery.py

@@ -78,15 +78,21 @@ def _view_tool(
             if isinstance(result, BaseModel):
                 structured = result.model_dump(by_alias=True, exclude_none=True)
             elif isinstance(result, dict):
-                if "structuredContent" in result:
+                if "structuredContent" in result and "content" in result:
                     return result
-                structured = result
+                if "structuredContent" in result:
+                    structured = result["structuredContent"]
+                else:
+                    structured = result
             else:
                 raise TypeError(
                     f"Expected BaseModel or dict, got {type(result).__name__}"
                 )
 
-            return {"structuredContent": structured}
+            return {
+                "content": [{"type": "text", "text": "View ready."}],
+                "structuredContent": structured,
+            }
 
         if _has_view_tool(mcp_server):
             # Use ChukMCPServer's @view_tool for automatic resource
