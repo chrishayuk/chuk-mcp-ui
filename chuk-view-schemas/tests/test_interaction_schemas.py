@@ -13,6 +13,7 @@ from chuk_view_schemas import (
 # ChartClickAction + ChartContent.on_click_tool
 # ---------------------------------------------------------------------------
 
+
 class TestChartClickAction:
     def test_chart_content_accepts_on_click_tool(self):
         """ChartContent accepts onClickTool with a ChartClickAction."""
@@ -72,6 +73,7 @@ class TestChartClickAction:
 # ---------------------------------------------------------------------------
 # DataTableContent pagination fields
 # ---------------------------------------------------------------------------
+
 
 class TestDataTablePagination:
     def _make_table(self, **kwargs):

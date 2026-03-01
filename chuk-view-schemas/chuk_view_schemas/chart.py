@@ -54,8 +54,11 @@ class Annotation(BaseModel):
 
 class ChartClickAction(BaseModel):
     """Action to call when a chart element is clicked."""
+
     tool: str
-    arguments: Optional[Dict[str, str]] = None  # template strings: {"label": "{{label}}"}
+    arguments: Optional[Dict[str, str]] = (
+        None  # template strings: {"label": "{{label}}"}
+    )
 
     model_config = {"populate_by_name": True}
 

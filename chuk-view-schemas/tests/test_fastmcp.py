@@ -166,25 +166,80 @@ class TestGenericViewTool:
 
 
 class TestViewPaths:
-    def test_all_66_views_have_paths(self):
+    def test_all_67_views_have_paths(self):
         expected = [
-            "map", "chart", "datatable", "form", "markdown", "video", "pdf",
-            "dashboard", "split", "tabs", "detail", "counter", "code",
-            "progress", "confirm", "json", "status",
-            "gallery", "tree", "timeline", "log", "image", "compare",
-            "chat", "ranked", "quiz", "poll",
-            "alert", "stepper", "filter", "settings", "embed", "diff", "kanban",
-            "audio", "carousel", "heatmap", "gauge", "treemap", "sunburst",
-            "scatter", "boxplot", "pivot", "crosstab", "layers", "timeseries",
-            "profile", "minimap", "gis-legend", "terminal", "spectrogram",
-            "annotation", "calendar", "flowchart", "funnel", "gantt",
-            "geostory", "globe", "graph", "investigation", "neural",
-            "notebook", "sankey", "slides", "swimlane", "threed",
+            "map",
+            "chart",
+            "datatable",
+            "form",
+            "markdown",
+            "video",
+            "pdf",
+            "dashboard",
+            "split",
+            "tabs",
+            "detail",
+            "counter",
+            "code",
+            "progress",
+            "confirm",
+            "json",
+            "status",
+            "gallery",
+            "tree",
+            "timeline",
+            "log",
+            "image",
+            "compare",
+            "chat",
+            "ranked",
+            "quiz",
+            "poll",
+            "alert",
+            "stepper",
+            "filter",
+            "settings",
+            "embed",
+            "diff",
+            "kanban",
+            "audio",
+            "carousel",
+            "heatmap",
+            "gauge",
+            "treemap",
+            "sunburst",
+            "scatter",
+            "boxplot",
+            "pivot",
+            "crosstab",
+            "layers",
+            "timeseries",
+            "profile",
+            "minimap",
+            "gis-legend",
+            "terminal",
+            "spectrogram",
+            "annotation",
+            "calendar",
+            "flowchart",
+            "funnel",
+            "gantt",
+            "geostory",
+            "globe",
+            "graph",
+            "investigation",
+            "neural",
+            "notebook",
+            "sankey",
+            "slides",
+            "swimlane",
+            "threed",
+            "font",
         ]
-        assert len(expected) == 66
+        assert len(expected) == 67
         for view in expected:
             assert view in VIEW_PATHS, f"Missing path for {view}"
-        assert len(VIEW_PATHS) == 66
+        assert len(VIEW_PATHS) == 67
 
     def test_cdn_base(self):
         assert CDN_BASE == "https://mcp-views.chukai.io"
@@ -250,7 +305,9 @@ class TestPermissionsCspVisibility:
         mcp = MockMCP()
 
         @view_tool(
-            mcp, "full", "dashboard",
+            mcp,
+            "full",
+            "dashboard",
             permissions={"clipboard-write": {}},
             csp={"frameDomains": ["embed.example.com"]},
             visibility=["model", "app"],
@@ -286,7 +343,9 @@ class TestNewPerViewDecorators:
             return {"type": "timeline", "version": "1.0"}
 
         tool = mcp._tools["show_timeline"]
-        assert "ui://test-server/timeline" == tool["kwargs"]["meta"]["ui"]["resourceUri"]
+        assert (
+            "ui://test-server/timeline" == tool["kwargs"]["meta"]["ui"]["resourceUri"]
+        )
 
     def test_heatmap_tool(self):
         mcp = MockMCP()

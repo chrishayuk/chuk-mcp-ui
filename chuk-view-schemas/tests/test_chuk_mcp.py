@@ -375,7 +375,9 @@ class TestViewToolPath:
         mcp = MockChukMCPServerWithViewTool()
 
         @view_tool(
-            mcp, "full", "dashboard",
+            mcp,
+            "full",
+            "dashboard",
             description="Full dashboard",
             permissions={"clipboard-write": {}},
             csp={"frameDomains": ["embed.example.com"]},
