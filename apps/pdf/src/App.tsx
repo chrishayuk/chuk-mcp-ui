@@ -53,10 +53,11 @@ export function PdfView() {
 
 export function PdfRenderer({ data }: { data: PdfContent }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [pdfDoc, setPdfDoc] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(data.initialPage ?? 1);
   const [numPages, setNumPages] = useState(0);
-  const [scale, setScale] = useState(1.5);
+  const [scale, setScale] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -95,19 +96,40 @@ export function PdfRenderer({ data }: { data: PdfContent }) {
     return () => { cancelled = true; };
   }, [data.url, data.initialPage]);
 
+  // Auto-fit to container width on first load
+  useEffect(() => {
+    if (!pdfDoc || !containerRef.current) return;
+    let cancelled = false;
+
+    async function fitToWidth() {
+      const page = await pdfDoc.getPage(1);
+      if (cancelled) return;
+      const viewport = page.getViewport({ scale: 1 });
+      const containerWidth = containerRef.current!.clientWidth - 32; // minus p-4 padding
+      const fitScale = containerWidth / viewport.width;
+      setScale(Math.min(5, Math.max(0.25, fitScale)));
+    }
+
+    fitToWidth();
+    return () => { cancelled = true; };
+  }, [pdfDoc]);
+
   // Render page
   useEffect(() => {
-    if (!pdfDoc || !canvasRef.current) return;
+    if (!pdfDoc || !canvasRef.current || scale === null) return;
     let cancelled = false;
 
     async function render() {
       const page = await pdfDoc.getPage(currentPage);
       if (cancelled) return;
 
-      const viewport = page.getViewport({ scale });
+      const dpr = window.devicePixelRatio || 1;
+      const viewport = page.getViewport({ scale: scale * dpr });
       const canvas = canvasRef.current!;
       canvas.height = viewport.height;
       canvas.width = viewport.width;
+      canvas.style.width = `${viewport.width / dpr}px`;
+      canvas.style.height = `${viewport.height / dpr}px`;
 
       await page.render({
         canvasContext: canvas.getContext("2d")!,
@@ -121,8 +143,8 @@ export function PdfRenderer({ data }: { data: PdfContent }) {
 
   const prevPage = useCallback(() => setCurrentPage((p) => Math.max(1, p - 1)), []);
   const nextPage = useCallback(() => setCurrentPage((p) => Math.min(numPages, p + 1)), [numPages]);
-  const zoomIn = useCallback(() => setScale((s) => Math.min(3, s + 0.25)), []);
-  const zoomOut = useCallback(() => setScale((s) => Math.max(0.5, s - 0.25)), []);
+  const zoomIn = useCallback(() => setScale((s) => Math.min(5, (s ?? 1) + 0.25)), []);
+  const zoomOut = useCallback(() => setScale((s) => Math.max(0.25, (s ?? 1) - 0.25)), []);
 
   if (loading) return <Fallback message="Loading PDF..." />;
   if (error) return <Fallback message={error} />;
@@ -151,17 +173,17 @@ export function PdfRenderer({ data }: { data: PdfContent }) {
           Next
         </Button>
         <span className="mx-2 text-border">|</span>
-        <Button variant="outline" size="sm" onClick={zoomOut} disabled={scale <= 0.5}>
+        <Button variant="outline" size="sm" onClick={zoomOut} disabled={(scale ?? 1) <= 0.25}>
           -
         </Button>
-        <span>{Math.round(scale * 100)}%</span>
-        <Button variant="outline" size="sm" onClick={zoomIn} disabled={scale >= 3}>
+        <span>{scale !== null ? `${Math.round(scale * 100)}%` : "..."}</span>
+        <Button variant="outline" size="sm" onClick={zoomIn} disabled={(scale ?? 1) >= 5}>
           +
         </Button>
       </div>
       {/* Canvas */}
-      <div className="flex-1 overflow-auto flex justify-center p-4">
-        <canvas ref={canvasRef} />
+      <div ref={containerRef} className="flex-1 overflow-auto flex justify-center p-4">
+        <canvas ref={canvasRef} className="shrink-0" />
       </div>
     </motion.div>
   );

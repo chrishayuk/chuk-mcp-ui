@@ -15,7 +15,7 @@ export function createGeoJSONOptions(style: LeafletLayerStyle = {}): {
   pointToLayer: (feature: GeoJSON.Feature, latlng: L.LatLng) => L.Layer;
   style: () => L.PathOptions;
 } {
-  const pointToLayer = (_feature: GeoJSON.Feature, latlng: L.LatLng) => {
+  const pointToLayer = (feature: GeoJSON.Feature, latlng: L.LatLng) => {
     if (style.radius) {
       return L.circleMarker(latlng, {
         radius: style.radius,
@@ -25,12 +25,14 @@ export function createGeoJSONOptions(style: LeafletLayerStyle = {}): {
         fillOpacity: style.fillOpacity ?? DEFAULTS.fillOpacity,
       });
     }
-    if (style.icon) {
+    // Per-feature icon (from properties) takes priority over layer-level icon
+    const iconUrl = feature.properties?.icon ?? style.icon;
+    if (iconUrl) {
       const customIcon = L.icon({
-        iconUrl: style.icon,
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
+        iconUrl,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+        popupAnchor: [0, -16],
       });
       return L.marker(latlng, { icon: customIcon });
     }

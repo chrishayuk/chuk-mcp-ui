@@ -90,13 +90,33 @@ export interface LeafletMapProps {
   displayMode?: "inline" | "fullscreen" | "pip" | null;
 }
 
+/** How the current dataset should be framed — re-applied on resize until the user interacts. */
+type FitInstruction =
+  | { kind: "bounds"; value: L.LatLngBoundsExpression }
+  | { kind: "layers"; value: L.LatLngBounds }
+  | { kind: "view"; center: L.LatLngExpression; zoom: number };
+
 export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDisplayMode, displayMode }: LeafletMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const layerGroupsRef = useRef<Map<string, L.Layer>>(new Map());
   const featureLayersRef = useRef<Map<string, L.Layer>>(new Map());
+  const fitRef = useRef<FitInstruction | null>(null);
+  const interactedRef = useRef(false);
   const [panelId, setPanelId] = useState<string | null>(null);
   const { emitSelect } = useViewEvents();
+
+  // Re-frame the map to the remembered fit. fitBounds/setView depend on the
+  // container's pixel size, so this is called both when data arrives and after
+  // every resize (until the user takes over) — otherwise a fit computed against
+  // an unsized container collapses to the minimum zoom (a whole-world view).
+  const applyFit = useCallback((map: L.Map) => {
+    const fit = fitRef.current;
+    if (!fit) return;
+    if (fit.kind === "bounds") map.fitBounds(fit.value);
+    else if (fit.kind === "layers") map.fitBounds(fit.value, { padding: [20, 20] });
+    else map.setView(fit.center, fit.zoom);
+  }, []);
 
   const controlMode = resolveLayerMode(data.controls?.layers, data.layers.length);
 
@@ -190,13 +210,14 @@ export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDi
 
   // --- Initialize map ---
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return;
+    const el = containerRef.current;
+    if (!el || mapRef.current) return;
 
     const defaultCenter: L.LatLngExpression = data.center
       ? [data.center.lat, data.center.lon]
       : [51.505, -0.09];
 
-    const map = L.map(containerRef.current, {
+    const map = L.map(el, {
       center: defaultCenter,
       zoom: data.zoom ?? 10,
       zoomControl: data.controls?.zoom !== false,
@@ -213,14 +234,60 @@ export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDi
     }
 
     mapRef.current = map;
-    injectLeafletThemeStyles(containerRef.current);
+    injectLeafletThemeStyles(el);
+
+    // Once the user pans/zooms, stop auto-framing so we don't fight them. These
+    // DOM gestures (unlike Leaflet's zoomstart/movestart) never fire for our own
+    // programmatic fitBounds/setView, so they cleanly signal real user intent.
+    const markInteracted = () => {
+      interactedRef.current = true;
+    };
+    el.addEventListener("wheel", markInteracted, { passive: true });
+    el.addEventListener("mousedown", markInteracted);
+    el.addEventListener("touchstart", markInteracted, { passive: true });
+    el.addEventListener("keydown", markInteracted);
 
     return () => {
+      el.removeEventListener("wheel", markInteracted);
+      el.removeEventListener("mousedown", markInteracted);
+      el.removeEventListener("touchstart", markInteracted);
+      el.removeEventListener("keydown", markInteracted);
       map.remove();
       mapRef.current = null;
       layerGroupsRef.current.clear();
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // --- Keep Leaflet sized to (and framed for) its container ---
+  // The map is created once on mount; if the container then resizes (the inline
+  // panel mounting at one size and displaying at another, or a fullscreen
+  // toggle) Leaflet keeps its initial pixel size and never requests tiles for
+  // the visible area — leaving a gray, unpainted basemap. invalidateSize() fixes
+  // the tiles, and re-applying the fit reframes the data to the real size (a fit
+  // computed before the container settled would otherwise stay zoomed wrong).
+  useEffect(() => {
+    const map = mapRef.current;
+    const el = containerRef.current;
+    if (!map || !el) return;
+
+    let frame = 0;
+    const refresh = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        map.invalidateSize();
+        if (!interactedRef.current) applyFit(map);
+      });
+    };
+
+    const observer = new ResizeObserver(refresh);
+    observer.observe(el);
+    refresh(); // initial sync — container may have resized since map init
+
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [applyFit]);
 
   // --- Update layers when data changes ---
   useEffect(() => {
@@ -270,18 +337,28 @@ export function LeafletMap({ data, onCallTool, onUpdateModelContext, onRequestDi
       leafletControl.addTo(map);
     }
 
-    // Fit map to data
+    // Remember how to frame this dataset, then apply it. A new dataset re-enables
+    // auto-framing; applyFit also runs again from the resize effect once the
+    // container has its real size (see above).
     if (data.bounds) {
-      map.fitBounds([
-        [data.bounds.south, data.bounds.west],
-        [data.bounds.north, data.bounds.east],
-      ]);
+      fitRef.current = {
+        kind: "bounds",
+        value: [
+          [data.bounds.south, data.bounds.west],
+          [data.bounds.north, data.bounds.east],
+        ],
+      };
     } else if (!data.center && !data.zoom && allBounds.isValid()) {
-      map.fitBounds(allBounds, { padding: [20, 20] });
+      fitRef.current = { kind: "layers", value: allBounds };
     } else if (data.center) {
-      map.setView([data.center.lat, data.center.lon], data.zoom ?? 10);
+      fitRef.current = { kind: "view", center: [data.center.lat, data.center.lon], zoom: data.zoom ?? 10 };
+    } else {
+      fitRef.current = null;
     }
-  }, [data, handleAction, panelId, emitSelect, controlMode]);
+    interactedRef.current = false;
+    map.invalidateSize();
+    applyFit(map);
+  }, [data, handleAction, panelId, emitSelect, controlMode, applyFit]);
 
   // --- Panel mode: sync visibility and opacity ---
   useEffect(() => {
